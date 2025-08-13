@@ -1,0 +1,191 @@
+body {
+  background: #ffffff !important;
+  padding: 1rem !important;
+  font-family: "Montserrat", sans-serif !important;
+}
+
+.cover-letter-template {
+  margin: 0 auto !important;
+  padding: 0.5in !important;
+  font-family: 'Montserrat', sans-serif !important;
+  font-size: 12pt !important;
+  line-height: 1.6 !important;
+  color: #333 !important;
+  background: white !important;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1) !important;
+  border: 1px solid #e0e0e0 !important;
+}
+
+/* Header Styles */
+.letter-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  margin-bottom: 2rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid #333 !important;
+}
+
+.sender-info {
+  flex: 1 !important;
+}
+
+.sender-name {
+  font-size: 16pt !important;
+  font-weight: bold !important;
+  color: #333 !important;
+  margin-bottom: 0.5rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+}
+
+.sender-title {
+  font-size: 12pt !important;
+  font-weight: normal !important;
+  color: #333 !important;
+  margin-bottom: 1rem !important;
+}
+
+.contact-info {
+  font-size: 11pt !important;
+  line-height: 1.4 !important;
+  color: #333 !important;
+}
+
+.contact-info p {
+  margin-bottom: 0.2rem !important;
+}
+
+.date-section {
+  text-align: right !important;
+  margin-top: 0 !important;
+}
+
+.letter-date {
+  font-size: 11pt !important;
+  color: #333 !important;
+}
+
+/* Recipient Styles */
+.recipient-section {
+  margin-bottom: 2rem !important;
+}
+
+.recipient-info {
+  font-size: 11pt !important;
+  line-height: 1.5 !important;
+}
+
+.recipient-name {
+  font-weight: bold !important;
+  margin-bottom: 0.4rem !important;
+  color: #333 !important;
+  font-size: 12pt !important;
+}
+
+.recipient-title {
+  margin-bottom: 0.4rem !important;
+  color: #333 !important;
+}
+
+.recipient-company {
+  font-weight: normal !important;
+  margin-bottom: 0.4rem !important;
+  color: #333 !important;
+}
+
+.recipient-address {
+  margin-bottom: 0.4rem !important;
+  color: #333 !important;
+}
+
+/* Content Styles */
+.letter-content {
+  margin-bottom: 2rem !important;
+}
+
+.introduction,
+.body,
+.closing {
+  margin-bottom: 0.5rem !important;
+  background: transparent !important;
+}
+
+.introduction p,
+.body p,
+.closing p {
+  margin-bottom: 0.5rem !important;
+  line-height: 1.6 !important;
+}
+
+.closing p {
+  text-align: left !important;
+}
+
+/* Signature area styling */
+.closing p:last-child {
+  margin-top: 3rem !important;
+}
+
+/* Print Media Query */
+@media print {
+  body {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .cover-letter-template {
+    margin: 0 !important;
+    padding: 0.5in !important;
+    max-width: none !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+  }
+
+  .letter-header {
+    page-break-after: avoid !important;
+  }
+
+  .recipient-section {
+    page-break-after: avoid !important;
+  }
+
+  .introduction,
+  .body,
+  .closing {
+    page-break-inside: avoid !important;
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  body {
+    padding: 1rem !important;
+  }
+
+  .cover-letter-template {
+    padding: 1rem !important;
+    margin: 0 !important;
+    font-size: 11pt !important;
+  }
+
+  .letter-header {
+    flex-direction: column !important;
+    align-items: flex-start !important;
+  }
+
+  .sender-name {
+    font-size: 14pt !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .sender-title {
+    font-size: 11pt !important;
+  }
+
+  .date-section {
+    text-align: left !important;
+    margin-top: 1rem !important;
+  }
+}

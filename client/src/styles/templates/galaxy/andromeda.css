@@ -1,0 +1,283 @@
+@import url('https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap');
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0 !important;
+  padding: 0 !important;
+  color: #333;
+  background-color: #fff;
+  page-break-inside: avoid;
+  page-break-after: avoid;
+  page-break-before: avoid;
+}
+
+.resume-container {
+  font-family: 'IBM Plex Serif', serif;
+  max-width: 100%;
+  background-color: #fff;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.24);
+}
+
+/* Header Styles */
+.header {
+  background: linear-gradient(90deg, rgba(73, 64, 245, 1) 0%, rgba(67, 67, 222, 1) 21%, rgba(0, 212, 255, 1) 100%);
+  color: white;
+  padding-top: 1rem !important;
+  padding-left: 2rem !important;
+  padding-right: 2rem !important;
+  padding-bottom: 2rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.name {
+  font-size: 2.25rem;
+  font-weight: 700;
+  letter-spacing: -0.5px !important;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.headline {
+  font-size: 1.35rem;
+  font-weight: 400;
+  margin-left: 0.25rem !important;
+  opacity: 0.9;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.contact-info {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  margin-bottom: 1rem !important;
+  margin-left: 0.25rem !important;
+  font-size: 0.95rem;
+  margin-top: 0.5rem !important;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.contact-info p {
+  margin: 0 !important;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.contact-info a {
+  color: white;
+  text-decoration: none;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.social-links {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 0.35rem !important;
+  margin-left: 5px !important;
+  margin-top: 1.5rem !important;
+}
+
+.social-links a {
+  color: white;
+  text-decoration: none;
+  border-radius: 4px;
+  font-size: 0.9rem;
+  margin-right: 3px !important;
+  transition: background-color 0.2s;
+}
+
+.social-links a:hover {
+  background-color: rgba(255, 255, 255, 0.3);
+}
+
+.social-links a img.link-img {
+  width: 20px;
+  height: 20px;
+}
+
+/* Main Content Layout */
+.main-content {
+  display: flex;
+  padding-left: 1rem !important;
+  padding-right: 1rem !important;
+  padding-top: 0 !important;
+}
+
+.left-column {
+  flex: 2 !important;
+  padding-right: 1.5rem !important;
+}
+
+.right-column {
+  flex: 1.5 !important;
+  padding-left: 0.5rem !important;
+}
+
+/* Summary Styles */
+.summary {
+  margin-top: 5px !important;
+  line-height: 1.5;
+  font-size: 0.85rem;
+  color: #4b5563;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+/* Section Styles */
+.section {
+  margin-bottom: 0.85rem !important;
+}
+
+.section-title {
+  font-size: 1rem;
+  font-weight: 600;
+  color: #2563eb;
+  padding-bottom: 0.15rem !important;
+  border-bottom: 2px solid #e5e7eb;
+  margin-bottom: 0.5rem !important;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.section-content {
+  padding-top: -1.25rem !important;
+}
+
+/* Item Styles (for experience, education, etc.) */
+.item {
+  margin-bottom: 1rem !important;
+}
+
+.item-header {
+  margin-bottom: 0.70rem !important;
+}
+
+.item-title {
+  font-size: 0.9rem;
+  font-weight: 600;
+  color: #1f2937;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.item-subtitle {
+  font-size: 0.9rem;
+  color: #4b5563;
+  font-weight: 500;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.item-date {
+  font-size: 0.85rem;
+  color: #6b7280;
+  font-style: italic;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.item-description {
+  font-size: 0.85rem;
+  color: #4b5563;
+  line-height: 1.5;
+  margin-top: -0.5rem !important;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+ul.list-disc.ml-3,
+ul.ml-3 {
+  margin-left: 0 !important;
+  padding-left: 1.2em !important;
+  /* keep bullet indent, but not excessive */
+}
+
+ul.list-disc {
+  list-style-type: disc;
+}
+
+ul.list-disc li {
+  margin-top: 0 !important;
+  /* No extra space before the first bullet */
+  margin-bottom: 0.5em !important;
+  font-family: 'IBM Plex Serif', serif;
+  /* Small space after each bullet */
+}
+
+ul.list-disc li:not(:first-child) {
+  margin-top: -6px !important;
+  /* Reduce space between bullets after the first */
+}
+
+ul.list-disc li p {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Skills Styles */
+.skill-group {
+  margin-bottom: 1.25rem !important;
+}
+
+.skill-group-title {
+  font-size: 0.95rem;
+  font-weight: 600;
+  margin-bottom: 0.75rem !important;
+  color: #4b5563;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.skill-keywords,
+.languages,
+.interests {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-bottom: 0.5rem !important;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.keyword,
+.language,
+.interest {
+  background-color: #0496C7;
+  color: #FFF;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  display: inline-block;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.technology {
+  background-color: #dbeafe;
+  color: #2563eb;
+  padding: 0.25rem 0.75rem !important;
+  border-radius: 50px;
+  font-size: 0.85rem;
+  display: inline-block;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+/* Project Styles */
+.project-technologies {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  margin-top: 0.75rem !important;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+/* Reference Styles */
+.reference {
+  border-bottom: 1px solid #dbeafe;
+  margin-bottom: 0.5rem !important;
+  font-family: 'IBM Plex Serif', serif;
+}
+
+.reference-contact {
+  font-size: 0.85rem;
+  color: #4b5563;
+}
+
+.reference:last-child {
+  border-bottom: none;
+}
+
+.reference-contact p {
+  margin: 2px 0 !important;
+}

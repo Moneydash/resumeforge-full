@@ -1,0 +1,225 @@
+/* css file */
+body {
+  background: linear-gradient(135deg, #fff5f2 0%, #ffffff 100%) !important;
+  padding: 1rem !important;
+  font-family: "Geist", sans-serif !important;
+}
+
+.cover-letter-template {
+  position: relative !important;
+  margin: 0 auto !important;
+  padding: 0 !important;
+  font-family: 'Geist', sans-serif !important;
+  font-size: 12pt !important;
+  line-height: 1.6 !important;
+  color: #2c1810 !important;
+  background: white !important;
+  box-shadow: 0 8px 32px rgba(194, 65, 12, 0.08) !important;
+  border: 1px solid #fed7c7 !important;
+  border-radius: 12px !important;
+  overflow: hidden !important;
+}
+
+/* Gradient Blobs - REMOVED */
+
+/* Header Styles */
+.letter-header {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 2.5rem 2rem 2rem 2rem !important;
+  background: linear-gradient(135deg, #dc2626 0%, #ea580c 50%, #f97316 100%) !important;
+  color: white !important;
+  border-radius: 0 !important;
+}
+
+.sender-info {
+  width: 100% !important;
+}
+
+.sender-name {
+  text-transform: uppercase !important;
+  font-size: 20pt !important;
+  font-weight: 700 !important;
+  color: white !important;
+  margin-bottom: 0.5rem !important;
+  letter-spacing: 0.5px !important;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+}
+
+.sender-title {
+  font-size: 13pt !important;
+  font-weight: 400 !important;
+  color: rgba(255, 255, 255, 0.9) !important;
+  margin-bottom: 1.2rem !important;
+  letter-spacing: 0.3px !important;
+}
+
+.contact-info {
+  font-size: 11pt !important;
+  line-height: 1.5 !important;
+  color: rgba(255, 255, 255, 0.85) !important;
+  font-weight: 300 !important;
+}
+
+.contact-info p {
+  margin-bottom: 0.3rem !important;
+}
+
+.contact-info a {
+  color: rgba(255, 255, 255, 0.9) !important;
+  text-decoration: none !important;
+  border-bottom: 1px solid rgba(255, 255, 255, 0.3) !important;
+  transition: border-color 0.2s ease !important;
+}
+
+.contact-info a:hover {
+  border-bottom-color: rgba(255, 255, 255, 0.8) !important;
+}
+
+/* Recipient Styles */
+.recipient-section {
+  position: relative !important;
+  z-index: 1 !important;
+  margin-left: -5px !important;
+  padding: 2rem !important;
+  background: linear-gradient(to right, rgba(252, 165, 165, 0.05), transparent) !important;
+}
+
+.recipient-info {
+  font-size: 11pt !important;
+  line-height: 1.5 !important;
+}
+
+.recipient-name {
+  font-weight: 600 !important;
+  margin-bottom: 0.4rem !important;
+  color: #c2410c !important;
+  font-size: 12pt !important;
+}
+
+.recipient-title {
+  margin-bottom: 0.4rem !important;
+  color: #9a3412 !important;
+  font-weight: 500 !important;
+}
+
+.recipient-company {
+  font-weight: 500 !important;
+  margin-bottom: 0.4rem !important;
+  color: #ea580c !important;
+}
+
+.recipient-address {
+  margin-bottom: 0.4rem !important;
+  color: #7c2d12 !important;
+}
+
+/* Content Styles */
+.letter-content {
+  position: relative !important;
+  z-index: 1 !important;
+  width: 100% !important;
+  margin: 0 !important;
+  padding: 0.5rem 2rem 2.5rem 2rem !important;
+}
+
+.introduction,
+.body,
+.closing {
+  margin-bottom: 1.2rem !important;
+  background: transparent !important;
+}
+
+.introduction p,
+.body p,
+.closing p {
+  margin-bottom: 0.8rem !important;
+  line-height: 1.6 !important;
+  color: #2c1810 !important;
+  font-weight: 400 !important;
+  text-align: justify !important;
+}
+
+.closing p {
+  text-align: left !important;
+}
+
+/* Signature area styling */
+.closing p:last-child {
+  margin-top: 2.5rem !important;
+  font-weight: 500 !important;
+  color: #c2410c !important;
+}
+
+/* Print Media Query */
+@media print {
+  body {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .cover-letter-template {
+    margin: 0 !important;
+    padding: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border: none !important;
+    border-radius: 0 !important;
+  }
+
+  .gradient-blob {
+    display: none !important;
+  }
+
+  .letter-header {
+    background: #2c1810 !important;
+    page-break-after: avoid !important;
+  }
+
+  .recipient-section {
+    page-break-after: avoid !important;
+    border-left: 2px solid #2c1810 !important;
+  }
+
+  .introduction,
+  .body,
+  .closing {
+    page-break-inside: avoid !important;
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  body {
+    padding: 0.5rem !important;
+  }
+
+  .cover-letter-template {
+    font-size: 11pt !important;
+    border-radius: 8px !important;
+  }
+
+  .letter-header {
+    padding: 2rem 1.5rem 1.5rem 1.5rem !important;
+  }
+
+  .sender-name {
+    font-size: 18pt !important;
+    letter-spacing: 0.3px !important;
+  }
+
+  .sender-title {
+    font-size: 12pt !important;
+  }
+
+  .recipient-section {
+    padding: 1.5rem !important;
+  }
+
+  .letter-content {
+    padding: 0.5rem 1.5rem 2rem 1.5rem !important;
+  }
+}

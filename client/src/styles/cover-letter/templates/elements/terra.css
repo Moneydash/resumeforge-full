@@ -1,0 +1,288 @@
+body {
+  background: #f8fafc !important;
+  padding: 2rem !important;
+  margin: 0 !important;
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif !important;
+}
+
+.cover-letter-template {
+  padding: 1.5rem !important;
+  font-family: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-size: 15px !important;
+  line-height: 1.6 !important;
+  color: #1f2937 !important;
+  background: #ffffff !important;
+  border-radius: 8px !important;
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1), 0 1px 2px rgba(0, 0, 0, 0.06) !important;
+  min-height: 11in !important;
+}
+
+/* Header Styles */
+.letter-header {
+  margin-bottom: 4rem !important;
+  padding-bottom: 2rem !important;
+  border-bottom: 1px solid #e5e7eb !important;
+}
+
+.sender-info {
+  margin-bottom: 0 !important;
+}
+
+.sender-name {
+  font-size: 36px !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+  margin-bottom: 0.5rem !important;
+  letter-spacing: 0.025em !important;
+  line-height: 1.1 !important;
+  text-transform: uppercase !important;
+}
+
+.sender-title {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #4f46e5 !important;
+  margin-bottom: 2rem !important;
+  letter-spacing: 0.025em !important;
+  text-transform: uppercase !important;
+}
+
+.contact-info {
+  font-size: 14px !important;
+  color: #6b7280 !important;
+  font-weight: 400 !important;
+}
+
+.contact-row {
+  display: flex !important;
+  gap: 2rem !important;
+  margin-bottom: 0.5rem !important;
+  flex-wrap: wrap !important;
+}
+
+.contact-item {
+  position: relative !important;
+}
+
+.contact-item:not(:last-child)::after {
+  content: '|' !important;
+  position: absolute !important;
+  right: -1.2rem !important;
+  color: #d1d5db !important;
+}
+
+.linkedin-link {
+  color: #4f46e5 !important;
+  text-decoration: none !important;
+  font-weight: 500 !important;
+  transition: color 0.15s ease !important;
+}
+
+.linkedin-link:hover {
+  color: #3730a3 !important;
+}
+
+/* Recipient Styles */
+.recipient-section {
+  margin-bottom: 3rem !important;
+}
+
+.recipient-info {
+  background: transparent !important;
+  border: none !important;
+  padding: 0 !important;
+  line-height: 1.5 !important;
+}
+
+.recipient-name {
+  font-size: 16px !important;
+  font-weight: 600 !important;
+  color: #111827 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.recipient-title {
+  font-size: 14px !important;
+  font-weight: 400 !important;
+  color: #6b7280 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.recipient-company {
+  font-size: 14px !important;
+  font-weight: 500 !important;
+  color: #1f2937 !important;
+  margin-bottom: 0.25rem !important;
+}
+
+.recipient-address {
+  font-size: 14px !important;
+  color: #6b7280 !important;
+}
+
+/* Content Styles */
+.letter-content {
+  margin-bottom: 3rem !important;
+}
+
+.content-section {
+  margin-bottom: 1.5rem !important;
+}
+
+.content-section p {
+  margin-bottom: 1rem !important;
+  line-height: 1.7 !important;
+  font-size: 15px !important;
+  color: #374151 !important;
+  text-align: left !important;
+  font-weight: 400 !important;
+}
+
+.content-section:last-child p:last-of-type {
+  margin-bottom: 0 !important;
+}
+
+/* Signature section */
+.signature-space {
+  height: 3rem !important;
+  margin: 2rem 0 1rem 0 !important;
+}
+
+.sender-signature {
+  font-size: 16px !important;
+  font-weight: 500 !important;
+  color: #111827 !important;
+  display: inline-block !important;
+  border-top: 1px solid #e5e7eb !important;
+  padding-top: 0.5rem !important;
+  min-width: 200px !important;
+}
+
+/* Print Styles */
+@media print {
+  body {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .cover-letter-template {
+    margin: 0 !important;
+    padding: 0.5in !important;
+    max-width: none !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+    min-height: auto !important;
+  }
+
+  .letter-header {
+    margin-bottom: 2.5rem !important;
+    padding-bottom: 1.5rem !important;
+  }
+
+  .sender-name {
+    font-size: 28px !important;
+  }
+
+  .recipient-section {
+    margin-bottom: 2rem !important;
+  }
+
+  .content-section {
+    page-break-inside: avoid !important;
+  }
+
+  .linkedin-link {
+    color: #000 !important;
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  body {
+    padding: 1rem !important;
+  }
+
+  .cover-letter-template {
+    padding: 2rem !important;
+    margin: 0 !important;
+  }
+
+  .sender-name {
+    font-size: 28px !important;
+  }
+
+  .contact-row {
+    flex-direction: column !important;
+    gap: 0.5rem !important;
+  }
+
+  .contact-item:not(:last-child)::after {
+    display: none !important;
+  }
+
+  .letter-header {
+    margin-bottom: 3rem !important;
+  }
+}
+
+/* Dark mode support */
+@media (prefers-color-scheme: dark) {
+  @media screen {
+    body {
+      background: #111827 !important;
+    }
+
+    .cover-letter-template {
+      background: #1f2937 !important;
+      color: #f9fafb !important;
+      border: 1px solid #374151 !important;
+    }
+
+    .sender-name {
+      color: #f9fafb !important;
+    }
+
+    .sender-title {
+      color: #818cf8 !important;
+    }
+
+    .contact-info {
+      color: #d1d5db !important;
+    }
+
+    .recipient-name {
+      color: #f9fafb !important;
+    }
+
+    .recipient-title,
+    .recipient-address {
+      color: #d1d5db !important;
+    }
+
+    .recipient-company {
+      color: #e5e7eb !important;
+    }
+
+    .content-section p {
+      color: #e5e7eb !important;
+    }
+
+    .sender-signature {
+      color: #f9fafb !important;
+      border-top-color: #4b5563 !important;
+    }
+
+    .letter-header {
+      border-bottom-color: #4b5563 !important;
+    }
+
+    .linkedin-link {
+      color: #818cf8 !important;
+    }
+
+    .linkedin-link:hover {
+      color: #a5b4fc !important;
+    }
+  }
+}

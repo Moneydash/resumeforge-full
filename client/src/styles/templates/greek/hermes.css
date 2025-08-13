@@ -1,0 +1,540 @@
+* {
+  box-sizing: border-box !important;
+}
+
+.hermes-resume {
+  font-family: 'Ubuntu', sans-serif !important;
+  background-color: #ffffff !important;
+  color: #333333 !important;
+  line-height: 1.6 !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  font-size: 13px !important;
+  max-width: 210mm !important;
+}
+
+/* Header Section */
+.resume-header {
+  background-color: #ffffff !important;
+  padding-bottom: 1rem !important;
+}
+
+.resume-header-content {
+  text-align: left !important;
+}
+
+.resume-name {
+  font-size: 1.5rem !important;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  margin: 1.5rem 1rem 0.25rem 1rem !important;
+  line-height: 1 !important;
+}
+
+.resume-title {
+  font-size: 1.1rem !important;
+  font-weight: 500 !important;
+  color: #7f8c8d !important;
+  margin: 0 1rem 0.25rem 1rem !important;
+  text-transform: capitalize !important;
+}
+
+.resume-summary {
+  font-size: 0.9rem !important;
+  color: #555555 !important;
+  margin: 0 1rem 0.5rem 1rem !important;
+  line-height: 1.5 !important;
+}
+
+.contact-info {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 25px !important;
+  margin: 0 1rem 1rem 1rem !important;
+}
+
+.contact-item {
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+  font-size: 12px !important;
+  color: #555555 !important;
+}
+
+.contact-item i {
+  color: #2c3e50 !important;
+  width: 18px !important;
+  text-align: center !important;
+  font-size: 14px !important;
+}
+
+.contact-item a {
+  text-decoration: none !important;
+  color: #555555 !important;
+  transition: color 0.2s ease !important;
+}
+
+.contact-item a:hover {
+  color: #2c3e50 !important;
+}
+
+.social-links {
+  display: flex !important;
+  justify-content: center !important;
+  gap: 30px !important;
+  margin: 0 !important;
+  border-top: 1px solid #2c3e50 !important;
+  border-bottom: 2px solid #2c3e50 !important;
+  padding-block: 0.8rem !important;
+  margin-right: -1.5rem !important;
+}
+
+.social-link {
+  font-size: 18px !important;
+  color: #2c3e50 !important;
+  text-decoration: none !important;
+  transition: all 0.2s ease !important;
+}
+
+.social-link:hover {
+  color: #7f8c8d !important;
+  transform: translateY(-2px) !important;
+}
+
+/* Content Layout */
+.resume-content {
+  display: flex !important;
+  gap: 25px !important;
+  margin: 0 auto !important;
+  padding: 0 1rem !important;
+}
+
+.resume-left-column {
+  flex: 2.1 !important;
+  min-width: 0 !important;
+}
+
+.resume-right-column {
+  flex: 1.3 !important;
+  min-width: 0 !important;
+  border-left: 1px solid #ecf0f1 !important;
+  padding-left: 20px !important;
+}
+
+/* Section Styles */
+.resume-section {
+  margin-bottom: 2rem !important;
+  page-break-inside: avoid !important;
+}
+
+.resume-section:last-child {
+  margin-bottom: 0 !important;
+}
+
+.section-title {
+  font-size: 1rem !important;
+  font-weight: 700 !important;
+  color: #2c3e50 !important;
+  text-transform: uppercase !important;
+  letter-spacing: 0.5px !important;
+  margin-bottom: 1rem !important;
+  border-bottom: 1px solid #2c3e50 !important;
+  display: flex !important;
+  align-items: center !important;
+}
+
+.section-icon {
+  margin-right: 8px !important;
+  font-size: 0.9rem !important;
+}
+
+.section-content {
+  padding-left: 0.5rem !important;
+}
+
+/* Work Experience */
+.experience-item {
+  margin-bottom: 1rem !important;
+  padding-bottom: 0.5rem !important;
+  border-bottom: 1px solid #e6e6e6 !important;
+}
+
+.experience-item:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+}
+
+.experience-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  margin-bottom: 0.5rem !important;
+  gap: 15px !important;
+}
+
+.experience-main {
+  flex: 1 !important;
+}
+
+.experience-title {
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  margin: 0 0 0.3rem 0 !important;
+  line-height: 1.3 !important;
+}
+
+.experience-company {
+  font-size: 0.9rem !important;
+  color: #7f8c8d !important;
+  font-weight: 500 !important;
+  margin: 0 !important;
+  font-style: italic !important;
+}
+
+.experience-meta {
+  text-align: right !important;
+  flex-shrink: 0 !important;
+}
+
+.experience-date {
+  font-size: 0.8rem !important;
+  color: #95a5a6 !important;
+  background-color: #f8f9fa !important;
+  padding: 0.3rem 0.6rem !important;
+  border-radius: 4px !important;
+  white-space: nowrap !important;
+  font-weight: 500 !important;
+}
+
+.experience-description {
+  font-size: 0.85rem !important;
+  color: #555555 !important;
+  line-height: 1.6 !important;
+}
+
+.experience-description p {
+  margin-bottom: 0.5rem !important;
+}
+
+.experience-description p:last-child {
+  margin-bottom: 0 !important;
+}
+
+/* Skills */
+.skills-container {
+  display: grid !important;
+  gap: 0.5rem !important;
+}
+
+.skills-category {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+.skill-item {
+  background-color: #f8f9fa !important;
+  color: #2c3e50 !important;
+  padding: 0.4rem 0.8rem !important;
+  border-radius: 3px !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  border: 1px solid #e9ecef !important;
+  display: inline-block !important;
+}
+
+/* Certificates */
+.certificate-item {
+  margin-bottom: 1rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid #e6e6e6 !important;
+}
+
+.certificate-item:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+}
+
+.certificate-name {
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  margin-bottom: 0.4rem !important;
+  line-height: 1.3 !important;
+}
+
+.certificate-details {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.certificate-org {
+  font-size: 0.8rem !important;
+  color: #7f8c8d !important;
+  margin: 0 !important;
+  font-style: italic !important;
+}
+
+.certificate-date {
+  font-size: 0.75rem !important;
+  color: #95a5a6 !important;
+  background-color: #f8f9fa !important;
+  padding: 0.2rem 0.5rem !important;
+  border-radius: 3px !important;
+  white-space: nowrap !important;
+}
+
+/* Education */
+.education-item {
+  margin-bottom: 1rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid #e6e6e6 !important;
+}
+
+.education-item:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+}
+
+.education-degree {
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  margin-bottom: 0.4rem !important;
+  line-height: 1.3 !important;
+}
+
+.education-details {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: center !important;
+  gap: 10px !important;
+}
+
+.education-school {
+  font-size: 0.8rem !important;
+  color: #7f8c8d !important;
+  margin: 0 !important;
+  font-style: italic !important;
+}
+
+.education-date {
+  font-size: 0.75rem !important;
+  color: #95a5a6 !important;
+  background-color: #f8f9fa !important;
+  padding: 0.2rem 0.5rem !important;
+  border-radius: 3px !important;
+  white-space: nowrap !important;
+}
+
+/* Projects */
+.project-item {
+  margin-bottom: 1rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid #e6e6e6 !important;
+}
+
+.project-item:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+}
+
+.project-title {
+  font-size: 0.95rem !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  margin-bottom: 0.25rem !important;
+  line-height: 1.3 !important;
+}
+
+.project-description {
+  font-size: 0.85rem !important;
+  color: #555555 !important;
+  line-height: 1.6 !important;
+  margin-bottom: 0.8rem !important;
+}
+
+.project-technologies {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 5px !important;
+}
+
+.tech-item {
+  background-color: #2c3e50 !important;
+  color: white !important;
+  padding: 0.2rem 0.6rem !important;
+  border-radius: 3px !important;
+  font-size: 0.75rem !important;
+  font-weight: 500 !important;
+}
+
+/* Awards */
+.award-item {
+  margin-bottom: 1rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid #e6e6e6 !important;
+}
+
+.award-item:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+}
+
+.award-header {
+  display: flex !important;
+  justify-content: space-between !important;
+  align-items: flex-start !important;
+  margin-bottom: 0.5rem !important;
+  gap: 10px !important;
+}
+
+.award-title {
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  margin: 0 !important;
+  line-height: 1.3 !important;
+}
+
+.award-date {
+  font-size: 0.75rem !important;
+  color: #95a5a6 !important;
+  background-color: #f8f9fa !important;
+  padding: 0.2rem 0.5rem !important;
+  border-radius: 3px !important;
+  white-space: nowrap !important;
+}
+
+.award-description {
+  font-size: 0.8rem !important;
+  color: #555555 !important;
+  line-height: 1.5 !important;
+  margin: 0 !important;
+}
+
+/* Interests */
+.interests-container {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+.interest-item {
+  background-color: #f8f9fa !important;
+  color: #2c3e50 !important;
+  padding: 0.4rem 0.8rem !important;
+  border-radius: 3px !important;
+  font-size: 0.8rem !important;
+  font-weight: 500 !important;
+  border: 1px solid #e9ecef !important;
+}
+
+/* Languages */
+.languages-container {
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 6px !important;
+}
+
+.language-item {
+  background-color: #f8f9fa !important;
+  padding: 0.4rem 0.8rem !important;
+  border-radius: 3px !important;
+  border: 1px solid #e9ecef !important;
+}
+
+.language-name {
+  font-size: 0.8rem !important;
+  color: #2c3e50 !important;
+  font-weight: 500 !important;
+}
+
+/* References */
+.reference-item {
+  margin-bottom: 1rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid #e6e6e6 !important;
+}
+
+.reference-item:last-child {
+  border-bottom: none !important;
+  margin-bottom: 0 !important;
+}
+
+.reference-name {
+  font-size: 0.9rem !important;
+  font-weight: 600 !important;
+  color: #2c3e50 !important;
+  margin-bottom: 0.3rem !important;
+}
+
+.reference-title {
+  font-size: 0.8rem !important;
+  color: #7f8c8d !important;
+  margin-bottom: 0.3rem !important;
+  font-style: italic !important;
+}
+
+.reference-contact {
+  font-size: 0.8rem !important;
+  color: #95a5a6 !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 8px !important;
+}
+
+.contact-separator {
+  color: #dee2e6 !important;
+}
+
+/* List formatting improvements */
+ul.list-disc,
+ul.ml-3 {
+  margin-left: 0 !important;
+  padding-left: 1.5em !important;
+  margin-top: 0.5em !important;
+  margin-bottom: 0.5em !important;
+}
+
+ul.list-disc {
+  list-style-type: disc !important;
+}
+
+ul.list-disc li {
+  margin-bottom: 0.4em !important;
+  line-height: 1.5 !important;
+  word-wrap: break-word !important;
+  overflow-wrap: break-word !important;
+  hyphens: auto !important;
+}
+
+ul.list-disc li:last-child {
+  margin-bottom: 0 !important;
+}
+
+ul.list-disc li p {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+/* Print optimizations */
+@media print {
+  .hermes-resume {
+    font-size: 12px !important;
+  }
+
+  .resume-section {
+    page-break-inside: avoid !important;
+  }
+
+  .experience-item,
+  .project-item {
+    page-break-inside: avoid !important;
+  }
+}

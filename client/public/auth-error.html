@@ -1,0 +1,63 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Error</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #ff6b6b 0%, #ee5a24 100%);
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .error-icon {
+            font-size: 3rem;
+            margin-bottom: 1rem;
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="error-icon">❌</div>
+        <h2>Login Failed</h2>
+        <p id="error-message">An error occurred during login.</p>
+        <p>Closing window...</p>
+    </div>
+
+    <script>
+        // Get error message from URL parameters
+        const urlParams = new URLSearchParams(window.location.search);
+        const errorMessage = urlParams.get('error') || 'An error occurred during login.';
+
+        // Display the error message
+        document.getElementById('error-message').textContent = errorMessage;
+
+        // Send error message to parent window
+        if (window.opener) {
+            window.opener.postMessage({
+                type: 'LOGIN_ERROR',
+                error: errorMessage
+            }, 'http://localhost:3000'); // Replace with your frontend URL
+        }
+
+        // Close the popup after a short delay
+        setTimeout(() => {
+            window.close();
+        }, 2000);
+    </script>
+</body>
+
+</html>

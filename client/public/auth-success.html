@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Login Success</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            margin: 0;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+        }
+
+        .container {
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .spinner {
+            border: 4px solid rgba(255, 255, 255, 0.3);
+            border-radius: 50%;
+            border-top: 4px solid white;
+            width: 40px;
+            height: 40px;
+            animation: spin 1s linear infinite;
+            margin: 0 auto 1rem;
+        }
+
+        @keyframes spin {
+            0% {
+                transform: rotate(0deg);
+            }
+
+            100% {
+                transform: rotate(360deg);
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <div class="spinner"></div>
+        <h2>Login Successful!</h2>
+        <p>Closing window...</p>
+    </div>
+
+    <script>
+        // Get user data from URL parameters or localStorage
+        const urlParams = new URLSearchParams(window.location.search);
+        const userData = {
+            id: urlParams.get('id'),
+            email: urlParams.get('email'),
+            name: urlParams.get('name'),
+            picture: urlParams.get('picture')
+        };
+
+        // Send success message to parent window
+        if (window.opener) {
+            window.opener.postMessage({
+                type: 'LOGIN_SUCCESS',
+                user: userData
+            }, 'http://localhost:3000'); // Replace with your frontend URL
+        }
+
+        // Close the popup after a short delay
+        setTimeout(() => {
+            window.close();
+        }, 1500);
+    </script>
+</body>
+
+</html>

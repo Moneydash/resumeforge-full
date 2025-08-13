@@ -1,0 +1,169 @@
+* {
+  box-sizing: border-box;
+}
+
+body {
+  font-family: 'Georgia', Times, 'Times New Roman', serif;
+  color: #232323;
+  background: #fff;
+  margin: 1rem !important;
+  padding: 0 !important;
+}
+
+.resume-classic-container {
+  background: #fff;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+  font-family: 'DM Serif Text', serif;
+}
+
+.classic-header {
+  text-align: center;
+  border-bottom: 2px solid #1a237e;
+  padding-bottom: 0.8rem !important;
+  margin-bottom: 0.5rem !important;
+}
+
+.classic-name {
+  font-family: 'DM Serif Text', serif;
+  font-size: 2.2rem;
+  font-weight: 700;
+  color: #1a237e;
+}
+
+.classic-headline {
+  font-family: 'DM Serif Text', serif;
+  font-size: 1.15rem;
+  font-weight: 500;
+  color: #232323;
+  margin-top: -0.5rem !important;
+}
+
+.classic-contact {
+  font-size: 0.97rem;
+  color: #444;
+  margin-bottom: 0.3rem !important;
+  display: flex;
+  gap: 1.5rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.classic-contact a {
+  color: #1a237e;
+  text-decoration: none;
+}
+
+.classic-socials {
+  margin-top: 1rem !important;
+  font-size: 0.95rem;
+  display: flex;
+  gap: 1.1rem;
+  justify-content: center;
+  flex-wrap: wrap;
+  margin-bottom: 0.5rem !important;
+}
+
+.classic-socials a {
+  color: #1a237e;
+  text-decoration: none;
+  font-weight: 500;
+}
+
+.classic-main {
+  margin-top: 1rem !important;
+}
+
+.classic-section {
+  margin-bottom: 1.45rem !important;
+}
+
+.classic-section-title {
+  font-family: 'DM Serif Text', serif;
+  font-size: 1.08rem;
+  font-weight: 700;
+  color: #1a237e;
+  margin-bottom: 0.5rem !important;
+  letter-spacing: 0.5px;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.25rem !important;
+}
+
+.classic-item {
+  margin-bottom: 1.1rem !important;
+}
+
+.classic-item-header {
+  font-size: 1.01rem;
+  font-family: 'DM Serif Text', serif;
+  font-weight: 500;
+  color: #232323;
+  margin-bottom: 0.15rem !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.classic-item-title {
+  font-weight: 700;
+  font-family: 'DM Serif Text', serif;
+  font-size: 0.95rem;
+}
+
+.classic-item-subtitle {
+  color: #444;
+  font-size: 0.95rem !important;
+  font-family: 'DM Serif Text', serif;
+}
+
+ul.list-disc.ml-3,
+ul.ml-3 {
+  margin-left: 0 !important;
+  padding-left: 1em !important;
+  /* keep bullet indent, but not excessive */
+}
+
+ul.list-disc {
+  list-style-type: disc;
+}
+
+ul.list-disc li {
+  margin-top: 0 !important;
+  /* No extra space before the first bullet */
+  margin-bottom: 0.5em !important;
+  /* Small space after each bullet */
+}
+
+ul.list-disc li:not(:first-child) {
+  margin-top: -6px !important;
+  /* Reduce space between bullets after the first */
+}
+
+ul.list-disc li p {
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.classic-item-date {
+  margin-left: auto !important;
+  font-size: 0.97rem;
+  color: #555;
+  font-family: 'Georgia', Times, 'Times New Roman', serif;
+}
+
+.classic-item-description {
+  font-size: 0.97rem;
+  color: #232323;
+  margin-left: 0.1rem !important;
+  margin-top: 0.18rem !important;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.classic-skills,
+.classic-languages {
+  font-size: 0.97rem;
+  color: #232323;
+  margin-left: 0.1rem !important;
+  margin-bottom: 0.2rem !important;
+}

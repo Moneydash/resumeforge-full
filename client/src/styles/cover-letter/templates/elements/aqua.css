@@ -1,0 +1,240 @@
+body {
+  background: #f8f9fa !important;
+  padding: 1rem !important;
+  font-family: "Mozilla Headline", sans-serif !important;
+}
+
+.cover-letter-template {
+  margin: 0 auto !important;
+  font-family: 'Mozilla Headline', sans-serif !important;
+  font-size: 12pt !important;
+  line-height: 1.6 !important;
+  color: #333 !important;
+  background: white !important;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1) !important;
+  border-radius: 8px !important;
+  overflow: hidden !important;
+}
+
+/* Two Column Layout */
+.two-column-layout {
+  display: flex !important;
+  min-height: 600px !important;
+}
+
+/* Left Column - Sender Details */
+.left-column {
+  background: #00bcd4 !important;
+  color: white !important;
+  width: 35% !important;
+  padding: 2rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+  height: 100vh !important;
+}
+
+.sender-info {
+  flex: 1 !important;
+}
+
+.sender-name {
+  margin-top: 5em !important;
+  font-size: 18pt !important;
+  font-weight: 700 !important;
+  color: white !important;
+  margin-bottom: 0.5rem !important;
+  text-transform: uppercase !important;
+  letter-spacing: 1px !important;
+  line-height: 1.2 !important;
+}
+
+.sender-title {
+  font-size: 13pt !important;
+  font-weight: 400 !important;
+  color: #b2ebf2 !important;
+  margin-bottom: 2rem !important;
+  padding-bottom: 1rem !important;
+  border-bottom: 1px solid #00acc1 !important;
+}
+
+.contact-info {
+  font-size: 11pt !important;
+  line-height: 1.6 !important;
+  color: #ecf0f1 !important;
+}
+
+.contact-info p {
+  margin-bottom: 0.8rem !important;
+}
+
+.contact-info a {
+  color: #16363a !important;
+  text-decoration: none !important;
+  transition: color 0.3s ease !important;
+}
+
+.contact-info a:hover {
+  color: #80deea !important;
+  text-decoration: underline !important;
+}
+
+/* Right Column - Everything Else */
+.right-column {
+  background: white !important;
+  width: 65% !important;
+  padding: 2rem !important;
+  display: flex !important;
+  flex-direction: column !important;
+}
+
+/* Recipient Styles */
+.recipient-section {
+  margin-bottom: 2rem !important;
+}
+
+.recipient-info {
+  font-size: 11pt !important;
+  line-height: 1.5 !important;
+}
+
+.recipient-name {
+  font-weight: 600 !important;
+  margin-bottom: 0.4rem !important;
+  color: #00bcd4 !important;
+  font-size: 12pt !important;
+}
+
+.recipient-title {
+  margin-bottom: 0.4rem !important;
+  color: #333 !important;
+}
+
+.recipient-company {
+  font-weight: 500 !important;
+  margin-bottom: 0.4rem !important;
+  color: #333 !important;
+}
+
+.recipient-address {
+  margin-bottom: 0.4rem !important;
+  color: #333 !important;
+}
+
+/* Content Styles */
+.letter-content {
+  flex: 1 !important;
+  margin-bottom: 2rem !important;
+}
+
+.introduction,
+.body,
+.closing {
+  margin-bottom: 1.5rem !important;
+  background: transparent !important;
+}
+
+.introduction p,
+.body p,
+.closing p {
+  margin-bottom: 1rem !important;
+  line-height: 1.7 !important;
+  text-align: justify !important;
+}
+
+.closing p {
+  text-align: left !important;
+}
+
+/* Signature area styling */
+.closing p:last-child {
+  margin-top: 3rem !important;
+}
+
+/* Print Media Query */
+@media print {
+  body {
+    background: white !important;
+    padding: 0 !important;
+  }
+
+  .cover-letter-template {
+    margin: 0 !important;
+    max-width: none !important;
+    width: 100% !important;
+    box-shadow: none !important;
+    border-radius: 0 !important;
+  }
+
+  .two-column-layout {
+    min-height: auto !important;
+  }
+
+  .left-column {
+    background: #00bcd4 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .sender-name {
+    color: white !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .sender-title {
+    color: #b2ebf2 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  .contact-info {
+    color: #ecf0f1 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+}
+
+/* Responsive Design */
+@media screen and (max-width: 768px) {
+  body {
+    padding: 0.5rem !important;
+  }
+
+  .cover-letter-template {
+    font-size: 11pt !important;
+    border-radius: 0 !important;
+  }
+
+  .two-column-layout {
+    flex-direction: column !important;
+    min-height: auto !important;
+  }
+
+  .left-column {
+    width: 100% !important;
+    padding: 1.5rem !important;
+  }
+
+  .right-column {
+    width: 100% !important;
+    padding: 1.5rem !important;
+  }
+
+  .sender-name {
+    font-size: 16pt !important;
+    letter-spacing: 0.5px !important;
+  }
+
+  .sender-title {
+    font-size: 12pt !important;
+    margin-bottom: 1.5rem !important;
+  }
+
+  .contact-info {
+    font-size: 10pt !important;
+  }
+
+  .recipient-info {
+    font-size: 10pt !important;
+  }
+}

@@ -1,0 +1,273 @@
+* {
+  box-sizing: border-box !important;
+}
+
+body {
+  font-family: 'DM Serif Text', Georgia, serif !important;
+  color: #2c1810 !important;
+  background: linear-gradient(135deg, #f5f1e8 0%, #ede4d1 100%) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.resume-greek-container {
+  background: linear-gradient(135deg, #faf7f0 0%, #f0ead6 100%) !important;
+  margin: 0 !important;
+  position: relative !important;
+  overflow: hidden !important;
+}
+
+.greek-border-top {
+  height: 8px !important;
+  background: linear-gradient(90deg, #d4af37 0%, #ffd700 25%, #b8860b 50%, #ffd700 75%, #d4af37 100%) !important;
+  background-size: 40px 8px !important;
+  animation: shimmer 3s linear infinite !important;
+}
+
+@keyframes shimmer {
+  0% {
+    background-position: -40px 0 !important;
+  }
+
+  100% {
+    background-position: 40px 0 !important;
+  }
+}
+
+.greek-header {
+  text-align: center !important;
+  background: linear-gradient(135deg, #1a2855 0%, #2d4a9a 50%, #1a2855 100%) !important;
+  color: #ffd700 !important;
+  padding: 1.5rem 2rem !important;
+  position: relative !important;
+  border-bottom: 4px solid #d4af37 !important;
+  display: flex !important;
+  align-items: center !important;
+  justify-content: space-between !important;
+}
+
+.greek-header::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0 0h100v100H0z" fill="none"/><path d="M10 10l80 80M90 10L10 90" stroke="%23ffd700" stroke-width="0.5" opacity="0.1"/></svg>') !important;
+  pointer-events: none !important;
+}
+
+.greek-laurel-left,
+.greek-laurel-right {
+  font-size: 1.5rem !important;
+  color: #ffd700 !important;
+  text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3) !important;
+}
+
+.greek-header-content {
+  flex: 1 !important;
+  z-index: 1 !important;
+}
+
+.greek-name {
+  font-family: 'Cinzel', serif !important;
+  font-size: 1.8rem !important;
+  font-weight: 700 !important;
+  color: #ffd700 !important;
+  margin: 0 !important;
+  text-shadow: 3px 3px 6px rgba(0, 0, 0, 0.4) !important;
+  letter-spacing: 2px !important;
+  text-transform: uppercase !important;
+}
+
+.greek-headline {
+  font-family: 'Cinzel', serif !important;
+  font-size: 1rem !important;
+  font-weight: 600 !important;
+  color: #e6d7b8 !important;
+  margin: 0.5rem 0 1rem 0 !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.3) !important;
+  font-style: italic !important;
+}
+
+.greek-contact {
+  font-size: 0.85rem !important;
+  color: #f0e6d2 !important;
+  margin-bottom: 1.5rem !important;
+  display: flex !important;
+  gap: 2rem !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+}
+
+.greek-contact a {
+  color: #ffd700 !important;
+  text-decoration: none !important;
+  font-weight: 600 !important;
+}
+
+.greek-contact a:hover {
+  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6) !important;
+}
+
+.greek-socials {
+  margin-top: 1.5rem !important;
+  margin-bottom: 0.5rem !important;
+  display: flex !important;
+  gap: 1.5rem !important;
+  justify-content: center !important;
+  flex-wrap: wrap !important;
+}
+
+.greek-socials a {
+  color: #ffd700 !important;
+  text-decoration: none !important;
+  font-size: 1rem !important;
+  transition: all 0.3s ease !important;
+}
+
+.greek-socials a:hover {
+  color: #fff !important;
+  text-shadow: 0 0 12px rgba(255, 215, 0, 0.8) !important;
+  transform: scale(1.2) !important;
+}
+
+.greek-main {
+  padding: 1rem 1.5rem !important;
+  background: linear-gradient(135deg, #faf7f0 0%, #f0ead6 100%) !important;
+}
+
+.greek-section {
+  margin-bottom: 0.5rem !important;
+  background: rgba(255, 255, 255, 0.7) !important;
+  border-radius: 8px !important;
+  padding: 1.5rem !important;
+  border-left: 6px solid #d4af37 !important;
+  position: relative !important;
+}
+
+.greek-section::before {
+  content: '' !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  width: 30px !important;
+  height: 100% !important;
+  pointer-events: none !important;
+}
+
+.greek-section:last-child {
+  margin-bottom: 0 !important;
+}
+
+.greek-section-title {
+  font-family: 'Cinzel', serif !important;
+  font-size: 1.1rem !important;
+  font-weight: 700 !important;
+  color: #1a2855 !important;
+  margin-bottom: 1rem !important;
+  letter-spacing: 1px !important;
+  text-transform: uppercase !important;
+  border-bottom: 2px solid #d4af37 !important;
+  padding-bottom: 0.5rem !important;
+  display: flex !important;
+  align-items: center !important;
+  gap: 0.8rem !important;
+}
+
+.greek-icon {
+  font-size: 1rem !important;
+  color: #d4af37 !important;
+  text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.2) !important;
+}
+
+.greek-item {
+  margin-bottom: 0.5rem !important;
+  padding: 1rem !important;
+  background: rgba(255, 255, 255, 0.5) !important;
+  border-radius: 6px !important;
+  border-left: 3px solid #b8860b !important;
+}
+
+.greek-item-header {
+  font-size: 0.95rem !important;
+  font-family: 'Cinzel', serif !important;
+  font-weight: 600 !important;
+  color: #1a2855 !important;
+  margin-bottom: 0.3rem !important;
+  display: flex !important;
+  flex-wrap: wrap !important;
+  gap: 0.8rem !important;
+  align-items: baseline !important;
+}
+
+.greek-item-title {
+  font-weight: 700 !important;
+  color: #2d4a9a !important;
+}
+
+.greek-item-subtitle {
+  color: #8b4513 !important;
+  font-style: italic !important;
+}
+
+.greek-item-date {
+  margin-left: auto !important;
+  font-size: 0.85rem !important;
+  color: #b8860b !important;
+  font-family: 'DM Serif Text', serif !important;
+  font-weight: 600 !important;
+}
+
+.greek-item-description {
+  font-size: 0.9rem !important;
+  color: #2c1810 !important;
+  margin-left: 0.2rem !important;
+  margin-top: 0.5rem !important;
+  line-height: 1.6 !important;
+  text-align: justify !important;
+}
+
+.greek-skills,
+.greek-languages {
+  font-size: 0.9rem !important;
+  color: #2c1810 !important;
+  margin-left: 0.2rem !important;
+  margin-bottom: 0.5rem !important;
+  line-height: 1.6 !important;
+  font-weight: 600 !important;
+}
+
+ul.list-disc.ml-3,
+ul.ml-3 {
+  margin-left: 0 !important;
+  padding-left: 0.5em !important;
+}
+
+ul.list-disc {
+  list-style-type: none !important;
+}
+
+ul.list-disc li {
+  margin-top: 0 !important;
+  margin-bottom: 0.6em !important;
+  position: relative !important;
+  padding-left: 1.5em !important;
+}
+
+ul.list-disc li::before {
+  content: '⚡' !important;
+  position: absolute !important;
+  left: 0 !important;
+  color: #d4af37 !important;
+  font-size: 0.9em !important;
+}
+
+ul.list-disc li:not(:first-child) {
+  margin-top: -2px !important;
+}
+
+ul.list-disc li p {
+  margin: 0 !important;
+  padding: 0 !important;
+}

@@ -1,0 +1,9 @@
+.footer {
+    background-color: #232323; /* Replace with your desired footer background color */
+    color: #fff; /* Text color for the footer */
+    text-align: center;
+    position: fixed;
+    bottom: 0 !important;
+    z-index: 10;
+    width: 100%;
+}

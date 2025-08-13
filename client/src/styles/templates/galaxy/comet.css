@@ -1,0 +1,120 @@
+body {
+  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+  color: #232323;
+  background: #fff;
+  margin: 0 !important;
+  padding: 0 !important;
+}
+
+.comet-container {
+  margin: 0 auto !important;
+  background: #fff;
+  padding: 2.2rem 2.2rem 2.2rem 2.2rem !important;
+}
+
+.comet-header {
+  text-align: center;
+  border-bottom: 2px solid #1976d2;
+  padding-bottom: 0.7rem !important;
+  margin-bottom: 1.3rem !important;
+}
+
+.comet-name {
+  font-size: 2.1rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin: 0 !important;
+}
+
+.comet-headline {
+  font-size: 1.1rem;
+  font-weight: 500;
+  color: #232323;
+  margin: 0.3rem 0 0.7rem 0 !important;
+}
+
+.comet-contact {
+  font-size: 0.97rem;
+  color: #444;
+  margin-bottom: 0.3rem !important;
+  display: flex;
+  gap: 1.2rem;
+  justify-content: center;
+  flex-wrap: wrap;
+}
+
+.comet-contact a {
+  color: #1976d2;
+  text-decoration: none;
+}
+
+.comet-main {
+  margin-top: 1.2rem !important;
+}
+
+.comet-section {
+  margin-bottom: 1.15rem !important;
+}
+
+.comet-section-title {
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: #1976d2;
+  margin-bottom: 0.5rem !important;
+  border-bottom: 1px solid #e0e0e0;
+  padding-bottom: 0.13rem !important;
+  letter-spacing: 0.5px;
+}
+
+.comet-summary {
+  font-size: 1rem;
+  color: #232323;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.comet-skills {
+  font-size: 0.97rem;
+  color: #232323;
+  margin-bottom: 0.2rem !important;
+}
+
+.comet-item {
+  margin-bottom: 0.95rem !important;
+}
+
+.comet-item-header {
+  font-size: 1.01rem;
+  font-weight: 500;
+  color: #232323;
+  margin-bottom: 0.13rem !important;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  align-items: baseline;
+}
+
+.comet-item-title {
+  font-weight: 700;
+}
+
+.comet-item-tech {
+  font-size: 0.95rem;
+  color: #1976d2;
+  margin-left: 0.6rem !important;
+}
+
+.comet-item-description {
+  font-size: 0.97rem;
+  color: #232323;
+  margin-left: 0.1rem !important;
+  margin-top: 0.15rem !important;
+  line-height: 1.6;
+  text-align: justify;
+}
+
+.comet-interests {
+  font-size: 0.97rem;
+  color: #232323;
+  margin-bottom: 0.2rem !important;
+}
