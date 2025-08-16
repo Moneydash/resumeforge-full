@@ -75,7 +75,7 @@ All community leaders are obligated to respect the privacy and security of the r
 
 ## Questions and Clarifications
 
-If you have questions about this Code of Conduct or need clarification on what constitutes acceptable behavior, please reach out to the maintainers at **[INSERT CONTACT EMAIL]**.
+If you have questions about this Code of Conduct or need clarification on what constitutes acceptable behavior, please reach out to the maintainers at **crraquid@gmail.com**.
 
 We encourage open dialogue about creating a welcoming environment for all contributors.
 
