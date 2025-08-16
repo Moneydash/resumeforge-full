@@ -1,7 +1,7 @@
 import express from "express";
 import generate_cl_pdf from "../controllers/cl-pdf";
 import { isAuthenticated, validateSocialLogin, authRateLimit } from '../middlewares/auth';
-import { save_userData, fetchAllCL, createInitCL, cloneCL, deleteCL, fetchCLData, renameCL } from "../controllers/cover-letter";
+import { save_userData, fetchAllCL, createInitCL, cloneCL, deleteCL, fetchCLData, renameCL, saveExportedCL } from "../controllers/cover-letter";
 
 const clRouter = express.Router();
 // Apply authentication middleware to ensure user is logged in with Google or GitHub
@@ -60,4 +60,10 @@ clRouter.put('/rename-cl/:id/:userId',
   renameCL
 );
 
+clRouter.post('/save-exports/:id/:userId',
+  authRateLimit(100, 30 * 60 * 1000),
+  isAuthenticated,
+  validateSocialLogin(['google', 'github']),
+  saveExportedCL
+)
 export default clRouter;

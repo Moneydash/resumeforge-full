@@ -41,7 +41,7 @@ const Login: React.FC = () => {
   useEffect(() => {
     const handleMessage = (event: MessageEvent) => {
       // Verify the origin for security
-      if (event.origin !== 'http://localhost:8080') {
+      if (event.origin !== API_URL) {
         return;
       }
 
@@ -100,7 +100,7 @@ const Login: React.FC = () => {
 
     // Open new popup
     popupRef.current = window.open(
-      'http://localhost:8080/auth/github', // Your backend GitHub OAuth URL
+      `${API_URL}/auth/github`, // Your backend GitHub OAuth URL
       'GitHub Login', // Window name
       'width=500,height=600,menubar=no,toolbar=no,location=no,status=no'
     );

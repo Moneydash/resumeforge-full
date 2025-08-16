@@ -3,6 +3,7 @@ import { CoverLetterData } from "@/types/interface.cover-letter";
 
 export class CoverLetterModel {
   private tableName = 'user_cover_letter_data';
+  private tableExports = 'cover_letter_exports';
 
   async findByUserId(userId: string): Promise<CoverLetterData[]> {
     try {
@@ -134,6 +135,18 @@ export class CoverLetterModel {
       console.error('Error soft deleting cover letter data: ', error);
       throw error;
     }
+  }
+
+  async saveExportedCoverLetter(id: string, userId: string, clId: string, template: string): Promise<void> {
+    await knex(this.tableExports)
+      .insert({
+        id: id,
+        user_id: userId,
+        cover_letter_id: clId,
+        export_format: 'pdf',
+        template: template,
+        created_at: new Date()
+      });
   }
 }
 

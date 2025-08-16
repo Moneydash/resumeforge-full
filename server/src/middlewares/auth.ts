@@ -257,7 +257,7 @@ const validateSocialLogin = (providers: SocialProvider[] = ['google', 'github'])
 
 const csrfProtection = csrf({
   cookie: false,
-  value: (req) => req.headers['x-csrf-token'] as string
+  value: (req: Request) => req.headers['x-csrf-token'] as string
 });
 
 // Export all middleware functions

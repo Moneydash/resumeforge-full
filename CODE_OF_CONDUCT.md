@@ -62,7 +62,7 @@ Community leaders have the right and responsibility to remove, edit, or reject c
 ## Enforcement Process
 
 ### Reporting
-Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at **[INSERT YOUR EMAIL HERE]**.
+Instances of abusive, harassing, or otherwise unacceptable behavior may be reported to the community leaders responsible for enforcement at **crraquid@gmail.com**.
 
 All complaints will be reviewed and investigated promptly and fairly. **Reports will be acknowledged within 48 hours and investigated within 7 days.**
 

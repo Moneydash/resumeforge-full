@@ -33,7 +33,7 @@ interface GithubProfile {
 passport.use(new GoogleStrategy({
   clientID: process.env.GOOGLE_CLIENT_ID!,
   clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
-  callbackURL: "/auth/google/callback",
+  callbackURL: `${process.env.BASE_URL}/auth/google/callback`,
   passReqToCallback: true
 }, async (req, accessToken, refreshToken, profile, done) => {
   try {
@@ -80,7 +80,7 @@ passport.use(new GoogleStrategy({
 passport.use(new GithubStrategy({
   clientID: process.env.GITHUB_CLIENT_ID!,
   clientSecret: process.env.GITHUB_CLIENT_SECRET!,
-  callbackURL: "/auth/github/callback",
+  callbackURL: `${process.env.BASE_URL}/auth/github/callback`,
   passReqToCallback: true,
   scope: ['user:email']
 }, async (req: Request, accessToken: string, refreshToken: string, profile: any, done: any) => {
@@ -226,7 +226,7 @@ const googleCallback = async (req: Request, res: Response, next: NextFunction) =
                   avatar: '${user.avatar || ''}',
                   token: '${token}'
                 }
-              }, 'http://localhost:5173');
+              }, '${process.env.FRONTEND_URL}');
               window.close();
             } else {
               window.location.href = '/dashboard';
@@ -321,7 +321,7 @@ const githubCallback = async (req: Request, res: Response, next: NextFunction) =
                   avatar: '${user.avatar || ''}',
                   token: '${token}'
                 }
-              }, 'http://localhost:5173');
+              }, '${process.env.FRONTEND_URL}');
               window.close();
             } else {
               window.location.href = '/dashboard';

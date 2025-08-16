@@ -29,10 +29,10 @@ interface CLFormProps {
 
 const STORAGE_KEY = 'clFormData';
 
-const CLForm: React.FC<CLFormProps> = ({ onSubmit, loading = false, onChange, sectionRefs }) => {
+const CLForm: React.FC<CLFormProps> = ({ onSubmit, loading = false, sectionRefs }) => {
   const [loadingStep, setLoadingStep] = useState(0);
 
-  const { register, handleSubmit, reset, formState: { errors }, watch } = useForm<CLFormData>({
+  const { register, handleSubmit, reset, formState: { errors } } = useForm<CLFormData>({
     resolver: yupResolver(clSchema as any),
     defaultValues: {
       sender: {
@@ -40,7 +40,6 @@ const CLForm: React.FC<CLFormProps> = ({ onSubmit, loading = false, onChange, se
         email: '',
         phone: '',
         address: '',
-        website: { name: '', link: '' },
         location: '',
         linkedin: '',
         job_title: ''

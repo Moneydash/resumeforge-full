@@ -112,6 +112,21 @@ const fetchCLData: Controller = async (req, res) => {
 
   const { user_id, cover_letter_data } = cover_letter;
   return res.json({ user_id, cover_letter_data });
+};
+
+const saveExportedCL: Controller = async (req, res) => {
+  const { id, userId } = req.params;
+  const { template } = req.body;
+
+  const generatedId = generateId();
+  const cover_letter = await coverletterModel.findByIdAndUserId(id, userId);
+
+  if (!cover_letter) {
+    return res.status(404).json({ message: 'Resume not found' });
+  }
+
+  await coverletterModel.saveExportedCoverLetter(generatedId, userId, cover_letter.id, template);
+  return res.json({ 'message': 'Resume successfully exported!' });
 }
 
 export {
@@ -121,5 +136,6 @@ export {
   cloneCL,
   deleteCL,
   renameCL,
-  fetchCLData
+  fetchCLData,
+  saveExportedCL
 }

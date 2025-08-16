@@ -1,6 +1,7 @@
 import { Controller } from "@/types/types.controller-type";
 import { formatDescription } from "../utils/helper";
 import puppeteer, { Browser, Page } from "puppeteer";
+import { execSync } from 'child_process';
 
 const generate_pdf: Controller = async (req, res) => {
   let browser: Browser | undefined;
@@ -16,6 +17,15 @@ const generate_pdf: Controller = async (req, res) => {
         success: false,
         message: 'Invalid HTML content provided'
       });
+    }
+
+    if (process.env.NODE_ENV === 'production') {
+      try {
+        console.log('Installing Chrome for Puppeteer...');
+        execSync('npx puppeteer browsers install chrome', { stdio: 'inherit' });
+      } catch (err) {
+        console.error('Failed to install Chrome at runtime:', err);
+      }
     }
 
     // Launch browser with more stable configuration

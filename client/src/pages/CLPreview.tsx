@@ -1,4 +1,3 @@
-// Cover Letter Preview - Mirrored from Resume Preview Design
 import React, { useEffect, useRef, useState } from 'react';
 import CLForm from '../components/CLForm';
 import { useTheme } from '../contexts/ThemeContext';
@@ -64,7 +63,6 @@ const CLPreview: React.FC = () => {
       email: '',
       phone: '',
       address: '',
-      website: { name: '', link: '' },
       location: '',
       linkedin: '',
       job_title: ''
@@ -224,6 +222,17 @@ const CLPreview: React.FC = () => {
     }
   };
 
+  const saveCLExports = async () => {
+    try {
+      await client.post(`/cover-letter/save-exports/${clId}/${userId}`, {
+        template: template,
+      });
+    } catch (error) {
+      console.error('Failed saving resume exports: ', error);
+      throw error;
+    }
+  }
+
   // Handle form submission
   const handleFormSubmit = async (data: CLFormData) => {
     setLoading(true);
@@ -252,6 +261,7 @@ const CLPreview: React.FC = () => {
     setLoadingExport(true);
     const toastExport = toast.loading("Exporting your cover letter into PDF");
     try {
+      await saveCLExports();
       const htmlContent = renderToString(<CLTemplateComponent data={data} template={template} />);
       const payload = pdfPayloadv2(data, htmlContent, template || 'aether');
 
