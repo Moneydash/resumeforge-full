@@ -32,8 +32,9 @@ const Login: React.FC = () => {
 
   // Handle successful login
   const handleSuccessfulLogin = async (userData: any) => {
-    Cookies.set('user.id', userData.id, { secure: true });
-    Cookies.set('user.email', userData.email, { secure: true });
+    // Secure cookies require HTTPS; on local http dev they'd be silently dropped.
+    Cookies.set('user.id', userData.id, { secure: import.meta.env.PROD });
+    Cookies.set('user.email', userData.email, { secure: import.meta.env.PROD });
     navigate('/dashboard');
   };
 

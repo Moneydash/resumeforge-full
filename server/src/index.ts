@@ -27,14 +27,18 @@ app.use(express.json());
 app.use(cookieParser(process.env.SESSION_SECRET || 'your-secret-key'));
 // app.use(cookieParser());
 
+const isProduction = process.env.NODE_ENV === 'production';
+
 app.use(session({
   secret: process.env.SESSION_SECRET || 'your-secret-key',
   resave: false,
   saveUninitialized: false,
   cookie: {
-    secure: process.env.NODE_ENV === 'production', // HTTPS in production
+    secure: isProduction, // HTTPS in production
     maxAge: 24 * 60 * 60 * 1000, // 24 hours
-    sameSite: 'none',
+    // SameSite=None requires Secure; browsers reject the cookie otherwise.
+    // Without HTTPS in dev, fall back to Lax so the session cookie is actually set.
+    sameSite: isProduction ? 'none' : 'lax',
     httpOnly: true
   }
 }));
