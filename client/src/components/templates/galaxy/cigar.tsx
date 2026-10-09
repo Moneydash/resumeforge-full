@@ -2,6 +2,8 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import cigarCss from "@/styles/templates/galaxy/cigar.css?inline";
+import { getRenderColumns } from "@/utils/section-layout";
+import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const CigarTemplate: React.FC<TemplateProps> = ({ data }) => {
   const aboutSection = (
@@ -143,6 +145,20 @@ const CigarTemplate: React.FC<TemplateProps> = ({ data }) => {
     </section>
   );
 
+  const columns = getRenderColumns('cigar', data);
+  const sections: SectionMap = {
+    summary: aboutSection,
+    experience: expSection,
+    education: educSection,
+    projects: projSection,
+    skills: skillSection,
+    languages: langSection,
+    interests: interestsSection,
+    certifications: certSection,
+    awards: awardsSection,
+    references: refSection,
+  };
+
   return (
     <>
       <style>
@@ -165,16 +181,7 @@ const CigarTemplate: React.FC<TemplateProps> = ({ data }) => {
           </div>
         </header>
         <main className="classic-main">
-          {data?.summary && aboutSection}
-          {data?.experience && data?.experience?.filter(exp => !exp?.hidden)?.length >= 1 && expSection}
-          {data?.education && data?.education?.filter(ed => !ed?.hidden)?.length >= 1 && educSection}
-          {data?.projects && data?.projects?.filter(proj => !proj?.hidden)?.length >= 1 && projSection}
-          {data?.skills && data?.skills?.filter(skill => !skill?.hidden)?.length >= 1 && skillSection}
-          {data?.languages && data?.languages?.length >= 1 && langSection}
-          {data?.interests && data?.interests?.length >= 1 && interestsSection}
-          {data?.certifications && data?.certifications?.filter(cert => !cert?.hidden)?.length >= 1 && certSection}
-          {data?.awards && data?.awards?.filter(award => !award?.hidden)?.length >= 1 && awardsSection}
-          {data?.references && data?.references?.filter(reference => !reference?.hidden)?.length >= 1 && refSection}
+          {renderSections(columns[0], sections)}
         </main>
       </div>
     </>

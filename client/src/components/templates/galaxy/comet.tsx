@@ -1,6 +1,8 @@
 import React from "react";
 import type { TemplateProps } from "@/types";
 import CometCss from "@/styles/templates/galaxy/comet.css?inline";
+import { getRenderColumns } from "@/utils/section-layout";
+import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const CometTemplate: React.FC<TemplateProps> = ({ data }) => {
   const aboutSection = (
@@ -48,6 +50,14 @@ const CometTemplate: React.FC<TemplateProps> = ({ data }) => {
     </section>
   );
 
+  const columns = getRenderColumns('comet', data);
+  const sections: SectionMap = {
+    summary: aboutSection,
+    skills: skillSection,
+    projects: projSection,
+    interests: interestSection,
+  };
+
   return (
     <>
       <style>
@@ -65,10 +75,7 @@ const CometTemplate: React.FC<TemplateProps> = ({ data }) => {
           </div>
         </header>
         <main className="comet-main">
-          {data?.summary && aboutSection}
-          {data?.skills && data?.skills?.filter(skill => !skill.hidden)?.length >= 1 && skillSection}
-          {data?.projects && data?.projects?.filter(proj => !proj.hidden)?.length >= 1 && projSection}
-          {data?.interests && data?.interests?.length >= 1 && interestSection}
+          {renderSections(columns[0], sections)}
         </main>
       </div>
     </>

@@ -2,6 +2,8 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import ZeusCss from "@/styles/templates/greek/zeus.css?inline";
+import { getRenderColumns } from "@/utils/section-layout";
+import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
   const socialSection = (
@@ -159,6 +161,19 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
     </section>
   );
 
+  const columns = getRenderColumns('zeus', data);
+  const sections: SectionMap = {
+    summary: aboutSection,
+    experience: expSection,
+    education: educSection,
+    projects: projSection,
+    skills: skillSection,
+    languages: langSection,
+    certifications: certSection,
+    awards: awardsSection,
+    references: refSection,
+  };
+
   return (
     <>
       <style>
@@ -182,15 +197,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
           <div className="greek-laurel-right">⚡</div>
         </header>
         <main className="greek-main">
-          {data?.summary && aboutSection}
-          {data?.experience && data?.experience?.filter(exp => !exp.hidden)?.length >= 1 && expSection}
-          {data?.education && data?.education?.filter(ed => !ed.hidden)?.length >= 1 && educSection}
-          {data?.projects && data?.projects?.filter(proj => !proj.hidden)?.length >= 1 && projSection}
-          {data?.skills && data?.skills?.filter(s => !s.hidden)?.length >= 1 && skillSection}
-          {data?.languages && data?.languages?.length >= 1 && langSection}
-          {data?.certifications && data?.certifications?.filter(cert => !cert.hidden)?.length >= 1 && certSection}
-          {data?.awards && data?.awards?.filter(a => !a.hidden)?.length >= 1 && awardsSection}
-          {data?.references && data?.references?.filter(r => !r.hidden)?.length >= 1 && refSection}
+          {renderSections(columns[0], sections)}
         </main>
       </div>
     </>

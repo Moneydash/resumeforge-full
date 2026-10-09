@@ -22,3 +22,11 @@ describe("template default render (no sectionLayout)", () => {
     });
   });
 });
+
+describe("template render honours sectionLayout", () => {
+  it("cigar renders education before experience", () => {
+    const data = { ...makeSampleResume(2), sectionLayout: { template: 'cigar' as const, columns: [['education', 'experience']] as never } };
+    const html = renderToString(<TemplateComponent data={data} template="cigar" />);
+    expect(html.indexOf('Education')).toBeLessThan(html.indexOf('Work Experience'));
+  });
+});
