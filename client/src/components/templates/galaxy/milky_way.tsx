@@ -147,9 +147,9 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
         ?.map((reference, i) => (
           <div className="mw-item mw-card" key={i}>
             <div className="mw-item-header">
-              <span className="mw-item-title">{reference?.name}</span> <span className="mw-item-company">{reference?.title} @ {reference?.company}</span>
+              <span className="mw-item-title">{reference?.name}</span> <span className="mw-item-company">{[reference?.title, reference?.company].filter(Boolean).join(' @ ')}</span>
             </div>
-            <span className="mw-item-description">{reference?.email || '-'} | {reference?.phone || '-'}</span>
+            <span className="mw-item-description">{[reference?.email, reference?.phone].filter(Boolean).join(' | ')}</span>
           </div>
         ))
       }
@@ -166,10 +166,10 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
           <h1 className="mw-name">{data?.personal?.name}</h1>
           <h2 className="mw-headline">{data?.personal?.headline}</h2>
           <div className="mw-contact">
-            <span>{data?.personal?.email}</span>
-            <span>{data?.personal?.location}</span>
-            <span>{data?.personal?.contact_number}</span>
-            <span><a href={data?.personal?.website?.link}>{data?.personal?.website?.name}</a></span>
+            {data?.personal?.email && <span>{data.personal.email}</span>}
+            {data?.personal?.location && <span>{data.personal.location}</span>}
+            {data?.personal?.contact_number && <span>{data.personal.contact_number}</span>}
+            {data?.personal?.website?.name && <span><a href={data.personal.website.link}>{data.personal.website.name}</a></span>}
           </div>
         </header>
         <main className="mw-main">

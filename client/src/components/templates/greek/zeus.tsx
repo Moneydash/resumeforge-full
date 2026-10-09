@@ -150,8 +150,8 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
         ?.map((reference, i) => (
           <div className="greek-item" key={i}>
             <div className="greek-item-header">
-              <span className="greek-item-title">{reference?.name}</span> | <span className="greek-item-subtitle">{reference?.title} at {reference?.company}</span>
-              <div className="greek-item-description">{reference?.email || '-'} | {reference?.phone || '-'}</div>
+              <span className="greek-item-title">{reference?.name}</span> | <span className="greek-item-subtitle">{[reference?.title, reference?.company].filter(Boolean).join(' at ')}</span>
+              <div className="greek-item-description">{[reference?.email, reference?.phone].filter(Boolean).join(' | ')}</div>
             </div>
           </div>
         ))
@@ -172,10 +172,10 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
             <h1 className="greek-name">{data?.personal?.name}</h1>
             <h2 className="greek-headline">{data?.personal?.headline}</h2>
             <div className="greek-contact">
-              <span>📧 {data?.personal?.email}</span>
-              <span>📍 {data?.personal?.location}</span>
-              <span>📞 {data?.personal?.contact_number}</span>
-              <span>🌐 <a href={data?.personal?.website?.link}>{data?.personal?.website?.name}</a></span>
+              {data?.personal?.email && <span>📧 {data.personal.email}</span>}
+              {data?.personal?.location && <span>📍 {data.personal.location}</span>}
+              {data?.personal?.contact_number && <span>📞 {data.personal.contact_number}</span>}
+              {data?.personal?.website?.name && <span>🌐 <a href={data.personal.website.link}>{data.personal.website.name}</a></span>}
             </div>
             {data?.socials && data?.socials?.length >= 1 && socialSection}
           </div>

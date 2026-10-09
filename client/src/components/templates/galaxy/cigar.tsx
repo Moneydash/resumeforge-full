@@ -160,7 +160,7 @@ const CigarTemplate: React.FC<TemplateProps> = ({ data }) => {
           </div>
           <div className="classic-socials">
             {data.socials?.map((social, i) => (
-              <a key={i} href={social.link}><i className={`fab fa-${social.slug} fa-lg`}></i></a>
+              <a key={i} href={social.link} aria-label={social.slug}><i className={`fab fa-${social.slug} fa-lg`} aria-hidden="true"></i></a>
             ))}
           </div>
         </header>

@@ -6,10 +6,10 @@ import ApolloCss from "@/styles/templates/greek/apollo.css?inline";
 const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
   const aboutSection = (
     <div className="sidebar-contact">
-      <div className="sidebar-contact-item"><i className="icon-globe fas fa-globe"></i><span className="contact-text"><a href={data?.personal?.website?.link} target="_blank">{data?.personal?.website?.name}</a></span></div>
-      <div className="sidebar-contact-item"><i className="icon-email fas fa-envelope"></i><a href={`mailto:${data?.personal?.email}`} className="contact-text">{data?.personal?.email}</a></div>
-      <div className="sidebar-contact-item"><i className="icon-phone fas fa-phone"></i><span className="contact-text">{data?.personal?.contact_number}</span></div>
-      <div className="sidebar-contact-item"><i className="icon-location fas fa-map-marker-alt"></i><span className="contact-text">{data?.personal?.location}</span></div>
+      {data?.personal?.website?.name && <div className="sidebar-contact-item"><i className="icon-globe fas fa-globe"></i><span className="contact-text"><a href={data.personal.website.link} target="_blank">{data.personal.website.name}</a></span></div>}
+      {data?.personal?.email && <div className="sidebar-contact-item"><i className="icon-email fas fa-envelope"></i><a href={`mailto:${data.personal.email}`} className="contact-text">{data.personal.email}</a></div>}
+      {data?.personal?.contact_number && <div className="sidebar-contact-item"><i className="icon-phone fas fa-phone"></i><span className="contact-text">{data.personal.contact_number}</span></div>}
+      {data?.personal?.location && <div className="sidebar-contact-item"><i className="icon-location fas fa-map-marker-alt"></i><span className="contact-text">{data.personal.location}</span></div>}
 
       {/* social links */}
       {data?.socials && data?.socials?.length >= 1 && (
@@ -178,8 +178,8 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
         ?.map((reference, i) => (
           <div className="main-exp-item" key={i}>
             <div className="main-exp-title">{reference?.name}</div>
-            <div className="main-exp-company">{reference?.title} at {reference?.company}</div>
-            <div className="main-exp-desc">{reference?.email || '-'} | {reference?.phone || '-'}</div>
+            <div className="main-exp-company">{[reference?.title, reference?.company].filter(Boolean).join(' at ')}</div>
+            <div className="main-exp-desc">{[reference?.email, reference?.phone].filter(Boolean).join(' | ')}</div>
           </div>
         ))
       }
