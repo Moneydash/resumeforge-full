@@ -4,6 +4,7 @@ import type { TemplateProps } from "@/types";
 import ArtemisCss from "@/styles/templates/greek/artemis.css?inline";
 import { getRenderColumns } from "@/utils/section-layout";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { buildMainVariants, buildSidebarVariants } from "@/components/templates/column-variants";
 
 const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
   const socialSection = (
@@ -162,10 +163,24 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
   );
 
   const columns = getRenderColumns('artemis', data);
-  const sections: SectionMap = {
+  // a section dragged to the other column needs that column's markup/classes, see column-variants.tsx
+  const titles = {
+    education: 'Education',
+    skills: 'Skills',
+    projects: 'Projects',
+    certifications: 'Certifications',
+    awards: 'Awards',
+    languages: 'Languages',
+    references: 'References',
+  };
+  const mainSections: SectionMap = {
+    ...buildMainVariants(data, titles),
     summary: summarySection,
     experience: expSection,
     references: refSection,
+  };
+  const sidebarSections: SectionMap = {
+    ...buildSidebarVariants(data, titles),
     education: educSection,
     skills: skillSection,
     projects: projSection,
@@ -176,14 +191,14 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const mainSection = (
     <main className="resume-main-content">
-      {renderSections(columns[0], sections)}
+      {renderSections(columns[0], mainSections)}
     </main>
   );
 
   const sidebarSection = (
     <aside className="resume-sidebar">
       {contactSection}
-      {renderSections(columns[1], sections)}
+      {renderSections(columns[1], sidebarSections)}
     </aside>
   );
 

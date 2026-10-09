@@ -4,6 +4,7 @@ import type { TemplateProps } from "@/types";
 import AthenaCss from "@/styles/templates/greek/athena.css?inline";
 import { getRenderColumns } from "@/utils/section-layout";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { buildMainVariants, buildSidebarVariants } from "@/components/templates/column-variants";
 
 const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
   const personalSection = (
@@ -178,29 +179,44 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
   );
 
   const columns = getRenderColumns('athena', data);
-  const sections: SectionMap = {
+  // a section dragged to the other column needs that column's markup/classes, see column-variants.tsx
+  const titles = {
+    education: 'Education',
+    skills: 'Skills',
+    projects: 'Key Projects',
+    certifications: 'Certifications',
+    awards: 'Awards',
+    languages: 'Languages',
+    references: 'References',
+    socials: 'Professional Links',
+  };
+  const mainSections: SectionMap = {
+    ...buildMainVariants(data, titles),
+    socials: socialSection,
+    summary: aboutSection,
+    experience: expSection,
+    references: refSection,
+  };
+  const sidebarSections: SectionMap = {
+    ...buildSidebarVariants(data, titles),
     education: educSection,
     skills: skillSection,
     projects: projSection,
     certifications: certSection,
     awards: awardsSection,
     languages: langSection,
-    socials: socialSection,
-    summary: aboutSection,
-    experience: expSection,
-    references: refSection,
   };
 
   const sidebarSection = (
     <aside className="resume-sidebar">
       {personalSection}
-      {renderSections(columns[0], sections)}
+      {renderSections(columns[0], sidebarSections)}
     </aside>
   );
 
   const mainSection = (
     <main className="resume-main-content">
-      {renderSections(columns[1], sections)}
+      {renderSections(columns[1], mainSections)}
     </main>
   );
 
