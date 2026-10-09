@@ -29,7 +29,7 @@ body {
   box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.12), 0 0 0 1px rgba(0, 0, 0, 0.05) !important;
   border-radius: 0 !important;
   overflow: hidden !important;
-  min-height: 800px !important;
+  min-height: 100vh !important;
   border-top: 6px solid transparent !important;
   border-image: linear-gradient(90deg, #2b6cb5 0%, #1e40af 25%, #3b82f6 50%, #60a5fa 75%, #93c5fd 100%) 1 !important;
 }
@@ -501,7 +501,7 @@ body {
   .resume-main-container {
     box-shadow: none !important;
     border-radius: 0 !important;
-    min-height: auto !important;
+    min-height: 100vh !important;
   }
 
   .main-exp-item {
