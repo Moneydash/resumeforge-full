@@ -37,7 +37,7 @@ New pure module `client/src/utils/section-layout.ts`:
 
 ## Template rendering
 
-Each of the 10 templates keeps its existing section JSX consts. The hardcoded list is replaced by a lookup from section id to the existing JSX, rendered in the order returned by `resolveLayout` (per column for column templates). Default output must be byte-for-byte equivalent in structure to today's. Header and contact blocks are untouched (in apollo/artemis/athena contact info stays in the sidebar).
+Each of the 10 templates keeps its existing section JSX consts. The hardcoded list is replaced by a lookup from section id to the existing JSX, rendered in the order returned by `resolveLayout` (per column for column templates). With no saved layout, the rendered output must be identical to today's. Where a template does not currently render a pinned section inside a column (for example if Summary sits in a header), the per-template config follows the template's actual current placement; this is verified against each template's source when writing the plan. Header and contact blocks are untouched (in apollo/artemis/athena contact info stays in the sidebar).
 
 ## UI
 
