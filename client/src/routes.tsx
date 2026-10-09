@@ -22,7 +22,7 @@ const RouteComponent = () => {
   const location = useLocation();
 
   // Define the paths where the footer should be shown
-  const showFooter = !location.pathname.startsWith('/preview') && !location.pathname.startsWith('/cl-preview') && !location.pathname.startsWith('/terms-of-service') && !location.pathname.startsWith('/privacy-policy');
+  const showFooter = !location.pathname.startsWith('/preview') && !location.pathname.startsWith('/cl-preview') && !location.pathname.startsWith('/terms-of-service') && !location.pathname.startsWith('/privacy-policy') && !location.pathname.startsWith('/login');
 
   return (
     <>
