@@ -39,7 +39,7 @@ export interface SectionLayout {
 interface TemplateLayoutConfig {
   /** Sections the template renders in a fixed header; never part of the layout. */
   header: SectionId[];
-  /** Sections locked to their default column and slot. */
+  /** Sections locked to their default column, kept at the top of it. */
   pinned: SectionId[];
   columnLabels: string[];
   /** Default columns; `visibleExperience` drives hermes/andromeda's automatic placement. */
@@ -98,7 +98,7 @@ const LAYOUTS: Record<TemplateType, TemplateLayoutConfig> = {
   },
   athena: {
     header: [],
-    pinned: ['summary', 'experience'],
+    pinned: ['socials', 'summary', 'experience'],
     columnLabels: ['Sidebar (left)', 'Main (right)'],
     defaultColumns: () => [
       ['education', 'skills', 'projects', 'certifications', 'awards', 'languages'],
@@ -178,16 +178,13 @@ const distributeFree = (
   return free;
 };
 
-/** Insert pinned sections at their default slots around the free sections. */
+/** Pinned sections stay at the top of their default column, in default order; free sections follow. */
 const pinInto = (template: TemplateType, data: ResumeFormData, free: SectionId[][]): SectionId[][] => {
   const { pinned } = LAYOUTS[template];
-  return getDefaultColumns(template, data).map((defaultColumn, c) => {
-    const out = [...free[c]];
-    defaultColumn.forEach((id, slot) => {
-      if (pinned.includes(id)) out.splice(Math.min(slot, out.length), 0, id);
-    });
-    return out;
-  });
+  return getDefaultColumns(template, data).map((defaultColumn, c) => [
+    ...defaultColumn.filter((id) => pinned.includes(id)),
+    ...free[c],
+  ]);
 };
 
 export const resolveLayout = (

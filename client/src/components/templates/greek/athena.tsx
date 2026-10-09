@@ -188,7 +188,6 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
     awards: 'Awards',
     languages: 'Languages',
     references: 'References',
-    socials: 'Professional Links',
   };
   const mainSections: SectionMap = {
     ...buildMainVariants(data, titles),

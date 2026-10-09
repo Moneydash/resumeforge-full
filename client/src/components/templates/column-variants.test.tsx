@@ -33,7 +33,7 @@ describe("artemis cross-column rendering", () => {
 describe("athena cross-column rendering", () => {
   const layout: SectionLayout = {
     template: 'athena',
-    columns: [['references', 'socials', 'skills', 'projects', 'certifications', 'awards', 'languages'], ['summary', 'experience', 'education']],
+    columns: [['references', 'skills', 'projects', 'certifications', 'awards', 'languages'], ['socials', 'summary', 'experience', 'education']],
   };
   const html = render('athena', layout);
 
@@ -42,12 +42,9 @@ describe("athena cross-column rendering", () => {
     expect(html).not.toContain('sidebar-section-title">Education</div>');
   });
 
-  it("main sections moved to the sidebar use the sidebar styles", () => {
+  it("a main section moved to the sidebar uses the sidebar styles", () => {
     expect(html).toContain('sidebar-section-title">References</div>');
-    expect(html).toContain('sidebar-section-title">Professional Links</div>');
     expect(html).not.toContain('main-section-title">References</div>');
-    expect(html).not.toContain('main-section-title">Professional Links</div>');
-    expect(html).toContain('https://github.com/ada');
   });
 });
 

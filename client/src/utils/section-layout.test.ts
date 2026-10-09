@@ -86,13 +86,21 @@ describe("resolveLayout", () => {
     expect(out[1].slice(0, 2)).toEqual(['summary', 'experience']);
   });
 
-  it("keeps pinned sections at their default slots when free sections are placed around them (athena)", () => {
+  it("keeps pinned sections at the top of their column, free sections below them (athena)", () => {
     const saved: SectionLayout = {
       template: 'athena',
       columns: [['education', 'skills', 'projects', 'certifications', 'awards', 'languages'], ['references', 'socials']],
     };
     const right = resolveLayout('athena', saved, data2)[1];
-    expect(right).toEqual(['references', 'summary', 'experience', 'socials']);
+    expect(right).toEqual(['socials', 'summary', 'experience', 'references']);
+  });
+
+  it("never lets a free section above a pinned one, whatever the saved order (apollo)", () => {
+    const saved: SectionLayout = {
+      template: 'apollo',
+      columns: [['education', 'skills', 'interests', 'languages', 'projects', 'certifications'], ['references', 'awards', 'experience', 'summary']],
+    };
+    expect(resolveLayout('apollo', saved, data2)[1]).toEqual(['summary', 'experience', 'references', 'awards']);
   });
 
   it("falls back to defaults for free sections when the column count does not match", () => {

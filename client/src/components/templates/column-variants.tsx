@@ -119,11 +119,4 @@ export const buildSidebarVariants = (data: ResumeFormData, titles: SectionTitles
       ))}
     </SidebarSection>
   ),
-  socials: (
-    <SidebarSection title={titles.socials}>
-      {data.socials?.map((social, i) => (
-        <SidebarItem key={i} name={social.name} org={social.link} />
-      ))}
-    </SidebarSection>
-  ),
 });
