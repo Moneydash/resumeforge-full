@@ -1,3 +1,5 @@
+import type { SectionLayout } from "@/utils/section-layout";
+
 export interface ResumeFormData {
   personal: {
     name: string;
@@ -64,4 +66,5 @@ export interface ResumeFormData {
     phone: string;
     hidden?: boolean;
   }>;
+  sectionLayout?: SectionLayout;
 }

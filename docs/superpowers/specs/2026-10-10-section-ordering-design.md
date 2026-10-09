@@ -23,7 +23,7 @@ Let users choose the order of resume sections per resume. Template design (marku
 
 ## Data
 
-`ResumeFormData` gains optional `sectionLayout: { columns: SectionId[][] }` (columns in visual left-to-right order; single-column templates use `columns[0]`). The resume is stored as an opaque JSON blob in `user_resume_data.resume_data`, so there is no migration or server change; `/clone` copies it verbatim. The yup schema in `client/src/schema/schema.ts` and the load/merge logic in `ResumeForm.tsx` must pass the field through untouched. The layout is not a react-hook-form field: it is held in Preview state and merged into the data on save/render.
+`ResumeFormData` gains optional `sectionLayout: { template: TemplateType; columns: SectionId[][] }` (`template` records which template the columns were arranged for, so a template switch can be detected on load) (columns in visual left-to-right order; single-column templates use `columns[0]`). The resume is stored as an opaque JSON blob in `user_resume_data.resume_data`, so there is no migration or server change; `/clone` copies it verbatim. The layout is not a react-hook-form field: it is held in Preview state and merged into the data on save/render.
 
 ## Layout module
 
