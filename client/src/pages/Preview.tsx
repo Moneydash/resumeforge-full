@@ -68,6 +68,11 @@ const Preview: React.FC = () => {
 
   // Properly typed initial state matching ResumeFormData interface
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
+  // Update mode = the resume already had saved data when the page opened (not a first-time creation)
+  const [isUpdateMode, setIsUpdateMode] = useState(false);
+  const liveEdit = isUpdateMode && !!pdfUrl;
+  const [liveStatus, setLiveStatus] = useState<'idle' | 'updating' | 'saved' | 'error'>('idle');
+  const requestIdRef = useRef(0); // ignore out-of-order responses
   const [resumeData, setResumeData] = useState<ResumeFormData>({
     personal: {
       name: '',
@@ -141,11 +146,13 @@ const Preview: React.FC = () => {
       localStorage.setItem('resumeFormData', request.data?.resume_data);
       if (request.data?.resume_data) {
         try {
+          setIsUpdateMode(true);
           const parsedData = JSON.parse(request.data.resume_data);
           setResumeData(parsedData);
           handleFormSubmit(parsedData); // Use parsedData directly!
         } catch (e) {
           // fallback if not JSON
+          setIsUpdateMode(true);
           setResumeData(request.data.resume_data);
           handleFormSubmit(request.data.resume_data); // Use the fallback data directly!
         }
@@ -256,7 +263,9 @@ const Preview: React.FC = () => {
   }
 
   const handleFormSubmit = async (data: ResumeFormData) => {
+    const requestId = ++requestIdRef.current;
     setLoading(true);
+    if (liveEdit) setLiveStatus('updating');
     try {
       setResumeData(data);
       await saveResumeData(data);
@@ -266,11 +275,20 @@ const Preview: React.FC = () => {
       const requestData = await formRequest("POST", `/resume/generate`, payload);
       const blob = new Blob([requestData?.data], { type: 'application/pdf' });
       const url = URL.createObjectURL(blob);
-      setPdfUrl(url);
+      if (requestId !== requestIdRef.current) { // a newer edit superseded this one
+        URL.revokeObjectURL(url);
+        return;
+      }
+      setPdfUrl((prev) => {
+        if (prev) URL.revokeObjectURL(prev);
+        return url;
+      });
+      if (liveEdit) setLiveStatus('saved');
     } catch (error) {
       console.error("Error: ", error);
+      if (liveEdit) setLiveStatus('error');
     } finally {
-      setLoading(false);
+      if (requestId === requestIdRef.current) setLoading(false);
     }
   }
 
@@ -436,6 +454,7 @@ const Preview: React.FC = () => {
               <ResumeForm
                 onSubmit={handleFormSubmit}
                 loading={loading}
+                liveEdit={liveEdit}
                 template={template}
                 sectionRefs={{
                   personalRef,
@@ -506,6 +525,13 @@ const Preview: React.FC = () => {
                 </div>
 
                 <div className="flex items-center space-x-3">
+                  {liveEdit && liveStatus !== 'idle' && (
+                    <span className={`text-xs font-medium flex items-center ${liveStatus === 'error' ? 'text-red-500' : isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
+                      {liveStatus === 'updating' && <><Loader2 className="w-3 h-3 mr-1 animate-spin" />Saving &amp; updating preview...</>}
+                      {liveStatus === 'saved' && 'All changes saved'}
+                      {liveStatus === 'error' && 'Update failed, will retry on next edit'}
+                    </span>
+                  )}
                   <Button
                     variant="outline"
                     onClick={redirectTemplates}
@@ -569,7 +595,7 @@ const Preview: React.FC = () => {
 
             {/* Preview Content - Scrollable */}
             <div className="flex-1 overflow-y-auto p-6 no-scrollbar">
-              {loading ? (
+              {loading && !liveEdit ? (
                 <div className={`
                   h-full flex flex-col items-center justify-center rounded-xl border-2 border-dashed
                   ${isDarkMode

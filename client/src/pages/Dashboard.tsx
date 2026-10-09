@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { Plus, FileText, Edit, Grid3X3, List, Trash2, CalendarDays, NotepadTextDashed, FilePlus2, FilePenLine, Copy, LayoutDashboard, Menu, X } from 'lucide-react';
+import { Plus, FileText, Edit, Grid3X3, List, Trash2, CalendarDays, NotepadTextDashed, FilePlus2, FilePenLine, Copy, LayoutDashboard, Menu, X, ScanText } from 'lucide-react';
 import { useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import client from '@/api/axiosInstance';
@@ -12,6 +12,7 @@ import { useMainStore } from '@/store/useMainStore';
 import { formatDateDisplay, formatTemplateName, getCsrfToken, slugify } from '@/utils/helper';
 import { toast } from 'sonner';
 import ThemeToggle from '@/components/ThemeToggle';
+import LogoutButton from '@/components/LogoutButton';
 
 // Import snapshot images
 import andromedaImg from "@/assets/snapshots/galaxy/andromeda.jpg";
@@ -224,6 +225,8 @@ const Dashboard: React.FC = () => {
       </Dialog>
       {/* dialog for delete resume confirmation --- end */}
 
+      <LogoutButton />
+
       <Dialog
         open={createDialogOpen}
         onOpenChange={(open) => {
@@ -322,14 +325,14 @@ const Dashboard: React.FC = () => {
               <LayoutDashboard className="w-5 h-5" />
               Cover Letter Dashboard
             </Button>
-            {/* ATS Scanner Button - commented, planning to add later */}
-            {/* <Button
-              onClick={() => { }}
+            {/* ATS Scanner Button */}
+            <Button
+              onClick={() => navigate('/ats-scanner')}
               className="inline-flex items-center gap-3 px-6 py-3 bg-white dark:bg-yellow-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-semibold rounded-lg shadow hover:shadow-lg hover:bg-gray-50 dark:hover:bg-yellow-600 transition-all duration-200"
             >
               <ScanText className="w-5 h-5" />
               ATS Scanner
-            </Button> */}
+            </Button>
           </div>
 
           {/* Mobile Hamburger Menu - Visible on small screens */}
@@ -414,15 +417,16 @@ const Dashboard: React.FC = () => {
                       Cover Letter Dashboard
                     </Button>
 
-                    {/* <Button
+                    <Button
                       onClick={() => {
                         setMobileMenuOpen(false);
+                        navigate('/ats-scanner');
                       }}
                       className="w-full justify-start gap-3 bg-yellow-700 border border-gray-600 text-white hover:bg-yellow-600"
                     >
                       <ScanText className="w-4 h-4" />
                       ATS Scanner
-                    </Button> */}
+                    </Button>
                   </div>
                 </div>
               </div>

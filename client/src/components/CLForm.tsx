@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { CLFormData } from '@/types/interface.cl-form-data';
@@ -19,6 +19,8 @@ import ContentFields from './cover-letter/cl-forms/Content';
 interface CLFormProps {
   onSubmit: (data: CLFormData) => void;
   loading?: boolean;
+  // when true: edits auto-regenerate the preview (debounced) and the submit button is hidden
+  liveEdit?: boolean;
   onChange?: (data: CLFormData) => void;
   sectionRefs?: {
     senderRef: React.RefObject<HTMLDivElement>;
@@ -28,11 +30,12 @@ interface CLFormProps {
 }
 
 const STORAGE_KEY = 'clFormData';
+const LIVE_EDIT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF render, so wait for the user to pause typing
 
-const CLForm: React.FC<CLFormProps> = ({ onSubmit, loading = false, sectionRefs }) => {
+const CLForm: React.FC<CLFormProps> = ({ onSubmit, loading = false, liveEdit = false, sectionRefs }) => {
   const [loadingStep, setLoadingStep] = useState(0);
 
-  const { register, handleSubmit, reset, formState: { errors } } = useForm<CLFormData>({
+  const { register, handleSubmit, reset, watch, getValues, formState: { errors } } = useForm<CLFormData>({
     resolver: yupResolver(clSchema as any),
     defaultValues: {
       sender: {
@@ -73,10 +76,41 @@ const CLForm: React.FC<CLFormProps> = ({ onSubmit, loading = false, sectionRefs 
 
   // Handle form submission
   const handleSubmitForm = (data: CLFormData) => {
+    lastSubmittedRef.current = JSON.stringify(getValues());
     // Clear saved data on successful submission
     localStorage.removeItem(STORAGE_KEY);
     onSubmit(data);
   };
+
+  // Always-fresh handles so the debounced live-edit callback never uses stale closures
+  const lastSubmittedRef = useRef('');
+  const submitRef = useRef<() => void>(() => { });
+  const loadingRef = useRef(loading);
+  submitRef.current = handleSubmit(handleSubmitForm);
+  loadingRef.current = loading;
+
+  // Live edit: once the preview exists, regenerate it after the user stops typing
+  useEffect(() => {
+    if (!liveEdit) return;
+    lastSubmittedRef.current = JSON.stringify(getValues()); // baseline = what the preview already shows
+    let timer: ReturnType<typeof setTimeout>;
+    const run = () => {
+      if (loadingRef.current) { // a render is in flight; try again shortly instead of stacking requests
+        timer = setTimeout(run, 1000);
+        return;
+      }
+      if (JSON.stringify(getValues()) === lastSubmittedRef.current) return; // nothing actually changed
+      submitRef.current(); // goes through validation; invalid forms are simply not submitted
+    };
+    const subscription = watch(() => {
+      clearTimeout(timer);
+      timer = setTimeout(run, LIVE_EDIT_DEBOUNCE_MS);
+    });
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
+  }, [liveEdit, watch, getValues]);
 
   // Loading step progression
   useEffect(() => {
@@ -128,8 +162,8 @@ const CLForm: React.FC<CLFormProps> = ({ onSubmit, loading = false, sectionRefs 
         />
       </div>
 
-      {/* Submit Button */}
-      <div className="pt-6">
+      {/* Submit Button (hidden in live edit mode) */}
+      {!liveEdit && <div className="pt-6">
         <Button
           type="submit"
           disabled={loading}
@@ -160,7 +194,7 @@ const CLForm: React.FC<CLFormProps> = ({ onSubmit, loading = false, sectionRefs 
             <><SaveIcon /> Save & Generate Cover Letter</>
           )}
         </Button>
-      </div>
+      </div>}
     </form>
   );
 };

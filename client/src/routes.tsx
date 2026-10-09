@@ -10,6 +10,7 @@ const Dashboard = lazy(() => import('./pages/Dashboard'));
 const CLPreview = lazy(() => import('./pages/CLPreview'));
 const CLTemplates = lazy(() => import('./pages/CLTemplates'));
 const CLDashboard = lazy(() => import('./pages/CLDashboard'));
+const ATSScanner = lazy(() => import('./pages/ATSScanner'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const ToS = lazy(() => import('./pages/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
@@ -74,6 +75,14 @@ const RouteComponent = () => {
             element={
               <ProtectedRoute>
                 <CLDashboard />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/ats-scanner"
+            element={
+              <ProtectedRoute>
+                <ATSScanner />
               </ProtectedRoute>
             }
           />

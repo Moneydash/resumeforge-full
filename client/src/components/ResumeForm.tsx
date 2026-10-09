@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { useForm, useFieldArray } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { ResumeFormData } from '@/types/interface.resume-form-data';
@@ -31,6 +31,8 @@ interface ResumeFormProps {
   onSubmit: (data: ResumeFormData) => void;
   loading?: boolean;
   template?: string;
+  // when true: edits auto-regenerate the preview (debounced) and the submit button is hidden
+  liveEdit?: boolean;
   sectionRefs?: {
     personalRef: React.RefObject<HTMLDivElement>;
     summaryRef: React.RefObject<HTMLDivElement>;
@@ -48,11 +50,12 @@ interface ResumeFormProps {
 }
 
 const STORAGE_KEY = 'resumeFormData';
+const LIVE_EDIT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF render, so wait for the user to pause typing
 
-const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = false, sectionRefs }) => {
+const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = false, liveEdit = false, sectionRefs }) => {
   const [loadingStep, setLoadingStep] = useState(0);
 
-  const { register, handleSubmit, control, reset, formState: { errors }, setValue, watch } = useForm<ResumeFormData>({
+  const { register, handleSubmit, control, reset, formState: { errors }, setValue, watch, getValues } = useForm<ResumeFormData>({
     resolver: yupResolver(schema as any),
     defaultValues: {
       personal: {
@@ -158,7 +161,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
   }, [reset]);
 
   useEffect(() => {
-    let timers: NodeJS.Timeout[] = [];
+    const timers: ReturnType<typeof setTimeout>[] = [];
 
     if (loading) {
       setLoadingStep(0);
@@ -189,6 +192,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
   }, [loading, template]);
 
   const handleSubmitForm = (data: ResumeFormData) => {
+    lastSubmittedRef.current = JSON.stringify(getValues());
     // Save form data to localStorage
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
@@ -207,6 +211,36 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
     };
     onSubmit(processedData);
   };
+
+  // Always-fresh handles so the debounced live-edit callback never uses stale closures
+  const lastSubmittedRef = useRef('');
+  const submitRef = useRef<() => void>(() => { });
+  const loadingRef = useRef(loading);
+  submitRef.current = handleSubmit(handleSubmitForm);
+  loadingRef.current = loading;
+
+  // Live edit: once the preview exists, regenerate it after the user stops typing
+  useEffect(() => {
+    if (!liveEdit) return;
+    lastSubmittedRef.current = JSON.stringify(getValues()); // baseline = what the preview already shows
+    let timer: ReturnType<typeof setTimeout>;
+    const run = () => {
+      if (loadingRef.current) { // a render is in flight; try again shortly instead of stacking requests
+        timer = setTimeout(run, 1000);
+        return;
+      }
+      if (JSON.stringify(getValues()) === lastSubmittedRef.current) return; // nothing actually changed
+      submitRef.current(); // goes through validation; invalid forms are simply not submitted
+    };
+    const subscription = watch(() => {
+      clearTimeout(timer);
+      timer = setTimeout(run, LIVE_EDIT_DEBOUNCE_MS);
+    });
+    return () => {
+      subscription.unsubscribe();
+      clearTimeout(timer);
+    };
+  }, [liveEdit, watch, getValues]);
 
   return (
     <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-8">
@@ -435,8 +469,8 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
         />
       </div>
 
-      {/* Submit Button */}
-      <div className="pt-6">
+      {/* Submit Button (hidden in live edit mode) */}
+      {!liveEdit && <div className="pt-6">
         <Button
           type="submit"
           disabled={loading}
@@ -467,7 +501,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
             <><SaveIcon /> Save & Generate Resume</>
           )}
         </Button>
-      </div>
+      </div>}
     </form>
   );
 };

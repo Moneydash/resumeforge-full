@@ -3,6 +3,7 @@ import cors from "cors";
 import pdfRouter from "./routes/resume";
 import authRouter from "./routes/auth";
 import clRouter from "./routes/cover-letter";
+import atsRouter from "./routes/ats";
 import { config as configDotenv } from "dotenv";
 import session from 'express-session';
 import passport from 'passport';
@@ -65,6 +66,7 @@ app.use((req, res, next) => {
 app.use('/', authRouter);
 app.use('/resume', pdfRouter);
 app.use('/cover-letter', clRouter);
+app.use('/ats', atsRouter);
 
 app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
   const error = err as ErrorWithCode;
