@@ -30,7 +30,8 @@ import {
   Loader2,
   LayoutDashboard,
   GripVertical,
-  MoveLeft
+  MoveLeft,
+  ArrowUpDown
 } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
 
@@ -39,6 +40,9 @@ import { getCsrfToken, pdfPayload } from '@/utils/helper';
 import client from '@/api/axiosInstance';
 import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
+import SectionOrderPanel from '@/components/SectionOrderPanel';
+import { convertLayout, type SectionLayout } from '@/utils/section-layout';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const Preview: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -73,6 +77,14 @@ const Preview: React.FC = () => {
   const liveEdit = isUpdateMode && !!pdfUrl;
   const [liveStatus, setLiveStatus] = useState<'idle' | 'updating' | 'saved' | 'error'>('idle');
   const requestIdRef = useRef(0); // ignore out-of-order responses
+  const LAYOUT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF render, wait for the user to stop dragging
+  const activeTemplate: TemplateType = template ?? 'andromeda';
+  const [sectionLayout, setSectionLayout] = useState<SectionLayout | undefined>(undefined);
+  const [orderPanelOpen, setOrderPanelOpen] = useState(false);
+  const sectionLayoutRef = useRef<SectionLayout | undefined>(undefined);
+  const resumeDataRef = useRef<ResumeFormData | null>(null);
+  const layoutTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const handleFormSubmitRef = useRef<(data: ResumeFormData) => Promise<void>>(async () => { });
   const [resumeData, setResumeData] = useState<ResumeFormData>({
     personal: {
       name: '',
@@ -147,7 +159,13 @@ const Preview: React.FC = () => {
       if (request.data?.resume_data) {
         try {
           setIsUpdateMode(true);
-          const parsedData = JSON.parse(request.data.resume_data);
+          const parsedData: ResumeFormData = JSON.parse(request.data.resume_data);
+          // the layout was arranged for another template: carry it over (column <-> single-column rules)
+          const initialLayout = parsedData.sectionLayout && parsedData.sectionLayout.template !== activeTemplate
+            ? convertLayout(parsedData.sectionLayout, activeTemplate, parsedData)
+            : parsedData.sectionLayout;
+          sectionLayoutRef.current = initialLayout;
+          setSectionLayout(initialLayout);
           setResumeData(parsedData);
           handleFormSubmit(parsedData); // Use parsedData directly!
         } catch (e) {
@@ -262,11 +280,14 @@ const Preview: React.FC = () => {
     }
   }
 
-  const handleFormSubmit = async (data: ResumeFormData) => {
+  const handleFormSubmit = async (formData: ResumeFormData) => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
     if (liveEdit) setLiveStatus('updating');
+    // the layout lives outside the form; always attach the current one (undefined is dropped from the JSON)
+    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current };
     try {
+      resumeDataRef.current = data;
       setResumeData(data);
       await saveResumeData(data);
       const htmlContent = renderToString(<ResumePreview data={data} template={template} />);
@@ -291,6 +312,27 @@ const Preview: React.FC = () => {
       if (requestId === requestIdRef.current) setLoading(false);
     }
   }
+  handleFormSubmitRef.current = handleFormSubmit; // always-fresh handle for the debounced layout callback
+
+  const handleLayoutChange = (next: SectionLayout | undefined) => {
+    sectionLayoutRef.current = next;
+    setSectionLayout(next);
+    clearTimeout(layoutTimerRef.current);
+    layoutTimerRef.current = setTimeout(() => {
+      layoutTimerRef.current = undefined;
+      if (resumeDataRef.current) void handleFormSubmitRef.current(resumeDataRef.current);
+    }, LAYOUT_DEBOUNCE_MS);
+  };
+
+  // save a layout change that is still waiting on the debounce (leaving the page, exporting)
+  const flushPendingLayout = () => {
+    if (layoutTimerRef.current === undefined) return;
+    clearTimeout(layoutTimerRef.current);
+    layoutTimerRef.current = undefined;
+    if (resumeDataRef.current) void handleFormSubmitRef.current(resumeDataRef.current);
+  };
+
+  useEffect(() => () => flushPendingLayout(), []); // eslint-disable-line react-hooks/exhaustive-deps
 
   // Generate a proper PDF with selectable text and clickable links
   const handleExportPDF = async (data: ResumeFormData) => {
@@ -317,6 +359,7 @@ const Preview: React.FC = () => {
   };
 
   const redirectTemplates = () => {
+    flushPendingLayout();
     const toastId = toast.loading("Redirecting to Templates page...");
     setTimeout(() => {
       toast.dismiss(toastId);
@@ -325,6 +368,7 @@ const Preview: React.FC = () => {
   };
 
   const redirectResumes = () => {
+    flushPendingLayout();
     const toastId = toast.loading("Redirecting to Resume Dashboards...");
     setTimeout(() => {
       toast.dismiss(toastId);
@@ -496,7 +540,7 @@ const Preview: React.FC = () => {
           <div
             className="h-1/2 lg:h-full flex flex-col overflow-hidden"
             style={{
-              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px)` : '100%',
+              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${orderPanelOpen ? 320 : 0}px)` : '100%',
             }}
           >
             {/* Preview Header - Fixed */}
@@ -532,6 +576,32 @@ const Preview: React.FC = () => {
                       {liveStatus === 'error' && 'Update failed, will retry on next edit'}
                     </span>
                   )}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          aria-label="Section order"
+                          aria-pressed={orderPanelOpen}
+                          disabled={!pdfUrl}
+                          onClick={() => setOrderPanelOpen((open) => !open)}
+                          className={`
+                            ${isDarkMode
+                              ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
+                              : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
+                            }
+                            ${orderPanelOpen ? 'ring-2 ring-indigo-500' : ''}
+                            transition-all duration-200 hover:scale-105
+                          `}
+                        >
+                          <ArrowUpDown className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Section order</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
                   <Button
                     variant="outline"
                     onClick={redirectTemplates}
@@ -564,7 +634,7 @@ const Preview: React.FC = () => {
 
                   <Button
                     id="exportButton"
-                    onClick={() => handleExportPDF(resumeData)}
+                    onClick={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current })}
                     disabled={loadingExport || !pdfUrl}
                     className={`
                       ${isDarkMode
@@ -648,6 +718,17 @@ const Preview: React.FC = () => {
               )}
             </div>
           </div>
+
+          {orderPanelOpen && (
+            <SectionOrderPanel
+              template={activeTemplate}
+              data={resumeData}
+              layout={sectionLayout}
+              isDarkMode={isDarkMode}
+              onChange={handleLayoutChange}
+              onClose={() => setOrderPanelOpen(false)}
+            />
+          )}
         </div>
       </div>
     )

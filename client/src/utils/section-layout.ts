@@ -226,7 +226,8 @@ export const convertLayout = (
   data: ResumeFormData,
 ): SectionLayout => {
   const headerOfSource = LAYOUTS[saved.template]?.header ?? [];
-  const ordered = [...headerOfSource, ...saved.columns.flatMap((column) => (Array.isArray(column) ? column : []))];
+  const savedColumns = Array.isArray(saved.columns) ? saved.columns : [];
+  const ordered = [...headerOfSource, ...savedColumns.flatMap((column) => (Array.isArray(column) ? column : []))];
   return {
     template: to,
     columns: pinInto(to, data, distributeFree(to, data, ordered, new Map())),

@@ -158,6 +158,15 @@ describe("convertLayout", () => {
   });
 });
 
+describe("convertLayout with malformed input", () => {
+  it("falls back to defaults when saved columns is not an array", () => {
+    const saved = { template: 'cigar', columns: null } as unknown as SectionLayout;
+    const out = convertLayout(saved, 'andromeda', data2);
+    expect(out.template).toBe('andromeda');
+    expect(out.columns).toEqual(getDefaultColumns('andromeda', data2));
+  });
+});
+
 describe("normalizeLayout", () => {
   it("re-pins a pinned section the user tried to move and tags the template", () => {
     const out = normalizeLayout('apollo', [['education', 'skills', 'interests', 'languages', 'projects', 'certifications', 'summary'], ['awards', 'experience', 'references']], data2);
