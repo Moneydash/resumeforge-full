@@ -2,6 +2,8 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import andromedaCSS from "@/styles/templates/galaxy/andromeda.css?inline";
+import { getRenderColumns } from "@/utils/section-layout";
+import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
   const expSection = (
@@ -182,6 +184,27 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
     </section>
   );
 
+  const columns = getRenderColumns('andromeda', data);
+  const sections: SectionMap = {
+    summary: (
+      <section className="section">
+        <h3 className="section-title">Summary</h3>
+        <div className="summary">
+          <p>{data.summary}</p>
+        </div>
+      </section>
+    ),
+    experience: expSection,
+    education: educSection,
+    languages: langSection,
+    certifications: certSection,
+    interests: interestSection,
+    skills: skillSection,
+    projects: projSection,
+    awards: awardsSection,
+    references: refSection,
+  };
+
   return (
     <>
       <style>
@@ -205,47 +228,10 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
         </header>
         <div className="main-content">
           <div className="left-column">
-            <section className="section">
-              <h3 className="section-title">Summary</h3>
-              <div className="summary">
-                <p>{data.summary}</p>
-              </div>
-            </section>
-            {data.experience && data.experience.filter(exp => !exp.hidden).length > 0 && expSection}
-            {/* if experience is less than 4 then display the education on the left column */}
-            {data.experience.filter(exp => !exp.hidden)?.length <= 2 && data.education && data.education?.filter(ed => !ed.hidden)?.length > 0 && educSection}
-            {/* if experience is less than 2, display the languages and certifications into left column */}
-            {data.experience.filter(exp => !exp.hidden).length <= 2 && (
-              <>
-                {/* languages */}
-                {data.languages && data?.languages?.length >= 1 && langSection}
-
-                {/* certifications */}
-                {data.certifications && data?.certifications?.filter(cert => !cert.hidden)?.length >= 1 && certSection}
-
-                {/* interests */}
-                {data.interests && data?.interests?.length >= 1 && interestSection}
-              </>
-            )}
+            {renderSections(columns[0], sections)}
           </div>
           <div className="right-column">
-            {data.experience.filter(exp => !exp.hidden)?.length > 2 && data.education && data.education?.filter(ed => !ed.hidden)?.length > 0 && educSection}
-            {data.skills && data.skills?.filter(s => !s.hidden).length > 0 && skillSection}
-            {data.projects && projSection}
-            {data.experience.filter(exp => !exp.hidden)?.length > 2 && (
-              <>
-                {/* languages */}
-                {data.languages && data?.languages?.length >= 1 && langSection}
-
-                {/* certifications */}
-                {data.certifications && data?.certifications?.filter(cert => !cert.hidden)?.length >= 1 && certSection}
-
-                {/* interests */}
-                {data.interests && data?.interests?.length >= 1 && interestSection}
-              </>
-            )}
-            {data?.awards && data?.awards?.filter(award => !award.hidden)?.length >= 1 && awardsSection}
-            {data?.references && data?.references.filter(reference => !reference.hidden)?.length >= 1 && refSection}
+            {renderSections(columns[1], sections)}
           </div>
         </div>
       </div>
