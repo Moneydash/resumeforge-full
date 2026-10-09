@@ -19,6 +19,7 @@ import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from "@/components/ui/dialog";
 import { Input } from "@/components/ui/input";
 import ThemeToggle from '@/components/ThemeToggle';
+import LogoutButton from '@/components/LogoutButton';
 
 // Import snapshot images for cover letter templates
 import aetherImg from "@/assets/cl-snapshots/elements/aether.jpg";
@@ -201,6 +202,7 @@ const CLDashboard: React.FC = () => {
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
+      <LogoutButton />
       {/* Delete dialog */}
       <Dialog open={deleteDialogOpen} onOpenChange={(open) => {
         setDeleteDialogOpen(open);

@@ -343,7 +343,25 @@ const logout: Controller = async (req, res) => {
     if (err) {
       return res.status(500).json({ error: 'Logout failed' });
     }
-    res.json({ message: 'Logged out successfully' });
+    // Destroy the server-side session and clear the HttpOnly cookies the browser cannot remove itself
+    req.session.destroy((destroyErr) => {
+      if (destroyErr) {
+        console.error('Failed to destroy session on logout:', destroyErr);
+      }
+      const isProduction = process.env.NODE_ENV === 'production';
+      res.clearCookie('connect.sid', {
+        httpOnly: true,
+        secure: isProduction,
+        sameSite: isProduction ? 'none' : 'lax'
+      });
+      res.clearCookie('XSRF-TOKEN', {
+        httpOnly: true,
+        sameSite: 'none',
+        secure: true,
+        signed: true
+      });
+      res.json({ message: 'Logged out successfully' });
+    });
   });
 };
 
