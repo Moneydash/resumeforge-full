@@ -8,10 +8,10 @@ Let users choose the order of resume sections per resume. Template design (marku
 
 ## Confirmed requirements
 
-- Header and contact info are fixed and not movable.
+- Header and contact info are fixed and not movable. The header is a fixed region: whatever a template renders in its header (e.g. hermes renders Summary in the header) stays there, is never draggable, is never part of the sortable board, and no column section can be placed in the header. This holds across any template switch: moving to hermes (from andromeda, cigar, or anywhere) always puts Summary in the header, and moving from hermes to a single-column template places the header content first, then the left column, then the right. Each template's config declares its `header` sections; these are verified against every template's source when writing the plan.
 - Movable sections: summary, socials, experience, education, skills, projects, awards, certifications, references, languages, interests (limited per template to what that template renders; `comet` renders only summary, skills, projects, interests).
 - Single-column templates (zeus, hera, cigar, milky_way, comet): one draggable list.
-- Column templates (andromeda, artemis, hermes: Summary and Experience pinned left; athena, apollo: pinned right): board with one column per template column, in visual left-to-right order. Drag within a column and across columns.
+- Column templates (andromeda, artemis: Summary and Experience pinned left; hermes: Summary in the header and Experience pinned left; athena, apollo: pinned right): board with one column per template column, in visual left-to-right order. Drag within a column and across columns.
 - **Summary and Experience are fully fixed** in column templates: they keep both their column and their exact default slot, cannot be dragged, and the user arranges the other sections around them. They can only be repositioned by switching to a single-column template.
 - A resume with no saved layout renders exactly as today. For hermes and andromeda the existing experience-count rules (visible experience entries: hermes References left if < 3 else right; andromeda Education/Languages/Certifications/Interests placement at <= 2) remain the default for the free sections until the user saves a layout; a saved layout overrides them.
 - Switching templates:
@@ -30,7 +30,7 @@ Let users choose the order of resume sections per resume. Template design (marku
 New pure module `client/src/utils/section-layout.ts`:
 
 - `SectionId` union and section registry (id, label).
-- Per-template config: column count, supported sections, per-section default column and default slot, pinned set (`summary`, `experience` for column templates). hermes/andromeda defaults are computed from data (experience-count rules).
+- Per-template config: header sections (fixed, excluded from layout), column count, supported sections, per-section default column and default slot, pinned set (`summary`, `experience` for column templates). hermes/andromeda defaults are computed from data (experience-count rules).
 - `resolveLayout(template, saved, data): SectionId[][]` - returns final columns. Pinned sections always at their default column and slot; free sections fill remaining slots in saved order; sections missing from the saved layout are appended to their default column; unknown or unsupported ids are dropped.
 - `convertLayout(saved, fromTemplate, toTemplate): SectionLayout` - implements the switching rules above.
 - `isDefaultLayout` / reset helper.
