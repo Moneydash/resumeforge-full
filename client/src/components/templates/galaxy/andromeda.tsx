@@ -149,10 +149,10 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
           ?.map((reference, i) => (
             <div key={i} className="reference">
               <h3 className="item-title">{reference.name}</h3>
-              <p className="item-subtitle">{reference.title} at {reference.company}</p>
+              <p className="item-subtitle">{[reference.title, reference.company].filter(Boolean).join(' at ')}</p>
               <div className="reference-contact">
-                <p>{reference?.email || '-'}</p>
-                <p>{reference?.phone || '-'}</p>
+                {reference?.email && <p>{reference.email}</p>}
+                {reference?.phone && <p>{reference.phone}</p>}
               </div>
             </div>
           ))

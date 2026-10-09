@@ -418,7 +418,7 @@ const ATSScanner: React.FC = () => {
 
             <Button
               onClick={handleReset}
-              className="w-full inline-flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-semibold rounded-lg shadow hover:shadow-lg hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-200"
+              className="w-full mb-4 inline-flex items-center justify-center gap-2 px-4 py-3 bg-white dark:bg-slate-700 border border-gray-200 dark:border-gray-600 text-gray-900 dark:text-white font-semibold rounded-lg shadow hover:shadow-lg hover:bg-gray-50 dark:hover:bg-slate-600 transition-all duration-200"
             >
               <RotateCcw className="w-4 h-4" />
               Scan Another Resume

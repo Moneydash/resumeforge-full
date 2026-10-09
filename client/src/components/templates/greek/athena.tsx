@@ -11,10 +11,10 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
         <div className="sidebar-title">{data?.personal?.headline}</div>
       </div>
       <div className="sidebar-contact">
-        <div className="sidebar-contact-item"><i className="icon-location"></i>{data?.personal?.location}</div>
-        <div className="sidebar-contact-item"><i className="icon-email"></i>{data?.personal?.email}</div>
-        <div className="sidebar-contact-item"><i className="icon-phone"></i>{data?.personal?.contact_number}</div>
-        <div className="sidebar-contact-item"><i className="icon-website"></i><a href={data?.personal?.website?.link}>{data?.personal?.website?.name}</a></div>
+        {data?.personal?.location && <div className="sidebar-contact-item"><i className="icon-location" aria-hidden="true"></i>{data.personal.location}</div>}
+        {data?.personal?.email && <div className="sidebar-contact-item"><i className="icon-email" aria-hidden="true"></i>{data.personal.email}</div>}
+        {data?.personal?.contact_number && <div className="sidebar-contact-item"><i className="icon-phone" aria-hidden="true"></i>{data.personal.contact_number}</div>}
+        {data?.personal?.website?.name && <div className="sidebar-contact-item"><i className="icon-website" aria-hidden="true"></i><a href={data.personal.website.link}>{data.personal.website.name}</a></div>}
       </div>
     </>
   );
@@ -178,9 +178,9 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
           <div className="main-exp-item" key={i}>
             <div className="main-exp-header">
               <div className="main-exp-title">{reference?.name}</div>
-              <div className="main-exp-company">{reference?.title} at {reference?.company}</div>
+              <div className="main-exp-company">{[reference?.title, reference?.company].filter(Boolean).join(' at ')}</div>
             </div>
-            <div className="main-exp-desc">{reference?.email || '-'} | {reference?.phone || '-'}</div>
+            <div className="main-exp-desc">{[reference?.email, reference?.phone].filter(Boolean).join(' | ')}</div>
           </div>
         ))
       }
