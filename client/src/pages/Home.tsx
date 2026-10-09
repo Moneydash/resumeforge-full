@@ -51,9 +51,7 @@ const Home = () => {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center space-x-3">
-              <div className="w-8 h-8 bg-gradient-to-r from-blue-600 to-violet-600 rounded-lg flex items-center justify-center">
-                <FileText className="w-5 h-5 text-white" />
-              </div>
+              <img src="/icon.png" alt="" width={32} height={32} className="w-8 h-8 rounded-lg" />
               <span className="text-xl font-semibold text-gray-900">ResumeForge</span>
             </div>
             <div className="hidden md:flex items-center space-x-8">
