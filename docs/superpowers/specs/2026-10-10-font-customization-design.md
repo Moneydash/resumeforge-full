@@ -98,7 +98,7 @@ Notes on specific files:
 
 ### 3. Setting the variable
 
-`TemplateComponent` and `CoverLetterTemplateComponent` receive the resolved font entry (or nothing) and set both variables as an inline style on their existing wrapper `div`: `style={{ '--doc-font': bodyStack, '--doc-heading-font': headingStack }}`. The variables are only set when the user has a valid saved choice for the active template; otherwise no style attribute is emitted, so default markup is byte-for-byte unchanged. Because the wrapper is part of the `renderToString` output that is already sent to the server, the PDF HTML carries the variable automatically.
+The PDF server sets both variables on `:root` in the document `<head>` (`:root { --doc-font: …; --doc-heading-font: … }`), only when the document has a valid saved choice for the active template. It has to be `:root`, not the template wrapper `div`: nine of the ten resume templates and all five cover letter templates set their font on `body`, which is an ancestor of the wrapper and cannot see a variable defined on it. The client therefore does not touch the template components or their markup, and default markup is byte-for-byte unchanged.
 
 ### 4. Data
 
@@ -109,8 +109,9 @@ Notes on specific files:
 
 ### 5. PDF servers
 
-- The client adds `fontFamily` (the resolved font **id**, explicit or default) to the request payload for resume and cover letter PDF generation (`pdfPayload` / `pdfPayloadv2` in `client/src/utils/helper.ts`).
-- Server, in `pdf.ts`, `pdfGenerator.ts` and `cl-pdf.ts`: validate the id against the server registry (unknown or missing falls back to the template default), then emit a `<link>` for each of that entry's `googleHrefs` (one, or two for the pairing, so Cinzel is now actually loaded for Zeus and for any template using the pairing). The per-template link ladders in `pdf.ts` and `pdfGenerator.ts` and the fixed `FONT_CONFIGS` in `cl-pdf.ts` are deleted.
+- No payload change: the request body already carries the whole document as `data`, which includes `data.fontFamily` (see Data).
+- `server/src/utils/pdfGenerator.ts` is not imported anywhere (dead duplicate of `controllers/pdf.ts`) and is deleted rather than migrated.
+- Server, in `pdf.ts` and `cl-pdf.ts`: resolve the font from `data.fontFamily` and the template with the server registry (unknown, malformed or other-template values fall back to the template default), then emit a `<link>` for each of that entry's `googleHrefs` (one, or two for the pairing, so Cinzel is now actually loaded for Zeus and for any template using the pairing). The per-template link ladders in `pdf.ts` and `pdfGenerator.ts` and the fixed `FONT_CONFIGS` in `cl-pdf.ts` are deleted.
 - `cl-pdf.ts` currently forces `body, * { font-family: … !important }`. That rule is dropped for cover letters; the template CSS variable now does the job, and it removes the risk of overriding icon fonts.
 - The font id is validated server-side against a fixed allow-list, so it never reaches the HTML as free text.
 - Existing wait logic (`networkidle0` plus `document.fonts.ready`) already waits for the font to load.
@@ -132,7 +133,7 @@ Notes on specific files:
 ## Testing
 
 - Registry tests (both packages): every `TEMPLATE_DEFAULT_FONT` id exists; every entry has at least one `googleHref`, a `bodyStack` and a `headingStack` (equal for single fonts, different for the pairing); `resolveFontId` handles missing, wrong-template, and unknown-id inputs.
-- Template render tests (Vitest, existing setup): with a saved choice the wrapper carries `--doc-font` and `--doc-heading-font`; with none it emits no style attribute. The existing template snapshots are regenerated once; the diff must consist only of `font-family` declarations (plus the Hermes/Artemis fallback changes).
+- Server font-head builder tests (Vitest is added to the server as a dev dependency, as was done for the client): with a saved choice the output contains the `:root` variables and the right `<link>`s; with none it contains only the default font's links and no variables. The existing template snapshots are regenerated once; the diff must consist only of `font-family` declarations (plus the Hermes/Artemis fallback changes).
 - A script-level check that no template CSS file still contains a raw `font-family:` without `var(--doc-font` or `var(--doc-heading-font`, and no file references Ubuntu.
 - Manual: for one template of each family (resume and cover letter), pick several fonts, confirm the PDF preview and the downloaded PDF match, icons still render, reset restores the default, clone keeps the choice. `tsc -b` and eslint pass on client and server.
 
