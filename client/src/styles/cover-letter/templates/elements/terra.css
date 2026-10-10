@@ -2,12 +2,12 @@ body {
   background: #f8fafc !important;
   padding: 2rem !important;
   margin: 0 !important;
-  font-family: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: var(--doc-font, "Poppins", -apple-system, BlinkMacSystemFont, sans-serif) !important;
 }
 
 .cover-letter-template {
   padding: 1.5rem !important;
-  font-family: "Poppins", -apple-system, BlinkMacSystemFont, sans-serif !important;
+  font-family: var(--doc-font, "Poppins", -apple-system, BlinkMacSystemFont, sans-serif) !important;
   font-size: 15px !important;
   line-height: 1.6 !important;
   color: #1f2937 !important;
@@ -36,6 +36,7 @@ body {
   letter-spacing: 0.025em !important;
   line-height: 1.1 !important;
   text-transform: uppercase !important;
+  font-family: var(--doc-heading-font, inherit) !important;
 }
 
 .sender-title {

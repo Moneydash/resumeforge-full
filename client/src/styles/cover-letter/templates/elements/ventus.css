@@ -6,7 +6,7 @@
 body {
   margin: 0 !important;
   padding: 0 !important;
-  font-family: "IBM Plex Sans", sans-serif !important;
+  font-family: var(--doc-font, "IBM Plex Sans", sans-serif) !important;
   color: #1e293b !important;
 }
 
@@ -37,6 +37,7 @@ body {
   letter-spacing: 0.5px !important;
   margin: 0 0 0.5rem 0 !important;
   text-shadow: 0 2px 4px rgba(0, 0, 0, 0.1) !important;
+  font-family: var(--doc-heading-font, inherit) !important;
 }
 
 .sender-title {

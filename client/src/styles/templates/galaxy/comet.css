@@ -1,5 +1,5 @@
 body {
-  font-family: 'Poppins', Arial, Helvetica, sans-serif;
+  font-family: var(--doc-font, 'Poppins', Arial, Helvetica, sans-serif);
   color: #232323;
   background: #fff;
   margin: 0 !important;
@@ -24,6 +24,7 @@ body {
   font-weight: 700;
   color: #1976d2;
   margin: 0 !important;
+  font-family: var(--doc-heading-font, inherit) !important;
 }
 
 .comet-headline {
@@ -64,6 +65,7 @@ body {
   border-bottom: 1px solid #e0e0e0;
   padding-bottom: 0.13rem !important;
   letter-spacing: 0.5px;
+  font-family: var(--doc-heading-font, inherit) !important;
 }
 
 .comet-summary {

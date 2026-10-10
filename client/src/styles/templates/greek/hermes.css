@@ -3,7 +3,7 @@
 }
 
 .hermes-resume {
-  font-family: 'Ubuntu', sans-serif !important;
+  font-family: var(--doc-font, 'Roboto Slab', serif) !important;
   background-color: #ffffff !important;
   color: #333333 !important;
   line-height: 1.6 !important;
@@ -31,6 +31,7 @@
   letter-spacing: 0.5px !important;
   margin: 1.5rem 1rem 0.25rem 1rem !important;
   line-height: 1 !important;
+  font-family: var(--doc-heading-font, inherit) !important;
 }
 
 .resume-title {
@@ -143,6 +144,7 @@
   border-bottom: 1px solid #2c3e50 !important;
   display: flex !important;
   align-items: center !important;
+  font-family: var(--doc-heading-font, inherit) !important;
 }
 
 .section-icon {

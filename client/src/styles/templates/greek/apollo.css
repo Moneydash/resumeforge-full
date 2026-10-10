@@ -3,7 +3,7 @@
 }
 
 body {
-  font-family: 'Poppins', Arial, sans-serif !important;
+  font-family: var(--doc-font, 'Poppins', Arial, sans-serif) !important;
   color: #1a202c !important;
   background: #f7fafc !important;
   margin: 0 !important;
@@ -27,7 +27,7 @@ body {
 }
 
 .resume-header-name {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Poppins', sans-serif)) !important;
   font-size: 2.2rem !important;
   font-weight: 600 !important;
   letter-spacing: 0.03em !important;
@@ -126,7 +126,7 @@ body {
 }
 
 .sidebar-section-title {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Poppins', sans-serif)) !important;
   font-size: 0.95rem !important;
   font-weight: 600 !important;
   color: #065f46 !important;
@@ -316,7 +316,7 @@ body {
 }
 
 .main-section-title {
-  font-family: 'Poppins', sans-serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Poppins', sans-serif)) !important;
   font-size: 1.1rem !important;
   font-weight: 600 !important;
   color: #065f46 !important;

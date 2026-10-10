@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: 'DM Serif Text', Georgia, serif !important;
+  font-family: var(--doc-font, 'DM Serif Text', Georgia, serif) !important;
   color: #2c1810 !important;
   background: linear-gradient(135deg, #f5f1e8 0%, #ede4d1 100%) !important;
   margin: 0 !important;
@@ -57,7 +57,7 @@ body {
 }
 
 .greek-name {
-  font-family: 'Cinzel', serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Cinzel', serif)) !important;
   font-size: 1.8rem !important;
   font-weight: 700 !important;
   color: #ffd700 !important;
@@ -67,7 +67,7 @@ body {
 }
 
 .greek-headline {
-  font-family: 'Cinzel', serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Cinzel', serif)) !important;
   font-size: 1rem !important;
   font-weight: 600 !important;
   color: #e6d7b8 !important;
@@ -135,7 +135,7 @@ body {
 }
 
 .greek-section-title {
-  font-family: 'Cinzel', serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Cinzel', serif)) !important;
   font-size: 1.1rem !important;
   font-weight: 700 !important;
   color: #1a2855 !important;
@@ -164,7 +164,7 @@ body {
 
 .greek-item-header {
   font-size: 0.95rem !important;
-  font-family: 'Cinzel', serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Cinzel', serif)) !important;
   font-weight: 600 !important;
   color: #1a2855 !important;
   margin-bottom: 0.3rem !important;
@@ -188,7 +188,7 @@ body {
   margin-left: auto !important;
   font-size: 0.85rem !important;
   color: #b8860b !important;
-  font-family: 'DM Serif Text', serif !important;
+  font-family: var(--doc-font, 'DM Serif Text', serif) !important;
   font-weight: 600 !important;
 }
 
