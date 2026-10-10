@@ -31,7 +31,7 @@ body {
   overflow: hidden !important;
   min-height: 100vh !important;
   border-top: 6px solid transparent !important;
-  border-image: linear-gradient(90deg, #2b6cb5 0%, #1e40af 25%, #3b82f6 50%, #60a5fa 75%, #93c5fd 100%) 1 !important;
+  border-image: var(--doc-primary-strip, linear-gradient(90deg, #2b6cb5 0%, #1e40af 25%, #3b82f6 50%, #60a5fa 75%, #93c5fd 100%)) 1 !important;
 }
 
 /* Sidebar Styles - FIXED */
@@ -40,7 +40,7 @@ body {
   background:
     radial-gradient(circle at 20% 80%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
     radial-gradient(circle at 80% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-    linear-gradient(180deg, #1e3a8a 0%, #1e40af 30%, #2563eb 100%) !important;
+    var(--doc-primary-bg, linear-gradient(180deg, #1e3a8a 0%, #1e40af 30%, #2563eb 100%)) !important;
   color: #ffffff !important;
   padding: 1.5rem 1rem !important;
   overflow: visible !important;
@@ -67,7 +67,7 @@ body {
 
 .sidebar-title {
   font-size: 0.9rem !important;
-  color: #bfdbfe !important;
+  color: var(--doc-primary-light, #bfdbfe) !important;
   font-weight: 400 !important;
   letter-spacing: 0.025em !important;
   line-height: 1.4 !important;
@@ -81,7 +81,7 @@ body {
   display: flex !important;
   align-items: flex-start !important;
   font-size: 0.85rem !important;
-  color: #e0e7ff !important;
+  color: var(--doc-primary-lighter, #e0e7ff) !important;
   margin-bottom: 0.75rem !important;
   line-height: 1.4 !important;
 }
@@ -119,7 +119,7 @@ body {
 }
 
 .sidebar-contact-item a {
-  color: #bfdbfe !important;
+  color: var(--doc-primary-light, #bfdbfe) !important;
   text-decoration: none !important;
   transition: color 0.2s ease !important;
   word-break: break-word !important;
@@ -141,7 +141,7 @@ body {
   margin-bottom: 0.75rem !important;
   padding-bottom: 0.4rem !important;
   border-bottom: 1px solid rgba(255, 255, 255, 0.2) !important;
-  background: linear-gradient(#93c5fd, #93c5fd) no-repeat left bottom / 25px 1px !important;
+  background: linear-gradient(var(--doc-primary-light, #93c5fd), var(--doc-primary-light, #93c5fd)) no-repeat left bottom / 25px 1px !important;
   background-origin: border-box !important;
   text-transform: uppercase !important;
   letter-spacing: 0.05em !important;
@@ -169,14 +169,14 @@ body {
 
 .sidebar-edu-school {
   font-size: 0.75rem !important;
-  color: #bfdbfe !important;
+  color: var(--doc-primary-light, #bfdbfe) !important;
   margin-bottom: 0.25rem !important;
   line-height: 1.3 !important;
 }
 
 .sidebar-edu-date {
   font-size: 0.7rem !important;
-  color: #e0e7ff !important;
+  color: var(--doc-primary-lighter, #e0e7ff) !important;
   font-weight: 300 !important;
 }
 
@@ -223,7 +223,7 @@ body {
 
 .sidebar-project-desc {
   font-size: 0.75rem !important;
-  color: #bfdbfe !important;
+  color: var(--doc-primary-light, #bfdbfe) !important;
   margin-bottom: 0.5rem !important;
   line-height: 1.4 !important;
 }
@@ -235,13 +235,13 @@ body {
 }
 
 .sidebar-tech-tag {
-  background: rgba(147, 197, 253, 0.2) !important;
-  color: #93c5fd !important;
+  background: color-mix(in srgb, var(--doc-primary-light, #93c5fd) 20%, transparent) !important;
+  color: var(--doc-primary-light, #93c5fd) !important;
   padding: 0.2rem 0.5rem !important;
   border-radius: 8px !important;
   font-size: 0.65rem !important;
   font-weight: 500 !important;
-  border: 1px solid rgba(147, 197, 253, 0.3) !important;
+  border: 1px solid color-mix(in srgb, var(--doc-primary-light, #93c5fd) 30%, transparent) !important;
 }
 
 /* Sidebar Certifications Styles */
@@ -270,7 +270,7 @@ body {
 
 .sidebar-cert-org {
   font-size: 0.75rem !important;
-  color: #bfdbfe !important;
+  color: var(--doc-primary-light, #bfdbfe) !important;
   margin-bottom: 0.25rem !important;
   line-height: 1.3 !important;
 }
@@ -278,7 +278,7 @@ body {
 .sidebar-cert-date,
 .sidebar-award-date {
   font-size: 0.7rem !important;
-  color: #e0e7ff !important;
+  color: var(--doc-primary-lighter, #e0e7ff) !important;
   font-weight: 300 !important;
 }
 
@@ -301,10 +301,10 @@ body {
   font-family: var(--doc-heading-font, var(--doc-font, 'Lexend Deca', Roboto, sans-serif)) !important;
   font-size: 1.3rem !important;
   font-weight: 600 !important;
-  color: #1e40af !important;
+  color: var(--doc-primary-darker, #1e40af) !important;
   margin-bottom: 1.25rem !important;
   padding-bottom: 0.5rem !important;
-  background: linear-gradient(90deg, #2563eb 0%, rgba(37, 99, 235, 0.2) 100%) no-repeat left bottom / 100% 1px !important;
+  background: var(--doc-primary-fade, linear-gradient(90deg, #2563eb 0%, rgba(37, 99, 235, 0.2) 100%)) no-repeat left bottom / 100% 1px !important;
   text-transform: uppercase !important;
   letter-spacing: 0.025em !important;
 }
@@ -317,7 +317,7 @@ body {
 }
 
 .main-social-link {
-  color: #2563eb !important;
+  color: var(--doc-primary-ink, #2563eb) !important;
   text-decoration: none !important;
   transition: all 0.2s ease !important;
   font-size: 0.85rem !important;
@@ -325,9 +325,9 @@ body {
 }
 
 .main-social-link:hover {
-  background: #2563eb !important;
+  background: var(--doc-primary-dark, #2563eb) !important;
   color: #ffffff !important;
-  border-color: #2563eb !important;
+  border-color: var(--doc-primary-dark, #2563eb) !important;
 }
 
 .main-summary {
@@ -338,7 +338,7 @@ body {
   background: #f8fafc !important;
   padding: 1rem 1.25rem !important;
   border-radius: 6px !important;
-  border-left: 4px solid #2563eb !important;
+  border-left: 4px solid var(--doc-primary, #2563eb) !important;
 }
 
 .main-exp-item {
@@ -376,7 +376,7 @@ body {
 
 .main-exp-company {
   font-size: 0.95rem !important;
-  color: #2563eb !important;
+  color: var(--doc-primary-ink, #2563eb) !important;
   font-weight: 500 !important;
   font-style: italic !important;
 }
@@ -414,7 +414,7 @@ body {
 
 .tech-tag,
 .sidebar-language-tag {
-  background: #2563eb !important;
+  background: var(--doc-primary-dark, #2563eb) !important;
   color: #ffffff !important;
   padding: 0.25rem 0.6rem !important;
   border-radius: 4px !important;
@@ -425,7 +425,7 @@ body {
 }
 
 .sidebar-language-tag {
-  background: #059669 !important;
+  background: var(--doc-primary-darker, #059669) !important;
   margin-bottom: 0.3rem !important;
   margin-right: 5px !important;
   display: inline-block !important;

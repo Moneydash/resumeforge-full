@@ -23,7 +23,7 @@ body {
 
 /* Header Styles */
 .header {
-  background: linear-gradient(90deg, rgba(73, 64, 245, 1) 0%, rgba(67, 67, 222, 1) 21%, rgba(0, 212, 255, 1) 100%);
+  background: var(--doc-primary-bg, linear-gradient(90deg, rgba(73, 64, 245, 1) 0%, rgba(67, 67, 222, 1) 21%, rgba(0, 212, 255, 1) 100%));
   color: white;
   padding-top: 1rem !important;
   padding-left: 2rem !important;
@@ -130,7 +130,7 @@ body {
 .section-title {
   font-size: 1rem;
   font-weight: 600;
-  color: #2563eb;
+  color: var(--doc-primary-ink, #2563eb);
   padding-bottom: 0.15rem !important;
   border-bottom: 2px solid #e5e7eb;
   margin-bottom: 0.5rem !important;
@@ -234,7 +234,7 @@ ul.list-disc li p {
 .keyword,
 .language,
 .interest {
-  background-color: #0496C7;
+  background-color: var(--doc-primary-dark, #0496C7);
   color: #FFF;
   padding: 0.25rem 0.75rem !important;
   border-radius: 50px;
@@ -244,8 +244,8 @@ ul.list-disc li p {
 }
 
 .technology {
-  background-color: #dbeafe;
-  color: #2563eb;
+  background-color: var(--doc-primary-tint, #dbeafe);
+  color: var(--doc-primary-ink, #2563eb);
   padding: 0.25rem 0.75rem !important;
   border-radius: 50px;
   font-size: 0.85rem;
@@ -264,7 +264,7 @@ ul.list-disc li p {
 
 /* Reference Styles */
 .reference {
-  border-bottom: 1px solid #dbeafe;
+  border-bottom: 1px solid var(--doc-primary-tint, #dbeafe);
   margin-bottom: 0.5rem !important;
   font-family: var(--doc-font, 'IBM Plex Serif', serif);
 }
