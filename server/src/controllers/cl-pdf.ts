@@ -2,42 +2,14 @@ import { Controller } from "@/types/types.controller-type";
 import { formatDescription } from "../utils/helper";
 import puppeteer, { Browser, Page } from "puppeteer";
 import { execSync } from 'child_process';
-
-// Centralized font configuration per template for clean extensibility
-type FontConfig = { link: string; family: string };
-const FONT_CONFIGS: Record<string, FontConfig> = {
-  aether: {
-    link:
-      `<link href="https://fonts.googleapis.com/css2?family=Montserrat:ital,wght@0,100..900;1,100..900&display=swap" rel="stylesheet">`,
-    family: `'Montserrat', sans-serif`
-  },
-  terra: {
-    link:
-      `<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">`,
-    family: `'Poppins', sans-serif`
-  },
-  aqua: {
-    link:
-      `<link href="https://fonts.googleapis.com/css2?family=Mozilla+Headline:wght@200..700&display=swap" rel="stylesheet">`,
-    family: `'Mozilla Headline', sans-serif`
-  },
-  ignis: {
-    link: `<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">`,
-    family: `'Geist', sans-serif`
-  },
-  ventus: {
-    link: `<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">`,
-    family: `'IBM Plex Serif', serif`
-  }
-};
+import { buildFontHead } from "../utils/fonts";
 
 const generate_cl_pdf: Controller = async (req, res) => {
   let browser: Browser | undefined;
   let page: Page | undefined;
 
   try {
-    const { html, template } = req.body;
-    const fontConfig = FONT_CONFIGS[String(template)];
+    const { html, template, data } = req.body;
     const formattedHtml = formatDescription(html)
 
     // Input validation
@@ -106,7 +78,7 @@ const generate_cl_pdf: Controller = async (req, res) => {
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
           <link rel="preconnect" href="https://fonts.googleapis.com">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          ${fontConfig ? fontConfig.link : ''}
+          ${buildFontHead(String(template), data?.fontFamily)}
           <style>
             /* Reset all default margins and padding */
             * {
@@ -114,13 +86,6 @@ const generate_cl_pdf: Controller = async (req, res) => {
               padding: 0 !important;
               box-sizing: border-box;
             }
-            
-            /* Apply template-specific fonts */
-            ${fontConfig ? `
-            body, * {
-              font-family: ${fontConfig.family} !important;
-            }
-            ` : ''}
           </style>
         </head>
         <body>
