@@ -31,7 +31,7 @@ import {
   LayoutDashboard,
   GripVertical,
   MoveLeft,
-  ArrowUpDown
+  Palette
 } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
 
@@ -40,7 +40,8 @@ import { getCsrfToken, pdfPayload } from '@/utils/helper';
 import client from '@/api/axiosInstance';
 import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
-import SectionOrderPanel from '@/components/SectionOrderPanel';
+import DesignPanel, { type DesignTab } from '@/components/DesignPanel';
+import type { SavedFont } from '@/utils/fonts';
 import { convertLayout, type SectionLayout } from '@/utils/section-layout';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -80,8 +81,11 @@ const Preview: React.FC = () => {
   const LAYOUT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF render, wait for the user to stop dragging
   const activeTemplate: TemplateType = template ?? 'andromeda';
   const [sectionLayout, setSectionLayout] = useState<SectionLayout | undefined>(undefined);
-  const [orderPanelOpen, setOrderPanelOpen] = useState(false);
+  const [designOpen, setDesignOpen] = useState(false);
+  const [designTab, setDesignTab] = useState<DesignTab>('sections');
   const sectionLayoutRef = useRef<SectionLayout | undefined>(undefined);
+  const [fontFamily, setFontFamily] = useState<SavedFont | undefined>(undefined);
+  const fontFamilyRef = useRef<SavedFont | undefined>(undefined);
   const resumeDataRef = useRef<ResumeFormData | null>(null);
   const layoutTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const handleFormSubmitRef = useRef<(data: ResumeFormData) => Promise<void>>(async () => { });
@@ -166,6 +170,8 @@ const Preview: React.FC = () => {
             : parsedData.sectionLayout;
           sectionLayoutRef.current = initialLayout;
           setSectionLayout(initialLayout);
+          fontFamilyRef.current = parsedData.fontFamily;
+          setFontFamily(parsedData.fontFamily);
           setResumeData(parsedData);
           handleFormSubmit(parsedData); // Use parsedData directly!
         } catch (e) {
@@ -284,8 +290,8 @@ const Preview: React.FC = () => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
     if (liveEdit) setLiveStatus('updating');
-    // the layout lives outside the form; always attach the current one (undefined is dropped from the JSON)
-    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current };
+    // the layout and font live outside the form; always attach the current ones (undefined is dropped from the JSON)
+    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current };
     try {
       resumeDataRef.current = data;
       setResumeData(data);
@@ -314,14 +320,25 @@ const Preview: React.FC = () => {
   }
   handleFormSubmitRef.current = handleFormSubmit; // always-fresh handle for the debounced layout callback
 
-  const handleLayoutChange = (next: SectionLayout | undefined) => {
-    sectionLayoutRef.current = next;
-    setSectionLayout(next);
+  // each change is a server-side PDF render: wait for the user to stop before saving and regenerating
+  const queueRegenerate = () => {
     clearTimeout(layoutTimerRef.current);
     layoutTimerRef.current = setTimeout(() => {
       layoutTimerRef.current = undefined;
       if (resumeDataRef.current) void handleFormSubmitRef.current(resumeDataRef.current);
     }, LAYOUT_DEBOUNCE_MS);
+  };
+
+  const handleLayoutChange = (next: SectionLayout | undefined) => {
+    sectionLayoutRef.current = next;
+    setSectionLayout(next);
+    queueRegenerate();
+  };
+
+  const handleFontChange = (next: SavedFont | undefined) => {
+    fontFamilyRef.current = next;
+    setFontFamily(next);
+    queueRegenerate();
   };
 
   // save a layout change that is still waiting on the debounce (leaving the page, exporting)
@@ -540,7 +557,7 @@ const Preview: React.FC = () => {
           <div
             className="h-1/2 lg:h-full flex flex-col overflow-hidden"
             style={{
-              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${orderPanelOpen ? 320 : 0}px)` : '100%',
+              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${designOpen ? 320 : 0}px)` : '100%',
             }}
           >
             {/* Preview Header - Fixed */}
@@ -582,23 +599,23 @@ const Preview: React.FC = () => {
                         <Button
                           variant="outline"
                           size="icon"
-                          aria-label="Section order"
-                          aria-pressed={orderPanelOpen}
+                          aria-label="Design"
+                          aria-pressed={designOpen}
                           disabled={!pdfUrl}
-                          onClick={() => setOrderPanelOpen((open) => !open)}
+                          onClick={() => setDesignOpen((open) => !open)}
                           className={`
                             ${isDarkMode
                               ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
                               : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
                             }
-                            ${orderPanelOpen ? 'ring-2 ring-indigo-500' : ''}
+                            ${designOpen ? 'ring-2 ring-indigo-500' : ''}
                             transition-all duration-200 hover:scale-105
                           `}
                         >
-                          <ArrowUpDown className="w-4 h-4" />
+                          <Palette className="w-4 h-4" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Section order</TooltipContent>
+                      <TooltipContent>Design</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
 
@@ -634,7 +651,7 @@ const Preview: React.FC = () => {
 
                   <Button
                     id="exportButton"
-                    onClick={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current })}
+                    onClick={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current })}
                     disabled={loadingExport || !pdfUrl}
                     className={`
                       ${isDarkMode
@@ -719,14 +736,16 @@ const Preview: React.FC = () => {
             </div>
           </div>
 
-          {orderPanelOpen && (
-            <SectionOrderPanel
-              template={activeTemplate}
-              data={resumeData}
-              layout={sectionLayout}
+          {designOpen && (
+            <DesignPanel
+              tab={designTab}
+              onTabChange={setDesignTab}
+              onClose={() => setDesignOpen(false)}
               isDarkMode={isDarkMode}
-              onChange={handleLayoutChange}
-              onClose={() => setOrderPanelOpen(false)}
+              template={activeTemplate}
+              fontSaved={fontFamily}
+              onFontChange={handleFontChange}
+              sections={{ template: activeTemplate, data: resumeData, layout: sectionLayout, onChange: handleLayoutChange }}
             />
           )}
         </div>

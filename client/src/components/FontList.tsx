@@ -2,19 +2,6 @@ import React from "react";
 import { Check, RotateCcw } from "lucide-react";
 import { FONTS, type FontEntry, type FontId } from "@/utils/fonts";
 
-// The list previews every font in its own typeface; load them only once it is first shown.
-let fontsRequested = false;
-export const ensurePickerFontsLoaded = () => {
-  if (fontsRequested || typeof document === "undefined") return;
-  fontsRequested = true;
-  new Set(FONTS.flatMap((f) => f.googleHrefs)).forEach((href) => {
-    const link = document.createElement("link");
-    link.rel = "stylesheet";
-    link.href = href;
-    document.head.appendChild(link);
-  });
-};
-
 const GROUPS: Array<{ label: string; kind: FontEntry["kind"] }> = [
   { label: "Sans", kind: "sans" },
   { label: "Serif", kind: "serif" },
