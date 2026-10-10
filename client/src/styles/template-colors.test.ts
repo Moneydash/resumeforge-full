@@ -12,6 +12,7 @@ const THEME_LITERALS: Record<string, string[]> = {
   "templates/greek/athena.css": ["#2563eb", "#1e40af", "#1e3a8a", "#bfdbfe", "#e0e7ff", "#93c5fd", "#059669", "#2b6cb5", "#3b82f6", "#60a5fa", "rgba(147, 197, 253", "rgba(37, 99, 235"],
   "templates/greek/zeus.css": ["#d4af37", "#ffd700", "#b8860b", "#1a2855", "#2d4a9a", "rgba(255, 215, 0"],
   "templates/greek/artemis.css": ["#667eea", "#764ba2", "linear-gradient(135deg, #1a202c", "#63b3ed"],
+  "templates/galaxy/milky_way.css": ["#7b2ff2", "#f357a8", "#f3e7ff", "rgba(80, 0, 160", "rgba(123, 47, 242", "rgba(243, 87, 168"],
 };
 
 /** Removes every var(--doc-primary*|secondary*, ...) construct, including its fallback, with balanced parentheses. */
@@ -52,8 +53,8 @@ describe("themeable template CSS reads the color variables", () => {
     });
   });
 
-  it("zeus and artemis also use the secondary color variables", () => {
-    ["templates/greek/zeus.css", "templates/greek/artemis.css"].forEach((file) => {
+  it("zeus, artemis and milky way also use the secondary color variables", () => {
+    ["templates/greek/zeus.css", "templates/greek/artemis.css", "templates/galaxy/milky_way.css"].forEach((file) => {
       expect(fs.readFileSync(path.join(here, file), "utf8"), file).toMatch(/var\(--doc-secondary/);
     });
   });

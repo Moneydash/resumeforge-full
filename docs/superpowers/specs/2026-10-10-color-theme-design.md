@@ -19,6 +19,7 @@ Builds on the font customization (same Design panel, same save/regenerate flow, 
 | Athena | Primary ("Sidebar") | dark blue sidebar plus blue accents in the main column |
 | Zeus | Primary ("Header"), Secondary ("Accents") | navy header; gold borders, icons, dates, name |
 | Artemis | Primary ("Header"), Secondary ("Sidebar") | dark slate header; purple sidebar plus the same purple as accents in the main column |
+| Milky Way | Primary ("Header") only | purple-to-pink header gradient; purple titles, card borders and company names; pink dates, tags and accent bars |
 
 - Each slot can be set four ways, **Primary** gets all four, **Secondary** gets the first three:
   1. **Curated palette** of 8 swatches.
@@ -29,7 +30,8 @@ Builds on the font customization (same Design panel, same save/regenerate flow, 
 - A document with no color choice renders exactly as it does today.
 - When Primary is a gradient, accents that follow Primary (section titles, tags and so on) use the gradient's **first** stop.
 - The color choice is saved with the document and applies only to the template it was picked for, like the font choice.
-- Templates outside the four get no Color tab. Cover letters get no Color tab.
+- Milky Way is a single-color theme (added after the first design): its pink accents follow the **end** of the header gradient and its purple parts follow the **start**, so a solid pick makes the whole template one color. The client derives the accent family (`--doc-secondary*`) from the primary's end stop; it has no secondary slot.
+- Templates outside the five get no Color tab. Cover letters get no Color tab.
 
 ## Palette (8)
 

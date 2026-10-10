@@ -74,4 +74,14 @@ describe("ColorPanel", () => {
     const other: ColorTheme = { template: "zeus", primary: { type: "solid", color: "#2563eb" } };
     expect(resetDisabled(render({ theme: other }))).toBe(true); // a theme saved for another template does not count
   });
+
+  it("milky way: a single Header section with the Solid/Gradient switch", () => {
+    const html = render({ template: "milky_way" });
+    expect(html).toContain("Primary");
+    expect(html).toContain("Header");
+    expect(html).not.toContain("Secondary");
+    expect(html).toContain("Solid");
+    expect(html).toContain("Gradient");
+    expect(html).toContain('aria-label="Default"');
+  });
 });

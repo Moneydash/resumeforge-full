@@ -25,9 +25,10 @@ describe("registry", () => {
     expect(PALETTE.map((c) => c.hex)).toEqual(["#1e3a8a", "#2563eb", "#0f766e", "#15803d", "#6d28d9", "#be123c", "#b45309", "#334155"]);
   });
 
-  it("covers exactly the four themeable templates", () => {
-    expect(Object.keys(COLOR_TEMPLATES).sort()).toEqual(["andromeda", "artemis", "athena", "zeus"]);
+  it("covers exactly the five themeable templates", () => {
+    expect(Object.keys(COLOR_TEMPLATES).sort()).toEqual(["andromeda", "artemis", "athena", "milky_way", "zeus"]);
     expect(isColorTemplate("zeus")).toBe(true);
+    expect(isColorTemplate("milky_way")).toBe(true);
     expect(isColorTemplate("hermes")).toBe(false);
     expect(isColorTemplate("constructor")).toBe(false);
   });
@@ -321,6 +322,63 @@ describe("text and links on a custom fill stay readable", () => {
   it("only Artemis gets a link variable", () => {
     for (const t of ["andromeda", "athena", "zeus"] as const) {
       expect(buildThemeVars(t, { template: t, primary: { type: "solid", color: "#be123c" } })["--doc-primary-link"]).toBeUndefined();
+    }
+  });
+});
+
+describe("Milky Way (single color theme: accents follow the header gradient)", () => {
+  const solid: ColorTheme = { template: "milky_way", primary: { type: "solid", color: "#0f766e" } };
+  const grad: ColorTheme = { template: "milky_way", primary: { type: "gradient", from: "#0f766e", to: "#b45309", direction: "horizontal" } };
+  const stopsOf = (bg: string) => bg.match(/#[0-9a-f]{6}/g) as string[];
+
+  it("is a single-color template whose default header is its purple-to-pink gradient", () => {
+    expect(COLOR_TEMPLATES.milky_way.primaryLabel).toBe("Header");
+    expect(COLOR_TEMPLATES.milky_way.secondaryLabel).toBeUndefined();
+    expect(COLOR_TEMPLATES.milky_way.defaultPrimary).toEqual({ type: "gradient", from: "#7b2ff2", to: "#f357a8", direction: "horizontal" });
+  });
+
+  it("has no secondary slot, so a secondary pick is ignored", () => {
+    expect(readTheme("milky_way", { template: "milky_way", secondary: "#be123c" })).toBeUndefined();
+  });
+
+  it("a solid pick drives both color families with that one color", () => {
+    const vars = buildThemeVars("milky_way", solid);
+    expect(vars["--doc-primary"]).toBe("#0f766e");
+    expect(vars["--doc-secondary"]).toBe("#0f766e");
+    expect(vars["--doc-primary-bg"]).toBe("#0f766e");
+    expect(Object.keys(vars)).toHaveLength(16);
+  });
+
+  it("a gradient pick sends the start to the main family and the end to the accent family", () => {
+    const vars = buildThemeVars("milky_way", grad);
+    expect(vars["--doc-primary"]).toBe("#0f766e");
+    expect(vars["--doc-secondary"]).toBe("#b45309");
+    expect(vars["--doc-primary-bg"]).toBe("linear-gradient(90deg, #0f766e, #b45309)");
+    expect(contrast(vars["--doc-secondary-ink"], WHITE)).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(vars["--doc-primary-ink"], WHITE)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("keeps accent text and pill colors readable when the gradient ends in a pale color", () => {
+    const vars = buildThemeVars("milky_way", { template: "milky_way", primary: { type: "gradient", from: "#6d28d9", to: "#ffff00", direction: "diagonal" } });
+    expect(vars["--doc-secondary"]).toBe("#ffff00"); // exact, for decoration
+    expect(contrast(vars["--doc-secondary-ink"], WHITE)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("keeps the light header text readable against every header stop", () => {
+    const vars = buildThemeVars("milky_way", { template: "milky_way", primary: { type: "gradient", from: "#000000", to: "#ffff00", direction: "horizontal" } });
+    for (const stop of stopsOf(vars["--doc-primary-bg"])) expect(contrast(vars["--doc-primary-lighter"], stop)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("emits no Zeus or Artemis only variables", () => {
+    expect(buildThemeVars("milky_way", grad)["--doc-primary-link"]).toBeUndefined();
+    expect(Object.keys(buildThemeVars("milky_way", grad))).toHaveLength(16);
+  });
+
+  it("keeps extreme picks complete and well formed", () => {
+    for (const c of EXTREMES) {
+      const vars = buildThemeVars("milky_way", { template: "milky_way", primary: { type: "gradient", from: c, to: c, direction: "vertical" } });
+      expect(Object.keys(vars)).toHaveLength(16);
+      Object.values(vars).forEach((v) => expect(v).not.toMatch(/NaN|undefined/));
     }
   });
 });

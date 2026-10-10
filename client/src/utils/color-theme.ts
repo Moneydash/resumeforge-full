@@ -2,7 +2,7 @@
 // Pure and import-free on purpose: the PDF server only sanitizes the variables this module computes.
 
 export type Direction = 'horizontal' | 'diagonal' | 'vertical';
-export type ColorTemplate = 'andromeda' | 'athena' | 'zeus' | 'artemis';
+export type ColorTemplate = 'andromeda' | 'athena' | 'milky_way' | 'zeus' | 'artemis';
 
 export type PrimaryFill =
   | { type: 'solid'; color: string }
@@ -47,6 +47,11 @@ export const COLOR_TEMPLATES: Record<ColorTemplate, ColorTemplateConfig> = {
   athena: {
     primaryLabel: 'Sidebar',
     defaultPrimary: { type: 'gradient', from: '#1e3a8a', to: '#2563eb', direction: 'vertical' },
+    secondaryUnderWhiteText: false,
+  },
+  milky_way: {
+    primaryLabel: 'Header',
+    defaultPrimary: { type: 'gradient', from: '#7b2ff2', to: '#f357a8', direction: 'horizontal' },
     secondaryUnderWhiteText: false,
   },
   zeus: {
@@ -285,6 +290,9 @@ const ZEUS_DEFAULT_ACCENT = '#ffd700';
 /** Artemis paints its social links in this pale blue on the header. */
 const ARTEMIS_DEFAULT_LINK = '#63b3ed';
 
+/** The end of the header fill: the solid color itself, or the gradient's last stop. */
+const endOf = (fill: PrimaryFill): string => (fill.type === 'solid' ? fill.color : fill.to);
+
 /** Only the variables for slots with a valid choice for this template; an empty object means "render the default". */
 export function buildThemeVars(template: string, theme?: unknown): Record<string, string> {
   const t = readTheme(template, theme);
@@ -292,11 +300,14 @@ export function buildThemeVars(template: string, theme?: unknown): Record<string
   // the accent text must read on whatever header the user ends up with, so it is lightened until it does
   const accentOn = (base: string) => lightenToContrast(base, headerStops(t.template, t.primary));
   const light = t.template === 'zeus' ? accentOn(t.secondary ? mix(t.secondary, WHITE, 0.35) : ZEUS_DEFAULT_ACCENT) : undefined;
+  // Milky Way has one slot: its pink accents follow the end of the header gradient, its purple parts follow the start
+  const accent: Record<string, string> = t.template === 'milky_way' && t.primary ? secondaryVars(endOf(t.primary), mix(endOf(t.primary), WHITE, 0.35)) : {};
   const link: Record<string, string> = t.template === 'artemis' && t.primary ? { '--doc-primary-link': lightenToContrast(ARTEMIS_DEFAULT_LINK, headerStops(t.template, t.primary)) } : {};
   return {
     ...(t.primary ? primaryVars(t.primary) : {}),
     ...(t.secondary ? secondaryVars(t.secondary, light ?? mix(t.secondary, WHITE, 0.35)) : {}),
     ...(light && !t.secondary ? { '--doc-secondary-light': light } : {}),
     ...link,
+    ...accent,
   };
 }
