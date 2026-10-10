@@ -488,6 +488,15 @@ body {
 
 /* Print Styles */
 @media print {
+  /* The PDF page is sized from the screen layout and Chrome rounds it down by a fraction of a pixel.
+     Without this the overflow starts a second page and the last sidebar section (page-break-inside: avoid)
+     jumps onto it and is lost, since only page 1 is kept. */
+  html,
+  body {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+
   body {
     background: #ffffff !important;
     padding: 0 !important;
