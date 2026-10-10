@@ -155,8 +155,9 @@ body {
   font-family: Garamond, serif;
 }
 
-.font-cambria {
-  font-family: Cambria, serif;
+/* UI font for the editor/preview pages. Geist is already loaded in index.html. */
+.font-app {
+  font-family: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
 }
 
 @layer base {

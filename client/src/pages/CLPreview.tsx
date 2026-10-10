@@ -378,7 +378,7 @@ const CLPreview: React.FC = () => {
         </div>
       </div>
     ) : (
-      <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 font-cambria flex flex-col">
+      <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 font-app flex flex-col">
         {/* Fixed Navigation Sidebar */}
         <div className="fixed left-0 top-0 h-full w-12 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg z-50 flex flex-col">
           <div className="flex-1 flex flex-col justify-center py-4">
