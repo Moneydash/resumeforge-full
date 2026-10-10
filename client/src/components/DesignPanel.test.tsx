@@ -65,4 +65,30 @@ describe("DesignPanel", () => {
     expect(html).not.toContain('role="tab"');
     expect(html).toContain("IBM Plex Sans");
   });
+
+  it("adds a Templates tab; the Color tab only exists for themeable templates", () => {
+    const templates = { kind: "resume" as const, current: "athena", onSelect: noop };
+    const themeable = render({ tab: "templates", template: "athena", templates, color: { template: "athena", theme: undefined, onChange: noop } });
+    expect(themeable.match(/role="tab"/g)).toHaveLength(4);
+    expect(themeable).toContain(">Templates<");
+    expect(themeable).toContain("Galaxy Collection");
+    expect(themeable).not.toContain("Drag sections to reorder");
+    const plain = render({ tab: "templates", template: "hermes", templates: { ...templates, current: "hermes" } });
+    expect(plain.match(/role="tab"/g)).toHaveLength(3); // Sections, Font, Templates
+    expect(plain).not.toContain(">Color<");
+  });
+
+  it("falls back to the Font view when the active tab disappears after a template switch", () => {
+    // user was on Color, then switched to a template without a color theme
+    const html = render({ tab: "color", template: "hermes", templates: { kind: "resume", current: "hermes", onSelect: noop } });
+    expect(html).not.toContain(">Color<");
+    expect(html).toContain("Inter");
+  });
+
+  it("cover letters get Font and Templates tabs", () => {
+    const html = render({ sections: undefined, color: undefined, tab: "templates", template: "ventus", templates: { kind: "cover-letter", current: "ventus", onSelect: noop } });
+    expect(html.match(/role="tab"/g)).toHaveLength(2);
+    expect(html).toContain("Ventus");
+    expect(html).not.toContain("Galaxy Collection");
+  });
 });

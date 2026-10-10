@@ -3,6 +3,7 @@ import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SectionOrderPanel from "@/components/SectionOrderPanel";
 import ColorPanel from "@/components/ColorPanel";
+import TemplatesPanel from "@/components/TemplatesPanel";
 import { FontList } from "@/components/FontList";
 import { ensurePickerFontsLoaded } from "@/utils/load-picker-fonts";
 import type { TemplateType } from "@/types";
@@ -18,7 +19,7 @@ import {
   type SavedFont,
 } from "@/utils/fonts";
 
-export type DesignTab = "sections" | "font" | "color";
+export type DesignTab = "sections" | "font" | "color" | "templates";
 
 interface DesignPanelProps {
   tab: DesignTab;
@@ -41,12 +42,23 @@ interface DesignPanelProps {
     theme: ColorTheme | undefined;
     onChange: (next: ColorTheme | undefined) => void;
   };
+  /** Switch template without leaving the editor. */
+  templates?: {
+    kind: "resume" | "cover-letter";
+    current: string;
+    onSelect: (id: string) => void;
+  };
 }
 
-const TAB_LABELS: Record<DesignTab, string> = { sections: "Sections", font: "Font", color: "Color" };
+const TAB_LABELS: Record<DesignTab, string> = { sections: "Sections", font: "Font", color: "Color", templates: "Templates" };
 
-const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, isDarkMode, template, fontSaved, onFontChange, sections, color }) => {
-  const available: DesignTab[] = [...(sections ? (["sections"] as const) : []), "font", ...(color ? (["color"] as const) : [])];
+const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, isDarkMode, template, fontSaved, onFontChange, sections, color, templates }) => {
+  const available: DesignTab[] = [
+    ...(sections ? (["sections"] as const) : []),
+    "font",
+    ...(color ? (["color"] as const) : []),
+    ...(templates ? (["templates"] as const) : []),
+  ];
   const active: DesignTab = available.includes(tab) ? tab : "font";
 
   useEffect(() => {
@@ -76,7 +88,7 @@ const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, is
                 role="tab"
                 aria-selected={selected}
                 onClick={() => onTabChange(id)}
-                className={`flex-1 border-b-2 px-4 py-2 text-sm font-medium transition-colors ${
+                className={`flex-1 border-b-2 px-2 py-2 text-sm font-medium transition-colors ${
                   selected
                     ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
                     : `border-transparent ${isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-800"}`
@@ -93,6 +105,8 @@ const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, is
         <SectionOrderPanel template={sections.template} data={sections.data} layout={sections.layout} onChange={sections.onChange} />
       ) : active === "color" && color ? (
         <ColorPanel template={color.template} theme={color.theme} onChange={color.onChange} isDarkMode={isDarkMode} />
+      ) : active === "templates" && templates ? (
+        <TemplatesPanel kind={templates.kind} current={templates.current} onSelect={templates.onSelect} isDarkMode={isDarkMode} />
       ) : (
         <div className="flex-1 overflow-y-auto py-2 no-scrollbar">
           <FontList
