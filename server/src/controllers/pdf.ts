@@ -3,13 +3,14 @@ import { formatDescription } from "../utils/helper";
 import puppeteer, { Browser, Page } from "puppeteer";
 import { execSync } from 'child_process';
 import { buildFontHead } from "../utils/fonts";
+import { buildThemeHead } from "../utils/theme-vars";
 
 const generate_pdf: Controller = async (req, res) => {
   let browser: Browser | undefined;
   let page: Page | undefined;
 
   try {
-    const { html, template, data } = req.body;
+    const { html, template, data, themeVars } = req.body;
     const formattedHtml = formatDescription(html)
 
     // Input validation
@@ -79,6 +80,7 @@ const generate_pdf: Controller = async (req, res) => {
           <link rel="preconnect" href="https://fonts.googleapis.com">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
           ${buildFontHead(String(template), data?.fontFamily)}
+          ${buildThemeHead(themeVars)}
           <style>
             /* Reset all default margins and padding */
             * {
