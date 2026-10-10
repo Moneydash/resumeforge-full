@@ -2,6 +2,9 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import AthenaCss from "@/styles/templates/greek/athena.css?inline";
+import { getRenderColumns } from "@/utils/section-layout";
+import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { buildMainVariants, buildSidebarVariants } from "@/components/templates/column-variants";
 
 const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
   const personalSection = (
@@ -118,18 +121,6 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
     </div>
   );
 
-  const sidebarSection = (
-    <aside className="resume-sidebar">
-      {personalSection}
-      {data?.education && data?.education?.filter(ed => !ed.hidden)?.length >= 1 && educSection}
-      {data?.skills && data?.skills?.filter(s => !s.hidden)?.length >= 1 && skillSection}
-      {data?.projects && data?.projects?.filter(proj => !proj.hidden)?.length >= 1 && projSection}
-      {data?.certifications && data?.certifications?.filter(cert => !cert.hidden)?.length >= 1 && certSection}
-      {data?.awards && data?.awards?.filter(a => !a.hidden)?.length >= 1 && awardsSection}
-      {data?.languages && data?.languages?.length >= 1 && langSection}
-    </aside>
-  );
-
   const socialSection = (
     <div className="main-section">
       <div className="main-section-title">Professional Links</div>
@@ -187,12 +178,44 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
     </div>
   );
 
+  const columns = getRenderColumns('athena', data);
+  // a section dragged to the other column needs that column's markup/classes, see column-variants.tsx
+  const titles = {
+    education: 'Education',
+    skills: 'Skills',
+    projects: 'Key Projects',
+    certifications: 'Certifications',
+    awards: 'Awards',
+    languages: 'Languages',
+    references: 'References',
+  };
+  const mainSections: SectionMap = {
+    ...buildMainVariants(data, titles),
+    socials: socialSection,
+    summary: aboutSection,
+    experience: expSection,
+    references: refSection,
+  };
+  const sidebarSections: SectionMap = {
+    ...buildSidebarVariants(data, titles),
+    education: educSection,
+    skills: skillSection,
+    projects: projSection,
+    certifications: certSection,
+    awards: awardsSection,
+    languages: langSection,
+  };
+
+  const sidebarSection = (
+    <aside className="resume-sidebar">
+      {personalSection}
+      {renderSections(columns[0], sidebarSections)}
+    </aside>
+  );
+
   const mainSection = (
     <main className="resume-main-content">
-      {data?.socials && data?.socials?.length >= 1 && socialSection}
-      {data?.summary && aboutSection}
-      {data?.experience && data?.experience?.filter(exp => !exp.hidden)?.length >= 1 && expSection}
-      {data?.references && data?.references?.filter(r => !r.hidden)?.length >= 1 && refSection}
+      {renderSections(columns[1], mainSections)}
     </main>
   );
 

@@ -2,6 +2,8 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import HermesCss from "@/styles/templates/greek/hermes.css?inline";
+import { getRenderColumns } from "@/utils/section-layout";
+import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
   const headerSection = (
@@ -253,23 +255,28 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
     </div>
   );
 
+  const columns = getRenderColumns('hermes', data);
+  const sections: SectionMap = {
+    experience: workExperienceSection,
+    projects: projectsSection,
+    references: referencesSection,
+    skills: skillsSection,
+    education: educationSection,
+    certifications: certificatesSection,
+    awards: awardsSection,
+    interests: interestsSection,
+    languages: languagesSection,
+  };
+
   const leftColumn = (
     <div className="resume-left-column">
-      {data?.experience && data?.experience?.filter(section => !section.hidden)?.length >= 1 && workExperienceSection}
-      {data?.projects && data?.projects?.filter(section => !section.hidden)?.length >= 1 && projectsSection}
-      {data?.experience?.length < 3 && data?.references && data?.references?.filter(section => !section.hidden)?.length >= 1 && referencesSection}
+      {renderSections(columns[0], sections)}
     </div>
   );
 
   const rightColumn = (
     <div className="resume-right-column">
-      {data?.skills && data?.skills?.filter(section => !section.hidden)?.length >= 1 && skillsSection}
-      {data?.education && data?.education?.filter(section => !section.hidden)?.length >= 1 && educationSection}
-      {data?.certifications && data?.certifications?.filter(section => !section.hidden)?.length >= 1 && certificatesSection}
-      {data?.awards && data?.awards?.filter(section => !section.hidden)?.length >= 1 && awardsSection}
-      {data?.interests && data?.interests?.length >= 1 && interestsSection}
-      {data?.languages && data?.languages?.length >= 1 && languagesSection}
-      {data?.experience?.filter(section => !section.hidden)?.length >= 3 && data?.references && data?.references?.filter(section => !section.hidden)?.length >= 1 && referencesSection}
+      {renderSections(columns[1], sections)}
     </div>
   );
 

@@ -2,6 +2,9 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import ArtemisCss from "@/styles/templates/greek/artemis.css?inline";
+import { getRenderColumns } from "@/utils/section-layout";
+import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { buildMainVariants, buildSidebarVariants } from "@/components/templates/column-variants";
 
 const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
   const socialSection = (
@@ -54,14 +57,6 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
         ))
       }
     </div>
-  );
-
-  const mainSection = (
-    <main className="resume-main-content">
-      {data?.summary && summarySection}
-      {data?.experience && data?.experience?.filter(i => !i.hidden)?.length >= 1 && expSection}
-      {data?.references && data?.references?.filter(i => !i.hidden)?.length >= 1 && refSection}
-    </main>
   );
 
   const contactSection = (
@@ -167,15 +162,43 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
     </div>
   );
 
+  const columns = getRenderColumns('artemis', data);
+  // a section dragged to the other column needs that column's markup/classes, see column-variants.tsx
+  const titles = {
+    education: 'Education',
+    skills: 'Skills',
+    projects: 'Projects',
+    certifications: 'Certifications',
+    awards: 'Awards',
+    languages: 'Languages',
+    references: 'References',
+  };
+  const mainSections: SectionMap = {
+    ...buildMainVariants(data, titles),
+    summary: summarySection,
+    experience: expSection,
+    references: refSection,
+  };
+  const sidebarSections: SectionMap = {
+    ...buildSidebarVariants(data, titles),
+    education: educSection,
+    skills: skillSection,
+    projects: projSection,
+    certifications: certSection,
+    awards: awardsSection,
+    languages: langSection,
+  };
+
+  const mainSection = (
+    <main className="resume-main-content">
+      {renderSections(columns[0], mainSections)}
+    </main>
+  );
+
   const sidebarSection = (
     <aside className="resume-sidebar">
       {contactSection}
-      {data?.education && data?.education?.filter(i => !i.hidden)?.length >= 1 && educSection}
-      {data?.skills && data?.skills?.filter(i => !i.hidden)?.length >= 1 && skillSection}
-      {data?.projects && data?.projects?.filter(i => !i.hidden)?.length >= 1 && projSection}
-      {data?.certifications && data?.certifications?.filter(i => !i.hidden)?.length >= 1 && certSection}
-      {data?.awards && data?.awards?.filter(i => !i.hidden)?.length >= 1 && awardsSection}
-      {data?.languages && data?.languages?.length >= 1 && langSection}
+      {renderSections(columns[1], sidebarSections)}
     </aside>
   );
 

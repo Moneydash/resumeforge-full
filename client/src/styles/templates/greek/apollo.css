@@ -437,3 +437,15 @@ ul.list-disc li p {
   margin: 0 !important;
   padding: 0 !important;
 }
+
+/* Print Styles */
+@media print {
+  /* The PDF page is sized from the screen layout and the printed layout can overflow it by a fraction of a
+     pixel. That starts a second page, the last line/card of the sidebar moves onto it and is lost, since
+     only page 1 is kept. Clip the printed document to its page. */
+  html,
+  body {
+    height: 100% !important;
+    overflow: hidden !important;
+  }
+}

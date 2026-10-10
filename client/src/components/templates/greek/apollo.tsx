@@ -2,6 +2,9 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import ApolloCss from "@/styles/templates/greek/apollo.css?inline";
+import { getRenderColumns } from "@/utils/section-layout";
+import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { buildMainVariants, buildSidebarVariants } from "@/components/templates/column-variants";
 
 const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
   const aboutSection = (
@@ -114,18 +117,6 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
     </div>
   );
 
-  const sidebarSection = (
-    <aside className="resume-sidebar">
-      {aboutSection}
-      {data?.education && data?.education?.filter(i => !i.hidden)?.length >= 1 && educSection}
-      {data?.skills && data?.skills?.filter(i => !i.hidden)?.length >= 1 && skillSection}
-      {data?.interests && data?.interests?.length >= 1 && interestSection}
-      {data?.languages && data?.languages?.length >= 1 && langSection}
-      {data?.projects && data?.projects?.filter(i => !i.hidden)?.length >= 1 && projSection}
-      {data?.certifications && data?.certifications?.filter(i => !i.hidden)?.length >= 1 && certSection}
-    </aside>
-  );
-
   const summarySection = (
     <div className="main-section">
       <div className="main-section-title">PROFILE</div>
@@ -186,12 +177,45 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
     </div>
   );
 
+  const columns = getRenderColumns('apollo', data);
+  // a section dragged to the other column needs that column's markup/classes, see column-variants.tsx
+  const titles = {
+    education: 'EDUCATION',
+    skills: 'SKILLS',
+    projects: 'PROJECTS',
+    certifications: 'CERTIFICATIONS',
+    awards: 'AWARDS',
+    languages: 'LANGUAGES',
+    interests: 'INTERESTS',
+    references: 'REFERENCES',
+  };
+  const mainSections: SectionMap = {
+    ...buildMainVariants(data, titles),
+    summary: summarySection,
+    experience: expSection,
+    awards: awardsSection,
+    references: refSection,
+  };
+  const sidebarSections: SectionMap = {
+    ...buildSidebarVariants(data, titles),
+    education: educSection,
+    skills: skillSection,
+    interests: interestSection,
+    languages: langSection,
+    projects: projSection,
+    certifications: certSection,
+  };
+
+  const sidebarSection = (
+    <aside className="resume-sidebar">
+      {aboutSection}
+      {renderSections(columns[0], sidebarSections)}
+    </aside>
+  );
+
   const mainSection = (
     <main className="resume-main-content">
-      {data?.summary && summarySection}
-      {data?.experience && data?.experience?.filter(i => !i.hidden)?.length >= 1 && expSection}
-      {data?.awards && data?.awards?.filter(i => !i.hidden)?.length >= 1 && awardsSection}
-      {data?.references && data?.references?.filter(i => !i.hidden)?.length >= 1 && refSection}
+      {renderSections(columns[1], mainSections)}
     </main>
   );
 
