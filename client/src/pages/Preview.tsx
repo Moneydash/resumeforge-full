@@ -487,15 +487,7 @@ const Preview: React.FC = () => {
             `}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-3">
-                  <div className={`
-                    w-8 h-8 rounded-lg flex items-center justify-center
-                    ${isDarkMode
-                      ? 'bg-gradient-to-br from-blue-500 to-purple-600'
-                      : 'bg-gradient-to-br from-blue-600 to-indigo-600'
-                    }
-                  `}>
-                    <FileText className="w-4 h-4 text-white" />
-                  </div>
+                  <img src="/icon.png" alt="ResumeForge logo" className="h-8 w-8 flex-shrink-0 rounded-lg bg-white shadow-sm" />
                   <h1 className={`
                     text-2xl font-bold bg-gradient-to-r 
                     ${isDarkMode
