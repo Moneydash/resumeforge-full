@@ -18,7 +18,6 @@ import {
   Loader2,
   LayoutDashboard,
   GripVertical,
-  MoveLeft,
   Palette
 } from 'lucide-react';
 import type { CLTemplateType } from '@/types';
@@ -30,7 +29,7 @@ import { saveAs } from 'file-saver';
 import client from '@/api/axiosInstance';
 import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
-import DesignPanel from '@/components/DesignPanel';
+import DesignPanel, { type DesignTab } from '@/components/DesignPanel';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 import type { SavedFont } from '@/utils/fonts';
 
@@ -49,12 +48,12 @@ const CLPreview: React.FC = () => {
   const sidebarMax = 650;
   const clId = localStorage.getItem('cl-id');
 
-  // get the selected template and validate it
-  const templateParam = localStorage.getItem("cl-template") || 'aether';
+  // the selected template: restored from localStorage, switchable from the Design panel without leaving the page
   const validTemplates: CLTemplateType[] = ['aether', 'terra', 'aqua', 'ignis', 'ventus'];
-  const template: CLTemplateType | undefined = templateParam && validTemplates.includes(templateParam as CLTemplateType)
-    ? templateParam as CLTemplateType
-    : undefined;
+  const [template, setTemplate] = useState<CLTemplateType | undefined>(() => {
+    const stored = localStorage.getItem("cl-template") || 'aether';
+    return validTemplates.includes(stored as CLTemplateType) ? (stored as CLTemplateType) : undefined;
+  });
 
   const userId = useMainStore((state) => state.userId);
   const setUserId = useMainStore((state) => state.setUserId);
@@ -68,6 +67,7 @@ const CLPreview: React.FC = () => {
   const requestIdRef = useRef(0); // ignore out-of-order responses
   const FONT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF render, wait for the user to stop changing fonts
   const [designOpen, setDesignOpen] = useState(false);
+  const [designTab, setDesignTab] = useState<DesignTab>('font');
   const [fontFamily, setFontFamily] = useState<SavedFont | undefined>(undefined);
   const fontFamilyRef = useRef<SavedFont | undefined>(undefined);
   const clDataRef = useRef<CLFormData | null>(null);
@@ -316,6 +316,23 @@ const CLPreview: React.FC = () => {
 
   useEffect(() => () => flushPendingFont(), []);
 
+  // Switch template from the Design panel. The font choice is saved per template, so it simply stops applying.
+  const handleTemplateChange = (id: string) => {
+    if (!validTemplates.includes(id as CLTemplateType) || id === (template ?? 'aether')) return;
+    localStorage.setItem('cl-template', id);
+    clearTimeout(fontTimerRef.current); // the regeneration below saves whatever is pending
+    fontTimerRef.current = undefined;
+    setTemplate(id as CLTemplateType);
+  };
+
+  // regenerate the preview as soon as the template changes (runs after the render that carries the new template)
+  const previousTemplateRef = useRef(template);
+  useEffect(() => {
+    if (previousTemplateRef.current === template) return;
+    previousTemplateRef.current = template;
+    if (clDataRef.current) void handleFormSubmitRef.current(clDataRef.current);
+  }, [template]);
+
   // Handle PDF export
   const handleExportPDF = async (data: CLFormData) => {
     setLoadingExport(true);
@@ -342,15 +359,6 @@ const CLPreview: React.FC = () => {
   };
 
   // Navigation functions
-  const redirectTemplates = () => {
-    flushPendingFont();
-    const toastId = toast.loading("Redirecting to Templates page...");
-    setTimeout(() => {
-      toast.dismiss(toastId);
-      navigate("/cl-templates");
-    }, 1600);
-  };
-
   const redirectDashboard = () => {
     flushPendingFont();
     const toastId = toast.loading("Redirecting to Cover Letter Dashboard...");
@@ -578,21 +586,6 @@ const CLPreview: React.FC = () => {
 
                   <Button
                     variant="outline"
-                    onClick={redirectTemplates}
-                    className={`
-                      ${isDarkMode
-                        ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
-                        : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                      }
-                      transition-all duration-200 hover:scale-105
-                    `}
-                  >
-                    <MoveLeft className="w-4 h-4 mr-2" />
-                    Templates
-                  </Button>
-
-                  <Button
-                    variant="outline"
                     onClick={redirectDashboard}
                     className={`
                       ${isDarkMode
@@ -695,13 +688,14 @@ const CLPreview: React.FC = () => {
 
           {designOpen && (
             <DesignPanel
-              tab="font"
-              onTabChange={() => {}}
+              tab={designTab}
+              onTabChange={setDesignTab}
               onClose={() => setDesignOpen(false)}
               isDarkMode={isDarkMode}
               template={template ?? 'aether'}
               fontSaved={fontFamily}
               onFontChange={handleFontChange}
+              templates={{ kind: 'cover-letter', current: template ?? 'aether', onSelect: handleTemplateChange }}
             />
           )}
         </div>

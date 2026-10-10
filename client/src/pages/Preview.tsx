@@ -30,7 +30,6 @@ import {
   Loader2,
   LayoutDashboard,
   GripVertical,
-  MoveLeft,
   Palette
 } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
@@ -65,12 +64,12 @@ const Preview: React.FC = () => {
   const userId = useMainStore((state) => state.userId);
   const setUserId = useMainStore((state) => state.setUserId);
 
-  // get the selected template and validate it
-  const templateParam = localStorage.getItem("template") || 'cigar';
+  // the selected template: restored from localStorage, switchable from the Design panel without leaving the page
   const validTemplates: TemplateType[] = ['cigar', 'andromeda', 'comet', 'milky_way', 'zeus', 'athena', 'apollo', 'artemis', 'hermes', 'hera'];
-  const template: TemplateType | undefined = templateParam && validTemplates.includes(templateParam as TemplateType)
-    ? templateParam as TemplateType
-    : undefined;
+  const [template, setTemplate] = useState<TemplateType | undefined>(() => {
+    const stored = localStorage.getItem("template") || 'cigar';
+    return validTemplates.includes(stored as TemplateType) ? (stored as TemplateType) : undefined;
+  });
 
   // Properly typed initial state matching ResumeFormData interface
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -352,6 +351,30 @@ const Preview: React.FC = () => {
     queueRegenerate();
   };
 
+  // Switch template from the Design panel: the section order follows the same conversion rules as when a
+  // resume is opened on another template; font and color choices are saved per template and simply stop applying.
+  const handleTemplateChange = (id: string) => {
+    if (!validTemplates.includes(id as TemplateType) || id === activeTemplate) return;
+    const next = id as TemplateType;
+    localStorage.setItem('template', next);
+    clearTimeout(layoutTimerRef.current); // the regeneration below saves whatever is pending
+    layoutTimerRef.current = undefined;
+    if (sectionLayoutRef.current) {
+      const converted = convertLayout(sectionLayoutRef.current, next, resumeDataRef.current ?? resumeData);
+      sectionLayoutRef.current = converted;
+      setSectionLayout(converted);
+    }
+    setTemplate(next);
+  };
+
+  // regenerate the preview as soon as the template changes (runs after the render that carries the new template)
+  const previousTemplateRef = useRef(template);
+  useEffect(() => {
+    if (previousTemplateRef.current === template) return;
+    previousTemplateRef.current = template;
+    if (resumeDataRef.current) void handleFormSubmitRef.current(resumeDataRef.current);
+  }, [template]);
+
   // save a layout change that is still waiting on the debounce (leaving the page, exporting)
   const flushPendingLayout = () => {
     if (layoutTimerRef.current === undefined) return;
@@ -384,15 +407,6 @@ const Preview: React.FC = () => {
     } finally {
       setLoadingExport(false);
     }
-  };
-
-  const redirectTemplates = () => {
-    flushPendingLayout();
-    const toastId = toast.loading("Redirecting to Templates page...");
-    setTimeout(() => {
-      toast.dismiss(toastId);
-      navigate("/templates");
-    }, 1600);
   };
 
   const redirectResumes = () => {
@@ -632,21 +646,6 @@ const Preview: React.FC = () => {
 
                   <Button
                     variant="outline"
-                    onClick={redirectTemplates}
-                    className={`
-                      ${isDarkMode
-                        ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
-                        : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                      }
-                      transition-all duration-200 hover:scale-105
-                    `}
-                  >
-                    <MoveLeft className="w-4 h-4 mr-2" />
-                    Templates
-                  </Button>
-
-                  <Button
-                    variant="outline"
                     onClick={redirectResumes}
                     className={`
                       ${isDarkMode
@@ -758,6 +757,7 @@ const Preview: React.FC = () => {
               onFontChange={handleFontChange}
               sections={{ template: activeTemplate, data: resumeData, layout: sectionLayout, onChange: handleLayoutChange }}
               color={isColorTemplate(activeTemplate) ? { template: activeTemplate, theme: colorTheme, onChange: handleColorChange } : undefined}
+              templates={{ kind: 'resume', current: activeTemplate, onSelect: handleTemplateChange }}
             />
           )}
         </div>
