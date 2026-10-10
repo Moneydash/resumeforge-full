@@ -164,7 +164,7 @@ body {
 
 .greek-item-header {
   font-size: 0.95rem !important;
-  font-family: var(--doc-heading-font, var(--doc-font, 'Cinzel', serif)) !important;
+  font-family: var(--doc-font, 'DM Serif Text', Georgia, serif) !important;
   font-weight: 600 !important;
   color: #1a2855 !important;
   margin-bottom: 0.3rem !important;

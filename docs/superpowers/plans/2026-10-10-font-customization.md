@@ -18,7 +18,7 @@
 - Ubuntu is removed everywhere (CSS, PDF servers, registry). Cinzel is never offered on its own.
 - Template defaults: cigar `dm-serif-text`; zeus `dm-serif-text-cinzel`; andromeda `ibm-plex-serif`; comet and apollo `poppins`; milky_way `lato`; athena `lexend-deca`; hera `geist`; hermes `roboto-slab`; artemis `source-sans-3`; aether `montserrat`; aqua `mozilla-headline`; ignis `geist`; terra `poppins`; ventus `ibm-plex-sans`.
 - Saved shape: `fontFamily: { template: <template id>; id: <font id> }`. A saved value is only used when `template` equals the active template and `id` is in the registry; otherwise the template default applies. Resetting removes the key (JSON drops `undefined`).
-- Variable names are exactly `--doc-font` and `--doc-heading-font`. Heading role = document name and section titles (cover letters: the sender name). Zeus keeps its existing four Cinzel rules (name, headline, section title, item header) as heading role.
+- Variable names are exactly `--doc-font` and `--doc-heading-font`. Heading role = document name and section titles (cover letters: the sender name). Zeus keeps its Cinzel rules for name, headline and section title as heading role; its item header rows (entry titles) use the body role (changed after the plan, at the user's request: entry titles are content, not section titles).
 - A document with no saved choice must render exactly as it does today (apart from the intended Hermes, Artemis, Ventus-PDF and Zeus-PDF default changes).
 - No DB migration. The font id sent to the server is never interpolated into HTML except through the allow-listed registry.
 - Server and client registries hold identical data; a client test enforces this.

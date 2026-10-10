@@ -91,7 +91,7 @@ Two CSS variables, one per role. Every resume and cover letter template CSS file
 Notes on specific files:
 
 - `hermes.css`, `artemis.css`: the Ubuntu stack is replaced by the new default font's stack (Roboto Slab / Source Sans 3) as the fallback.
-- `zeus.css` already uses Cinzel for the name, headline, section titles and item header rows, and DM Serif Text for the rest. Those four Cinzel rules take the heading role (an exception to "item headers stay body": it keeps the Zeus default identical in CSS terms), and the rest take the body role. Choosing the pairing on Zeus is therefore the same as the default.
+- `zeus.css` used Cinzel for the name, headline, section titles and item header rows. Per the pairing's definition (Cinzel for section titles only, DM Serif Text for the content under them), the item header rows (entry titles such as a degree or job title) move to the body role, which is a deliberate change to Zeus's default look. The name, headline and section-title rules keep the heading role. Choosing the pairing on Zeus is therefore the same as the default.
 - On every other template, choosing the pairing puts Cinzel on that template's name and section titles and DM Serif Text on the rest. Choosing a single font puts it on both roles everywhere.
 - `andromeda.css` has an `@import` for IBM Plex Serif; it is removed since the PDF server now loads the font link.
 - `cigar.css`, `milky_way.css`, `comet.css`, `index.css` Georgia/Garamond/Cambria entries are reviewed; any that are template body fonts get the variable, generic fallbacks stay.
