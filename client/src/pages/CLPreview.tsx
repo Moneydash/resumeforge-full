@@ -10,7 +10,6 @@ import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
 import {
   User,
-  FileText,
   Building2,
   MessageSquare,
   FileIcon,
@@ -18,7 +17,7 @@ import {
   Loader2,
   LayoutDashboard,
   GripVertical,
-  MoveLeft
+  Palette
 } from 'lucide-react';
 import type { CLTemplateType } from '@/types';
 import { renderToString } from 'react-dom/server';
@@ -29,6 +28,9 @@ import { saveAs } from 'file-saver';
 import client from '@/api/axiosInstance';
 import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
+import DesignPanel, { DESIGN_PANEL_WIDTH, type DesignTab } from '@/components/DesignPanel';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { SavedFont } from '@/utils/fonts';
 
 const CLPreview: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -45,12 +47,12 @@ const CLPreview: React.FC = () => {
   const sidebarMax = 650;
   const clId = localStorage.getItem('cl-id');
 
-  // get the selected template and validate it
-  const templateParam = localStorage.getItem("cl-template") || 'aether';
+  // the selected template: restored from localStorage, switchable from the Design panel without leaving the page
   const validTemplates: CLTemplateType[] = ['aether', 'terra', 'aqua', 'ignis', 'ventus'];
-  const template: CLTemplateType | undefined = templateParam && validTemplates.includes(templateParam as CLTemplateType)
-    ? templateParam as CLTemplateType
-    : undefined;
+  const [template, setTemplate] = useState<CLTemplateType | undefined>(() => {
+    const stored = localStorage.getItem("cl-template") || 'aether';
+    return validTemplates.includes(stored as CLTemplateType) ? (stored as CLTemplateType) : undefined;
+  });
 
   const userId = useMainStore((state) => state.userId);
   const setUserId = useMainStore((state) => state.setUserId);
@@ -62,6 +64,14 @@ const CLPreview: React.FC = () => {
   const liveEdit = isUpdateMode && !!pdfUrl;
   const [liveStatus, setLiveStatus] = useState<'idle' | 'updating' | 'saved' | 'error'>('idle');
   const requestIdRef = useRef(0); // ignore out-of-order responses
+  const FONT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF render, wait for the user to stop changing fonts
+  const [designOpen, setDesignOpen] = useState(false);
+  const [designTab, setDesignTab] = useState<DesignTab>('font');
+  const [fontFamily, setFontFamily] = useState<SavedFont | undefined>(undefined);
+  const fontFamilyRef = useRef<SavedFont | undefined>(undefined);
+  const clDataRef = useRef<CLFormData | null>(null);
+  const fontTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const handleFormSubmitRef = useRef<(data: CLFormData) => Promise<void>>(async () => { });
   const [clData, setCLData] = useState<CLFormData>({
     sender: {
       name: '',
@@ -121,6 +131,8 @@ const CLPreview: React.FC = () => {
         try {
           setIsUpdateMode(true);
           const parsedData = JSON.parse(request.data?.cover_letter_data);
+          fontFamilyRef.current = parsedData.fontFamily;
+          setFontFamily(parsedData.fontFamily);
           setCLData(parsedData);
           handleFormSubmit(parsedData);
         } catch (e) {
@@ -243,10 +255,13 @@ const CLPreview: React.FC = () => {
   }
 
   // Handle form submission
-  const handleFormSubmit = async (data: CLFormData) => {
+  const handleFormSubmit = async (formData: CLFormData) => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
     if (liveEdit) setLiveStatus('updating');
+    // the font lives outside the form; always attach the current one (undefined is dropped from the JSON)
+    const data: CLFormData = { ...formData, fontFamily: fontFamilyRef.current };
+    clDataRef.current = data;
     try {
       setCLData(data);
       const saved = await saveCLData(data, liveEdit);
@@ -278,6 +293,45 @@ const CLPreview: React.FC = () => {
     }
   };
 
+  handleFormSubmitRef.current = handleFormSubmit; // always-fresh handle for the debounced font callback
+
+  const handleFontChange = (next: SavedFont | undefined) => {
+    fontFamilyRef.current = next;
+    setFontFamily(next);
+    clearTimeout(fontTimerRef.current);
+    fontTimerRef.current = setTimeout(() => {
+      fontTimerRef.current = undefined;
+      if (clDataRef.current) void handleFormSubmitRef.current(clDataRef.current);
+    }, FONT_DEBOUNCE_MS);
+  };
+
+  // save a font change that is still waiting on the debounce (leaving the page)
+  const flushPendingFont = () => {
+    if (fontTimerRef.current === undefined) return;
+    clearTimeout(fontTimerRef.current);
+    fontTimerRef.current = undefined;
+    if (clDataRef.current) void handleFormSubmitRef.current(clDataRef.current);
+  };
+
+  useEffect(() => () => flushPendingFont(), []);
+
+  // Switch template from the Design panel. The font choice is saved per template, so it simply stops applying.
+  const handleTemplateChange = (id: string) => {
+    if (!validTemplates.includes(id as CLTemplateType) || id === (template ?? 'aether')) return;
+    localStorage.setItem('cl-template', id);
+    clearTimeout(fontTimerRef.current); // the regeneration below saves whatever is pending
+    fontTimerRef.current = undefined;
+    setTemplate(id as CLTemplateType);
+  };
+
+  // regenerate the preview as soon as the template changes (runs after the render that carries the new template)
+  const previousTemplateRef = useRef(template);
+  useEffect(() => {
+    if (previousTemplateRef.current === template) return;
+    previousTemplateRef.current = template;
+    if (clDataRef.current) void handleFormSubmitRef.current(clDataRef.current);
+  }, [template]);
+
   // Handle PDF export
   const handleExportPDF = async (data: CLFormData) => {
     setLoadingExport(true);
@@ -304,15 +358,8 @@ const CLPreview: React.FC = () => {
   };
 
   // Navigation functions
-  const redirectTemplates = () => {
-    const toastId = toast.loading("Redirecting to Templates page...");
-    setTimeout(() => {
-      toast.dismiss(toastId);
-      navigate("/cl-templates");
-    }, 1600);
-  };
-
   const redirectDashboard = () => {
+    flushPendingFont();
     const toastId = toast.loading("Redirecting to Cover Letter Dashboard...");
     setTimeout(() => {
       toast.dismiss(toastId);
@@ -330,7 +377,7 @@ const CLPreview: React.FC = () => {
         </div>
       </div>
     ) : (
-      <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 font-cambria flex flex-col">
+      <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 font-app flex flex-col">
         {/* Fixed Navigation Sidebar */}
         <div className="fixed left-0 top-0 h-full w-12 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg z-50 flex flex-col">
           <div className="flex-1 flex flex-col justify-center py-4">
@@ -389,15 +436,7 @@ const CLPreview: React.FC = () => {
             `}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-3">
-                  <div className={`
-                    w-8 h-8 rounded-lg flex items-center justify-center
-                    ${isDarkMode
-                      ? 'bg-gradient-to-br from-blue-500 to-purple-600'
-                      : 'bg-gradient-to-br from-blue-600 to-indigo-600'
-                    }
-                  `}>
-                    <FileText className="w-4 h-4 text-white" />
-                  </div>
+                  <img src="/icon.png" alt="CoverCraft logo" className="h-8 w-8 flex-shrink-0 rounded-lg bg-white shadow-sm" />
                   <h1 className={`
                     text-2xl font-bold bg-gradient-to-r 
                     ${isDarkMode
@@ -474,7 +513,7 @@ const CLPreview: React.FC = () => {
           <div
             className="h-1/2 lg:h-full flex flex-col overflow-hidden"
             style={{
-              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px)` : '100%',
+              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${designOpen ? DESIGN_PANEL_WIDTH : 0}px)` : '100%',
             }}
           >
             {/* Preview Header - Fixed */}
@@ -510,20 +549,31 @@ const CLPreview: React.FC = () => {
                       {liveStatus === 'error' && 'Update failed, will retry on next edit'}
                     </span>
                   )}
-                  <Button
-                    variant="outline"
-                    onClick={redirectTemplates}
-                    className={`
-                      ${isDarkMode
-                        ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
-                        : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                      }
-                      transition-all duration-200 hover:scale-105
-                    `}
-                  >
-                    <MoveLeft className="w-4 h-4 mr-2" />
-                    Templates
-                  </Button>
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          aria-label="Design"
+                          aria-pressed={designOpen}
+                          disabled={!pdfUrl}
+                          onClick={() => setDesignOpen((open) => !open)}
+                          className={`
+                            ${isDarkMode
+                              ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
+                              : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
+                            }
+                            ${designOpen ? 'ring-2 ring-indigo-500' : ''}
+                            transition-all duration-200 hover:scale-105
+                          `}
+                        >
+                          <Palette className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Design</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
 
                   <Button
                     variant="outline"
@@ -542,7 +592,7 @@ const CLPreview: React.FC = () => {
 
                   <Button
                     id="exportButton"
-                    onClick={() => handleExportPDF(clData)}
+                    onClick={() => handleExportPDF({ ...clData, fontFamily: fontFamilyRef.current })}
                     disabled={loadingExport || !pdfUrl}
                     className={`
                       ${isDarkMode
@@ -626,6 +676,19 @@ const CLPreview: React.FC = () => {
               )}
             </div>
           </div>
+
+          {designOpen && (
+            <DesignPanel
+              tab={designTab}
+              onTabChange={setDesignTab}
+              onClose={() => setDesignOpen(false)}
+              isDarkMode={isDarkMode}
+              template={template ?? 'aether'}
+              fontSaved={fontFamily}
+              onFontChange={handleFontChange}
+              templates={{ kind: 'cover-letter', current: template ?? 'aether', onSelect: handleTemplateChange }}
+            />
+          )}
         </div>
       </div>
     )

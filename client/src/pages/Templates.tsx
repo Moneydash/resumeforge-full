@@ -87,7 +87,7 @@ const Templates: React.FC = () => {
               </h1>
               <p className="text-xl text-gray-600 mb-8 max-w-4xl mx-auto leading-relaxed">
                 Choose from our <strong>Galaxy Collection</strong> of modern classics or our new <strong>Greek Gods Collection</strong>
-                inspired by legendary power and wisdom. Each template is crafted to help you make an unforgettable impression.
+                &nbsp;inspired by legendary power and wisdom. Each template is crafted to help you make an unforgettable impression.
               </p>
             </div>
           </div>

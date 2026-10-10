@@ -1,13 +1,13 @@
 body {
   background: #ffffff !important;
   padding: 1rem !important;
-  font-family: "Montserrat", sans-serif !important;
+  font-family: var(--doc-font, "Montserrat", sans-serif) !important;
 }
 
 .cover-letter-template {
   margin: 0 auto !important;
   padding: 0.5in !important;
-  font-family: 'Montserrat', sans-serif !important;
+  font-family: var(--doc-font, 'Montserrat', sans-serif) !important;
   font-size: 12pt !important;
   line-height: 1.6 !important;
   color: #333 !important;
@@ -37,6 +37,7 @@ body {
   margin-bottom: 0.5rem !important;
   text-transform: uppercase !important;
   letter-spacing: 1px !important;
+  font-family: var(--doc-heading-font, inherit) !important;
 }
 
 .sender-title {

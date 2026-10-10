@@ -1,12 +1,12 @@
 body {
   background: #f8f9fa !important;
   padding: 1rem !important;
-  font-family: "Mozilla Headline", sans-serif !important;
+  font-family: var(--doc-font, "Mozilla Headline", sans-serif) !important;
 }
 
 .cover-letter-template {
   margin: 0 auto !important;
-  font-family: 'Mozilla Headline', sans-serif !important;
+  font-family: var(--doc-font, 'Mozilla Headline', sans-serif) !important;
   font-size: 12pt !important;
   line-height: 1.6 !important;
   color: #333 !important;
@@ -46,6 +46,7 @@ body {
   text-transform: uppercase !important;
   letter-spacing: 1px !important;
   line-height: 1.2 !important;
+  font-family: var(--doc-heading-font, inherit) !important;
 }
 
 .sender-title {

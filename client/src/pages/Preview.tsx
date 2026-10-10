@@ -30,8 +30,7 @@ import {
   Loader2,
   LayoutDashboard,
   GripVertical,
-  MoveLeft,
-  ArrowUpDown
+  Palette
 } from 'lucide-react';
 import { renderToString } from 'react-dom/server';
 
@@ -40,7 +39,9 @@ import { getCsrfToken, pdfPayload } from '@/utils/helper';
 import client from '@/api/axiosInstance';
 import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
-import SectionOrderPanel from '@/components/SectionOrderPanel';
+import DesignPanel, { DESIGN_PANEL_WIDTH, type DesignTab } from '@/components/DesignPanel';
+import type { SavedFont } from '@/utils/fonts';
+import { isColorTemplate, type ColorTheme } from '@/utils/color-theme';
 import { convertLayout, type SectionLayout } from '@/utils/section-layout';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -63,12 +64,12 @@ const Preview: React.FC = () => {
   const userId = useMainStore((state) => state.userId);
   const setUserId = useMainStore((state) => state.setUserId);
 
-  // get the selected template and validate it
-  const templateParam = localStorage.getItem("template") || 'cigar';
+  // the selected template: restored from localStorage, switchable from the Design panel without leaving the page
   const validTemplates: TemplateType[] = ['cigar', 'andromeda', 'comet', 'milky_way', 'zeus', 'athena', 'apollo', 'artemis', 'hermes', 'hera'];
-  const template: TemplateType | undefined = templateParam && validTemplates.includes(templateParam as TemplateType)
-    ? templateParam as TemplateType
-    : undefined;
+  const [template, setTemplate] = useState<TemplateType | undefined>(() => {
+    const stored = localStorage.getItem("template") || 'cigar';
+    return validTemplates.includes(stored as TemplateType) ? (stored as TemplateType) : undefined;
+  });
 
   // Properly typed initial state matching ResumeFormData interface
   const [pdfUrl, setPdfUrl] = useState<string | null>(null);
@@ -80,8 +81,13 @@ const Preview: React.FC = () => {
   const LAYOUT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF render, wait for the user to stop dragging
   const activeTemplate: TemplateType = template ?? 'andromeda';
   const [sectionLayout, setSectionLayout] = useState<SectionLayout | undefined>(undefined);
-  const [orderPanelOpen, setOrderPanelOpen] = useState(false);
+  const [designOpen, setDesignOpen] = useState(false);
+  const [designTab, setDesignTab] = useState<DesignTab>('sections');
   const sectionLayoutRef = useRef<SectionLayout | undefined>(undefined);
+  const [fontFamily, setFontFamily] = useState<SavedFont | undefined>(undefined);
+  const fontFamilyRef = useRef<SavedFont | undefined>(undefined);
+  const [colorTheme, setColorTheme] = useState<ColorTheme | undefined>(undefined);
+  const colorThemeRef = useRef<ColorTheme | undefined>(undefined);
   const resumeDataRef = useRef<ResumeFormData | null>(null);
   const layoutTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const handleFormSubmitRef = useRef<(data: ResumeFormData) => Promise<void>>(async () => { });
@@ -166,6 +172,10 @@ const Preview: React.FC = () => {
             : parsedData.sectionLayout;
           sectionLayoutRef.current = initialLayout;
           setSectionLayout(initialLayout);
+          fontFamilyRef.current = parsedData.fontFamily;
+          setFontFamily(parsedData.fontFamily);
+          colorThemeRef.current = parsedData.colorTheme;
+          setColorTheme(parsedData.colorTheme);
           setResumeData(parsedData);
           handleFormSubmit(parsedData); // Use parsedData directly!
         } catch (e) {
@@ -284,8 +294,8 @@ const Preview: React.FC = () => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
     if (liveEdit) setLiveStatus('updating');
-    // the layout lives outside the form; always attach the current one (undefined is dropped from the JSON)
-    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current };
+    // the layout, font and color theme live outside the form; always attach the current ones (undefined is dropped from the JSON)
+    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current };
     try {
       resumeDataRef.current = data;
       setResumeData(data);
@@ -314,15 +324,56 @@ const Preview: React.FC = () => {
   }
   handleFormSubmitRef.current = handleFormSubmit; // always-fresh handle for the debounced layout callback
 
-  const handleLayoutChange = (next: SectionLayout | undefined) => {
-    sectionLayoutRef.current = next;
-    setSectionLayout(next);
+  // each change is a server-side PDF render: wait for the user to stop before saving and regenerating
+  const queueRegenerate = () => {
     clearTimeout(layoutTimerRef.current);
     layoutTimerRef.current = setTimeout(() => {
       layoutTimerRef.current = undefined;
       if (resumeDataRef.current) void handleFormSubmitRef.current(resumeDataRef.current);
     }, LAYOUT_DEBOUNCE_MS);
   };
+
+  const handleLayoutChange = (next: SectionLayout | undefined) => {
+    sectionLayoutRef.current = next;
+    setSectionLayout(next);
+    queueRegenerate();
+  };
+
+  const handleFontChange = (next: SavedFont | undefined) => {
+    fontFamilyRef.current = next;
+    setFontFamily(next);
+    queueRegenerate();
+  };
+
+  const handleColorChange = (next: ColorTheme | undefined) => {
+    colorThemeRef.current = next;
+    setColorTheme(next);
+    queueRegenerate();
+  };
+
+  // Switch template from the Design panel: the section order follows the same conversion rules as when a
+  // resume is opened on another template; font and color choices are saved per template and simply stop applying.
+  const handleTemplateChange = (id: string) => {
+    if (!validTemplates.includes(id as TemplateType) || id === activeTemplate) return;
+    const next = id as TemplateType;
+    localStorage.setItem('template', next);
+    clearTimeout(layoutTimerRef.current); // the regeneration below saves whatever is pending
+    layoutTimerRef.current = undefined;
+    if (sectionLayoutRef.current) {
+      const converted = convertLayout(sectionLayoutRef.current, next, resumeDataRef.current ?? resumeData);
+      sectionLayoutRef.current = converted;
+      setSectionLayout(converted);
+    }
+    setTemplate(next);
+  };
+
+  // regenerate the preview as soon as the template changes (runs after the render that carries the new template)
+  const previousTemplateRef = useRef(template);
+  useEffect(() => {
+    if (previousTemplateRef.current === template) return;
+    previousTemplateRef.current = template;
+    if (resumeDataRef.current) void handleFormSubmitRef.current(resumeDataRef.current);
+  }, [template]);
 
   // save a layout change that is still waiting on the debounce (leaving the page, exporting)
   const flushPendingLayout = () => {
@@ -358,15 +409,6 @@ const Preview: React.FC = () => {
     }
   };
 
-  const redirectTemplates = () => {
-    flushPendingLayout();
-    const toastId = toast.loading("Redirecting to Templates page...");
-    setTimeout(() => {
-      toast.dismiss(toastId);
-      navigate("/templates");
-    }, 1600);
-  };
-
   const redirectResumes = () => {
     flushPendingLayout();
     const toastId = toast.loading("Redirecting to Resume Dashboards...");
@@ -386,7 +428,7 @@ const Preview: React.FC = () => {
         </div>
       </div>
     ) : (
-      <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 font-cambria flex flex-col">
+      <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 font-app flex flex-col">
         {/* Fixed Navigation Sidebar */}
         <div className="fixed left-0 top-0 h-full w-12 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg z-50 flex flex-col">
           <div className="flex-1 flex flex-col justify-center py-4">
@@ -445,15 +487,7 @@ const Preview: React.FC = () => {
             `}>
               <div className="flex items-center justify-between mb-2">
                 <div className="flex items-center space-x-3">
-                  <div className={`
-                    w-8 h-8 rounded-lg flex items-center justify-center
-                    ${isDarkMode
-                      ? 'bg-gradient-to-br from-blue-500 to-purple-600'
-                      : 'bg-gradient-to-br from-blue-600 to-indigo-600'
-                    }
-                  `}>
-                    <FileText className="w-4 h-4 text-white" />
-                  </div>
+                  <img src="/icon.png" alt="ResumeForge logo" className="h-8 w-8 flex-shrink-0 rounded-lg bg-white shadow-sm" />
                   <h1 className={`
                     text-2xl font-bold bg-gradient-to-r 
                     ${isDarkMode
@@ -540,7 +574,7 @@ const Preview: React.FC = () => {
           <div
             className="h-1/2 lg:h-full flex flex-col overflow-hidden"
             style={{
-              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${orderPanelOpen ? 320 : 0}px)` : '100%',
+              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${designOpen ? DESIGN_PANEL_WIDTH : 0}px)` : '100%',
             }}
           >
             {/* Preview Header - Fixed */}
@@ -582,40 +616,25 @@ const Preview: React.FC = () => {
                         <Button
                           variant="outline"
                           size="icon"
-                          aria-label="Section order"
-                          aria-pressed={orderPanelOpen}
+                          aria-label="Design"
+                          aria-pressed={designOpen}
                           disabled={!pdfUrl}
-                          onClick={() => setOrderPanelOpen((open) => !open)}
+                          onClick={() => setDesignOpen((open) => !open)}
                           className={`
                             ${isDarkMode
                               ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
                               : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
                             }
-                            ${orderPanelOpen ? 'ring-2 ring-indigo-500' : ''}
+                            ${designOpen ? 'ring-2 ring-indigo-500' : ''}
                             transition-all duration-200 hover:scale-105
                           `}
                         >
-                          <ArrowUpDown className="w-4 h-4" />
+                          <Palette className="w-4 h-4" />
                         </Button>
                       </TooltipTrigger>
-                      <TooltipContent>Section order</TooltipContent>
+                      <TooltipContent>Design</TooltipContent>
                     </Tooltip>
                   </TooltipProvider>
-
-                  <Button
-                    variant="outline"
-                    onClick={redirectTemplates}
-                    className={`
-                      ${isDarkMode
-                        ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
-                        : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                      }
-                      transition-all duration-200 hover:scale-105
-                    `}
-                  >
-                    <MoveLeft className="w-4 h-4 mr-2" />
-                    Templates
-                  </Button>
 
                   <Button
                     variant="outline"
@@ -634,7 +653,7 @@ const Preview: React.FC = () => {
 
                   <Button
                     id="exportButton"
-                    onClick={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current })}
+                    onClick={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current })}
                     disabled={loadingExport || !pdfUrl}
                     className={`
                       ${isDarkMode
@@ -719,14 +738,18 @@ const Preview: React.FC = () => {
             </div>
           </div>
 
-          {orderPanelOpen && (
-            <SectionOrderPanel
-              template={activeTemplate}
-              data={resumeData}
-              layout={sectionLayout}
+          {designOpen && (
+            <DesignPanel
+              tab={designTab}
+              onTabChange={setDesignTab}
+              onClose={() => setDesignOpen(false)}
               isDarkMode={isDarkMode}
-              onChange={handleLayoutChange}
-              onClose={() => setOrderPanelOpen(false)}
+              template={activeTemplate}
+              fontSaved={fontFamily}
+              onFontChange={handleFontChange}
+              sections={{ template: activeTemplate, data: resumeData, layout: sectionLayout, onChange: handleLayoutChange }}
+              color={isColorTemplate(activeTemplate) ? { template: activeTemplate, theme: colorTheme, onChange: handleColorChange } : undefined}
+              templates={{ kind: 'resume', current: activeTemplate, onSelect: handleTemplateChange }}
             />
           )}
         </div>

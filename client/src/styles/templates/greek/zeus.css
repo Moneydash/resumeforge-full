@@ -5,7 +5,7 @@
 }
 
 body {
-  font-family: 'DM Serif Text', Georgia, serif !important;
+  font-family: var(--doc-font, 'DM Serif Text', Georgia, serif) !important;
   color: #2c1810 !important;
   background: linear-gradient(135deg, #f5f1e8 0%, #ede4d1 100%) !important;
   margin: 0 !important;
@@ -20,7 +20,7 @@ body {
 
 .greek-border-top {
   height: 8px !important;
-  background: linear-gradient(90deg, #d4af37 0%, #ffd700 25%, #b8860b 50%, #ffd700 75%, #d4af37 100%) !important;
+  background: var(--doc-secondary-strip, linear-gradient(90deg, #d4af37 0%, #ffd700 25%, #b8860b 50%, #ffd700 75%, #d4af37 100%)) !important;
   background-size: 40px 8px !important;
   animation: shimmer 3s linear infinite !important;
 }
@@ -37,10 +37,10 @@ body {
 
 .greek-header {
   text-align: center !important;
-  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0 0h100v100H0z" fill="none"/><path d="M10 10l80 80M90 10L10 90" stroke="%23ffd700" stroke-width="0.5" opacity="0.1"/></svg>'), linear-gradient(135deg, #1a2855 0%, #2d4a9a 50%, #1a2855 100%) !important;
-  color: #ffd700 !important;
+  background: url('data:image/svg+xml,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><path d="M0 0h100v100H0z" fill="none"/><path d="M10 10l80 80M90 10L10 90" stroke="%23ffd700" stroke-width="0.5" opacity="0.1"/></svg>'), var(--doc-primary-bg, linear-gradient(135deg, #1a2855 0%, #2d4a9a 50%, #1a2855 100%)) !important;
+  color: var(--doc-secondary-light, #ffd700) !important;
   padding: 1.5rem 2rem !important;
-  border-bottom: 4px solid #d4af37 !important;
+  border-bottom: 4px solid var(--doc-secondary, #d4af37) !important;
   display: flex !important;
   align-items: center !important;
   justify-content: space-between !important;
@@ -49,7 +49,7 @@ body {
 .greek-laurel-left,
 .greek-laurel-right {
   font-size: 1.5rem !important;
-  color: #ffd700 !important;
+  color: var(--doc-secondary-light, #ffd700) !important;
 }
 
 .greek-header-content {
@@ -57,17 +57,17 @@ body {
 }
 
 .greek-name {
-  font-family: 'Cinzel', serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Cinzel', serif)) !important;
   font-size: 1.8rem !important;
   font-weight: 700 !important;
-  color: #ffd700 !important;
+  color: var(--doc-secondary-light, #ffd700) !important;
   margin: 0 !important;
   letter-spacing: 2px !important;
   text-transform: uppercase !important;
 }
 
 .greek-headline {
-  font-family: 'Cinzel', serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Cinzel', serif)) !important;
   font-size: 1rem !important;
   font-weight: 600 !important;
   color: #e6d7b8 !important;
@@ -86,13 +86,13 @@ body {
 }
 
 .greek-contact a {
-  color: #ffd700 !important;
+  color: var(--doc-secondary-light, #ffd700) !important;
   text-decoration: none !important;
   font-weight: 600 !important;
 }
 
 .greek-contact a:hover {
-  text-shadow: 0 0 8px rgba(255, 215, 0, 0.6) !important;
+  text-shadow: 0 0 8px color-mix(in srgb, var(--doc-secondary-light, #ffd700) 60%, transparent) !important;
 }
 
 .greek-socials {
@@ -105,7 +105,7 @@ body {
 }
 
 .greek-socials a {
-  color: #ffd700 !important;
+  color: var(--doc-secondary-light, #ffd700) !important;
   text-decoration: none !important;
   font-size: 1rem !important;
   transition: all 0.3s ease !important;
@@ -113,7 +113,7 @@ body {
 
 .greek-socials a:hover {
   color: #fff !important;
-  text-shadow: 0 0 12px rgba(255, 215, 0, 0.8) !important;
+  text-shadow: 0 0 12px color-mix(in srgb, var(--doc-secondary-light, #ffd700) 80%, transparent) !important;
   transform: scale(1.2) !important;
 }
 
@@ -127,7 +127,7 @@ body {
   background: rgba(255, 255, 255, 0.7) !important;
   border-radius: 8px !important;
   padding: 1.5rem !important;
-  border-left: 6px solid #d4af37 !important;
+  border-left: 6px solid var(--doc-secondary, #d4af37) !important;
 }
 
 .greek-section:last-child {
@@ -135,14 +135,14 @@ body {
 }
 
 .greek-section-title {
-  font-family: 'Cinzel', serif !important;
+  font-family: var(--doc-heading-font, var(--doc-font, 'Cinzel', serif)) !important;
   font-size: 1.1rem !important;
   font-weight: 700 !important;
-  color: #1a2855 !important;
+  color: var(--doc-primary-darker, #1a2855) !important;
   margin-bottom: 1rem !important;
   letter-spacing: 1px !important;
   text-transform: uppercase !important;
-  border-bottom: 2px solid #d4af37 !important;
+  border-bottom: 2px solid var(--doc-secondary, #d4af37) !important;
   padding-bottom: 0.5rem !important;
   display: flex !important;
   align-items: center !important;
@@ -151,7 +151,7 @@ body {
 
 .greek-icon {
   font-size: 1rem !important;
-  color: #d4af37 !important;
+  color: var(--doc-secondary, #d4af37) !important;
 }
 
 .greek-item {
@@ -159,14 +159,14 @@ body {
   padding: 1rem !important;
   background: rgba(255, 255, 255, 0.5) !important;
   border-radius: 6px !important;
-  border-left: 3px solid #b8860b !important;
+  border-left: 3px solid var(--doc-secondary-dark, #b8860b) !important;
 }
 
 .greek-item-header {
   font-size: 0.95rem !important;
-  font-family: 'Cinzel', serif !important;
+  font-family: var(--doc-font, 'DM Serif Text', Georgia, serif) !important;
   font-weight: 600 !important;
-  color: #1a2855 !important;
+  color: var(--doc-primary-darker, #1a2855) !important;
   margin-bottom: 0.3rem !important;
   display: flex !important;
   flex-wrap: wrap !important;
@@ -176,7 +176,7 @@ body {
 
 .greek-item-title {
   font-weight: 700 !important;
-  color: #2d4a9a !important;
+  color: var(--doc-primary-ink, #2d4a9a) !important;
 }
 
 .greek-item-subtitle {
@@ -187,8 +187,8 @@ body {
 .greek-item-date {
   margin-left: auto !important;
   font-size: 0.85rem !important;
-  color: #b8860b !important;
-  font-family: 'DM Serif Text', serif !important;
+  color: var(--doc-secondary-ink, #b8860b) !important;
+  font-family: var(--doc-font, 'DM Serif Text', serif) !important;
   font-weight: 600 !important;
 }
 
@@ -229,7 +229,7 @@ ul.list-disc li {
 }
 
 ul.list-disc li::marker {
-  color: #d4af37 !important;
+  color: var(--doc-secondary, #d4af37) !important;
   font-size: 0.9em !important;
 }
 

@@ -2,13 +2,16 @@ import { Controller } from "@/types/types.controller-type";
 import { formatDescription } from "../utils/helper";
 import puppeteer, { Browser, Page } from "puppeteer";
 import { execSync } from 'child_process';
+import { buildFontHead } from "../utils/fonts";
+import { buildThemeHead } from "../utils/theme-vars";
+import { measureDocumentHeightPx } from "../utils/pdf-height";
 
 const generate_pdf: Controller = async (req, res) => {
   let browser: Browser | undefined;
   let page: Page | undefined;
 
   try {
-    const { html, template } = req.body;
+    const { html, template, data, themeVars } = req.body;
     const formattedHtml = formatDescription(html)
 
     // Input validation
@@ -77,15 +80,8 @@ const generate_pdf: Controller = async (req, res) => {
           <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css"/>
           <link rel="preconnect" href="https://fonts.googleapis.com">
           <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-          ${template === 'andromeda' ? `<link href="https://fonts.googleapis.com/css2?family=IBM+Plex+Serif:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;1,100;1,200;1,300;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">` : ''}
-          ${template === 'cigar' ? `<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">` : ''}
-          ${template === 'comet' || template === 'apollo' ? `<link href="https://fonts.googleapis.com/css2?family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">` : ''}
-          ${template === 'milky_way' ? `<link href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&family=Poppins:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&display=swap" rel="stylesheet">` : ''}
-          ${template === 'zeus' ? `<link href="https://fonts.googleapis.com/css2?family=DM+Serif+Text:ital@0;1&display=swap" rel="stylesheet">` : ''}
-          ${template === 'athena' ? '<link href="https://fonts.googleapis.com/css2?family=Lexend+Deca:wght@100..900&display=swap" rel="stylesheet">' : ''}
-          ${template === 'artemis' ? '<link href="https://fonts.googleapis.com/css2?family=Roboto+Slab:wght@100..900&display=swap" rel="stylesheet">' : ''}
-          ${template === 'hermes' ? '<link href="https://fonts.googleapis.com/css2?family=Ubuntu:ital,wght@0,300;0,400;0,500;0,700;1,300;1,400;1,500;1,700&display=swap" rel="stylesheet">' : ''}
-          ${template === 'hera' ? '<link href="https://fonts.googleapis.com/css2?family=Geist:wght@100..900&display=swap" rel="stylesheet">' : ''}
+          ${buildFontHead(String(template), data?.fontFamily)}
+          ${buildThemeHead(themeVars)}
           <style>
             /* Reset all default margins and padding */
             * {
@@ -122,32 +118,12 @@ const generate_pdf: Controller = async (req, res) => {
     });
 
     // Get accurate content dimensions after everything is loaded
-    const dimensions = await page.evaluate(() => {
-      // Force layout recalculation
-      document.body.offsetHeight;
-      document.body.scrollHeight;
-
-      const body = document.body;
-      const html = document.documentElement;
-
-      // Get the actual rendered height
-      const bodyHeight = body.scrollHeight;
-      const htmlHeight = html.scrollHeight;
-      const offsetHeight = body.offsetHeight;
-
-      // Use the maximum height to ensure all content is captured
-      const height = Math.max(bodyHeight, htmlHeight, offsetHeight);
-
-      // Convert to inches (assuming 96 DPI)
-      const heightInInches = height / 96;
-      const widthInInches = 8.5; // Standard letter width
-
-      return {
-        width: widthInInches,
-        height: heightInInches,
-        heightPx: height
-      };
-    });
+    const heightPx = await measureDocumentHeightPx(page);
+    const dimensions = {
+      width: 8.5, // Standard letter width
+      height: heightPx / 96, // inches (96 DPI)
+      heightPx,
+    };
 
     const min_buffer = template === 'milky_way' ? 0.1 : 0;
 
