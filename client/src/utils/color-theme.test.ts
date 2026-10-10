@@ -224,3 +224,38 @@ describe("withPrimary / withSecondary", () => {
     expect(back?.primary).toEqual({ type: "solid", color: "#2563eb" });
   });
 });
+
+describe("Zeus header accents stay readable on any header", () => {
+  const light = (theme: ColorTheme) => buildThemeVars("zeus", theme)["--doc-secondary-light"];
+
+  it("lightens a dark secondary until it reads on a navy header", () => {
+    const theme: ColorTheme = { template: "zeus", primary: { type: "solid", color: "#1e3a8a" }, secondary: "#be123c" };
+    expect(contrast(light(theme), "#1e3a8a")).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("reads against every stop of a gradient header", () => {
+    const theme: ColorTheme = { template: "zeus", primary: { type: "gradient", from: "#15803d", to: "#0f766e", direction: "diagonal" }, secondary: "#b45309" };
+    expect(contrast(light(theme), "#15803d")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(light(theme), "#0f766e")).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("reads on the default header when only the secondary is customized", () => {
+    const l = light({ template: "zeus", secondary: "#be123c" });
+    expect(contrast(l, "#1a2855")).toBeGreaterThanOrEqual(4.5);
+    expect(contrast(l, "#2d4a9a")).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("keeps the default gold when only the header is customized and gold already reads on it", () => {
+    expect(light({ template: "zeus", primary: { type: "solid", color: "#1e3a8a" } })).toBe("#ffd700");
+  });
+
+  it("falls back to a readable accent even when the header is a custom pale pick", () => {
+    const theme: ColorTheme = { template: "zeus", primary: { type: "solid", color: "#ffff00" }, secondary: "#ffff00" };
+    expect(contrast(light(theme), ensureWhiteContrast("#ffff00"))).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("leaves other templates without a secondary-light when only the primary is set", () => {
+    expect(buildThemeVars("artemis", { template: "artemis", primary: { type: "solid", color: "#334155" } })["--doc-secondary-light"]).toBeUndefined();
+    expect(buildThemeVars("zeus", { template: "zeus", primary: { type: "solid", color: "#334155" } })["--doc-secondary-light"]).toBeDefined();
+  });
+});

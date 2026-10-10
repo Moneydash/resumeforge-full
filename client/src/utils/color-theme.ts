@@ -241,10 +241,27 @@ function primaryVars(fill: PrimaryFill): Record<string, string> {
   };
 }
 
-function secondaryVars(S: string): Record<string, string> {
+/** Lighten `base` toward white until it reaches `min` contrast against every background (white always does on a fill darkened for white text). */
+function lightenToContrast(base: string, backgrounds: string[], min = 4.5): string {
+  for (let t = 0; t <= 1; t += 0.05) {
+    const c = mix(base, WHITE, t);
+    if (backgrounds.every((bg) => contrast(c, bg) >= min)) return c;
+  }
+  return WHITE;
+}
+
+/** The colors a template's header is painted with: the (adjusted) custom fill, or the template's own default. */
+function headerStops(template: ColorTemplate, primary: PrimaryFill | undefined): string[] {
+  if (!primary) {
+    const def = COLOR_TEMPLATES[template].defaultPrimary;
+    return def.type === 'solid' ? [def.color] : [def.from, def.to];
+  }
+  return primary.type === 'solid' ? [ensureWhiteContrast(primary.color)] : [ensureWhiteContrast(primary.from), ensureWhiteContrast(primary.to)];
+}
+
+function secondaryVars(S: string, light: string): Record<string, string> {
   const SB = ensureWhiteContrast(S);
   const dark = lightnessBetween(S, 8, 40);
-  const light = mix(S, WHITE, 0.35);
   return {
     '--doc-secondary': S,
     '--doc-secondary-ink': SB,
@@ -255,9 +272,19 @@ function secondaryVars(S: string): Record<string, string> {
   };
 }
 
+/** Zeus paints its name, contact links and laurels in the accent color on top of the header. */
+const ZEUS_DEFAULT_ACCENT = '#ffd700';
+
 /** Only the variables for slots with a valid choice for this template; an empty object means "render the default". */
 export function buildThemeVars(template: string, theme?: unknown): Record<string, string> {
   const t = readTheme(template, theme);
   if (!t) return {};
-  return { ...(t.primary ? primaryVars(t.primary) : {}), ...(t.secondary ? secondaryVars(t.secondary) : {}) };
+  // the accent text must read on whatever header the user ends up with, so it is lightened until it does
+  const accentOn = (base: string) => lightenToContrast(base, headerStops(t.template, t.primary));
+  const light = t.template === 'zeus' ? accentOn(t.secondary ? mix(t.secondary, WHITE, 0.35) : ZEUS_DEFAULT_ACCENT) : undefined;
+  return {
+    ...(t.primary ? primaryVars(t.primary) : {}),
+    ...(t.secondary ? secondaryVars(t.secondary, light ?? mix(t.secondary, WHITE, 0.35)) : {}),
+    ...(light && !t.secondary ? { '--doc-secondary-light': light } : {}),
+  };
 }
