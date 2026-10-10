@@ -42,6 +42,7 @@ import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
 import DesignPanel, { type DesignTab } from '@/components/DesignPanel';
 import type { SavedFont } from '@/utils/fonts';
+import { isColorTemplate, type ColorTheme } from '@/utils/color-theme';
 import { convertLayout, type SectionLayout } from '@/utils/section-layout';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
@@ -86,6 +87,8 @@ const Preview: React.FC = () => {
   const sectionLayoutRef = useRef<SectionLayout | undefined>(undefined);
   const [fontFamily, setFontFamily] = useState<SavedFont | undefined>(undefined);
   const fontFamilyRef = useRef<SavedFont | undefined>(undefined);
+  const [colorTheme, setColorTheme] = useState<ColorTheme | undefined>(undefined);
+  const colorThemeRef = useRef<ColorTheme | undefined>(undefined);
   const resumeDataRef = useRef<ResumeFormData | null>(null);
   const layoutTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const handleFormSubmitRef = useRef<(data: ResumeFormData) => Promise<void>>(async () => { });
@@ -172,6 +175,8 @@ const Preview: React.FC = () => {
           setSectionLayout(initialLayout);
           fontFamilyRef.current = parsedData.fontFamily;
           setFontFamily(parsedData.fontFamily);
+          colorThemeRef.current = parsedData.colorTheme;
+          setColorTheme(parsedData.colorTheme);
           setResumeData(parsedData);
           handleFormSubmit(parsedData); // Use parsedData directly!
         } catch (e) {
@@ -290,8 +295,8 @@ const Preview: React.FC = () => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
     if (liveEdit) setLiveStatus('updating');
-    // the layout and font live outside the form; always attach the current ones (undefined is dropped from the JSON)
-    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current };
+    // the layout, font and color theme live outside the form; always attach the current ones (undefined is dropped from the JSON)
+    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current };
     try {
       resumeDataRef.current = data;
       setResumeData(data);
@@ -338,6 +343,12 @@ const Preview: React.FC = () => {
   const handleFontChange = (next: SavedFont | undefined) => {
     fontFamilyRef.current = next;
     setFontFamily(next);
+    queueRegenerate();
+  };
+
+  const handleColorChange = (next: ColorTheme | undefined) => {
+    colorThemeRef.current = next;
+    setColorTheme(next);
     queueRegenerate();
   };
 
@@ -651,7 +662,7 @@ const Preview: React.FC = () => {
 
                   <Button
                     id="exportButton"
-                    onClick={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current })}
+                    onClick={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current })}
                     disabled={loadingExport || !pdfUrl}
                     className={`
                       ${isDarkMode
@@ -746,6 +757,7 @@ const Preview: React.FC = () => {
               fontSaved={fontFamily}
               onFontChange={handleFontChange}
               sections={{ template: activeTemplate, data: resumeData, layout: sectionLayout, onChange: handleLayoutChange }}
+              color={isColorTemplate(activeTemplate) ? { template: activeTemplate, theme: colorTheme, onChange: handleColorChange } : undefined}
             />
           )}
         </div>
