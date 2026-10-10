@@ -2,11 +2,13 @@ import React, { useEffect } from "react";
 import { X } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import SectionOrderPanel from "@/components/SectionOrderPanel";
+import ColorPanel from "@/components/ColorPanel";
 import { FontList } from "@/components/FontList";
 import { ensurePickerFontsLoaded } from "@/utils/load-picker-fonts";
 import type { TemplateType } from "@/types";
 import type { ResumeFormData } from "@/types/interface.resume-form-data";
 import type { SectionLayout } from "@/utils/section-layout";
+import type { ColorTemplate, ColorTheme } from "@/utils/color-theme";
 import {
   TEMPLATE_DEFAULT_FONT,
   chooseFont,
@@ -16,7 +18,7 @@ import {
   type SavedFont,
 } from "@/utils/fonts";
 
-export type DesignTab = "sections" | "font";
+export type DesignTab = "sections" | "font" | "color";
 
 interface DesignPanelProps {
   tab: DesignTab;
@@ -33,15 +35,19 @@ interface DesignPanelProps {
     layout: SectionLayout | undefined;
     onChange: (layout: SectionLayout | undefined) => void;
   };
+  /** Themeable resume templates only (Andromeda, Athena, Zeus, Artemis). */
+  color?: {
+    template: ColorTemplate;
+    theme: ColorTheme | undefined;
+    onChange: (next: ColorTheme | undefined) => void;
+  };
 }
 
-const TABS: Array<{ id: DesignTab; label: string }> = [
-  { id: "sections", label: "Sections" },
-  { id: "font", label: "Font" },
-];
+const TAB_LABELS: Record<DesignTab, string> = { sections: "Sections", font: "Font", color: "Color" };
 
-const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, isDarkMode, template, fontSaved, onFontChange, sections }) => {
-  const active: DesignTab = sections ? tab : "font";
+const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, isDarkMode, template, fontSaved, onFontChange, sections, color }) => {
+  const available: DesignTab[] = [...(sections ? (["sections"] as const) : []), "font", ...(color ? (["color"] as const) : [])];
+  const active: DesignTab = available.includes(tab) ? tab : "font";
 
   useEffect(() => {
     if (active === "font") ensurePickerFontsLoaded();
@@ -59,9 +65,9 @@ const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, is
         </Button>
       </div>
 
-      {sections && (
+      {available.length > 1 && (
         <div role="tablist" aria-label="Design options" className="flex border-b border-gray-200/50 dark:border-gray-700/50">
-          {TABS.map(({ id, label }) => {
+          {available.map((id) => {
             const selected = id === active;
             return (
               <button
@@ -76,15 +82,17 @@ const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, is
                     : `border-transparent ${isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-800"}`
                 }`}
               >
-                {label}
+                {TAB_LABELS[id]}
               </button>
             );
           })}
         </div>
       )}
 
-      {sections && active === "sections" ? (
+      {active === "sections" && sections ? (
         <SectionOrderPanel template={sections.template} data={sections.data} layout={sections.layout} onChange={sections.onChange} />
+      ) : active === "color" && color ? (
+        <ColorPanel template={color.template} theme={color.theme} onChange={color.onChange} isDarkMode={isDarkMode} />
       ) : (
         <div className="flex-1 overflow-y-auto py-2 no-scrollbar">
           <FontList

@@ -68,6 +68,7 @@
     "path": "^0.12.7",
     "pdfjs-dist": "^3.11.174",
     "react": "^19.1.0",
+    "react-colorful": "^5.8.1",
     "react-day-picker": "^9.7.0",
     "react-dom": "^19.1.0",
     "react-hook-form": "^7.56.4",

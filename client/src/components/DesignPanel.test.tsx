@@ -43,4 +43,26 @@ describe("DesignPanel", () => {
     expect(html).toContain('IBM Plex Sans');
     expect(html).not.toContain('Drag sections to reorder');
   });
+
+  it("adds a Color tab for a themeable template", () => {
+    const html = render({ tab: "color", template: "zeus", color: { template: "zeus", theme: undefined, onChange: noop } });
+    expect(html.match(/role="tab"/g)).toHaveLength(3);
+    expect(html).toContain(">Color<");
+    expect(html).toContain("Reset all colors");
+    expect(html).not.toContain("Drag sections to reorder");
+    expect(html).not.toContain("Cinzel headings");
+  });
+
+  it("has no Color tab when the template is not themeable", () => {
+    const html = render({ tab: "color" });
+    expect(html.match(/role="tab"/g)).toHaveLength(2);
+    expect(html).not.toContain(">Color<");
+    expect(html).toContain("Inter"); // falls back to the Font view
+  });
+
+  it("cover letters (no sections, no color) still have no tabs", () => {
+    const html = render({ sections: undefined, color: undefined, tab: "color", template: "ventus" });
+    expect(html).not.toContain('role="tab"');
+    expect(html).toContain("IBM Plex Sans");
+  });
 });
