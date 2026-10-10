@@ -18,7 +18,8 @@ import {
   Loader2,
   LayoutDashboard,
   GripVertical,
-  MoveLeft
+  MoveLeft,
+  Palette
 } from 'lucide-react';
 import type { CLTemplateType } from '@/types';
 import { renderToString } from 'react-dom/server';
@@ -29,6 +30,9 @@ import { saveAs } from 'file-saver';
 import client from '@/api/axiosInstance';
 import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
+import DesignPanel from '@/components/DesignPanel';
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import type { SavedFont } from '@/utils/fonts';
 
 const CLPreview: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -62,6 +66,13 @@ const CLPreview: React.FC = () => {
   const liveEdit = isUpdateMode && !!pdfUrl;
   const [liveStatus, setLiveStatus] = useState<'idle' | 'updating' | 'saved' | 'error'>('idle');
   const requestIdRef = useRef(0); // ignore out-of-order responses
+  const FONT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF render, wait for the user to stop changing fonts
+  const [designOpen, setDesignOpen] = useState(false);
+  const [fontFamily, setFontFamily] = useState<SavedFont | undefined>(undefined);
+  const fontFamilyRef = useRef<SavedFont | undefined>(undefined);
+  const clDataRef = useRef<CLFormData | null>(null);
+  const fontTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
+  const handleFormSubmitRef = useRef<(data: CLFormData) => Promise<void>>(async () => { });
   const [clData, setCLData] = useState<CLFormData>({
     sender: {
       name: '',
@@ -121,6 +132,8 @@ const CLPreview: React.FC = () => {
         try {
           setIsUpdateMode(true);
           const parsedData = JSON.parse(request.data?.cover_letter_data);
+          fontFamilyRef.current = parsedData.fontFamily;
+          setFontFamily(parsedData.fontFamily);
           setCLData(parsedData);
           handleFormSubmit(parsedData);
         } catch (e) {
@@ -243,10 +256,13 @@ const CLPreview: React.FC = () => {
   }
 
   // Handle form submission
-  const handleFormSubmit = async (data: CLFormData) => {
+  const handleFormSubmit = async (formData: CLFormData) => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
     if (liveEdit) setLiveStatus('updating');
+    // the font lives outside the form; always attach the current one (undefined is dropped from the JSON)
+    const data: CLFormData = { ...formData, fontFamily: fontFamilyRef.current };
+    clDataRef.current = data;
     try {
       setCLData(data);
       const saved = await saveCLData(data, liveEdit);
@@ -278,6 +294,28 @@ const CLPreview: React.FC = () => {
     }
   };
 
+  handleFormSubmitRef.current = handleFormSubmit; // always-fresh handle for the debounced font callback
+
+  const handleFontChange = (next: SavedFont | undefined) => {
+    fontFamilyRef.current = next;
+    setFontFamily(next);
+    clearTimeout(fontTimerRef.current);
+    fontTimerRef.current = setTimeout(() => {
+      fontTimerRef.current = undefined;
+      if (clDataRef.current) void handleFormSubmitRef.current(clDataRef.current);
+    }, FONT_DEBOUNCE_MS);
+  };
+
+  // save a font change that is still waiting on the debounce (leaving the page)
+  const flushPendingFont = () => {
+    if (fontTimerRef.current === undefined) return;
+    clearTimeout(fontTimerRef.current);
+    fontTimerRef.current = undefined;
+    if (clDataRef.current) void handleFormSubmitRef.current(clDataRef.current);
+  };
+
+  useEffect(() => () => flushPendingFont(), []);
+
   // Handle PDF export
   const handleExportPDF = async (data: CLFormData) => {
     setLoadingExport(true);
@@ -305,6 +343,7 @@ const CLPreview: React.FC = () => {
 
   // Navigation functions
   const redirectTemplates = () => {
+    flushPendingFont();
     const toastId = toast.loading("Redirecting to Templates page...");
     setTimeout(() => {
       toast.dismiss(toastId);
@@ -313,6 +352,7 @@ const CLPreview: React.FC = () => {
   };
 
   const redirectDashboard = () => {
+    flushPendingFont();
     const toastId = toast.loading("Redirecting to Cover Letter Dashboard...");
     setTimeout(() => {
       toast.dismiss(toastId);
@@ -474,7 +514,7 @@ const CLPreview: React.FC = () => {
           <div
             className="h-1/2 lg:h-full flex flex-col overflow-hidden"
             style={{
-              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px)` : '100%',
+              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${designOpen ? 320 : 0}px)` : '100%',
             }}
           >
             {/* Preview Header - Fixed */}
@@ -510,6 +550,32 @@ const CLPreview: React.FC = () => {
                       {liveStatus === 'error' && 'Update failed, will retry on next edit'}
                     </span>
                   )}
+                  <TooltipProvider>
+                    <Tooltip>
+                      <TooltipTrigger asChild>
+                        <Button
+                          variant="outline"
+                          size="icon"
+                          aria-label="Design"
+                          aria-pressed={designOpen}
+                          disabled={!pdfUrl}
+                          onClick={() => setDesignOpen((open) => !open)}
+                          className={`
+                            ${isDarkMode
+                              ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
+                              : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
+                            }
+                            ${designOpen ? 'ring-2 ring-indigo-500' : ''}
+                            transition-all duration-200 hover:scale-105
+                          `}
+                        >
+                          <Palette className="w-4 h-4" />
+                        </Button>
+                      </TooltipTrigger>
+                      <TooltipContent>Design</TooltipContent>
+                    </Tooltip>
+                  </TooltipProvider>
+
                   <Button
                     variant="outline"
                     onClick={redirectTemplates}
@@ -542,7 +608,7 @@ const CLPreview: React.FC = () => {
 
                   <Button
                     id="exportButton"
-                    onClick={() => handleExportPDF(clData)}
+                    onClick={() => handleExportPDF({ ...clData, fontFamily: fontFamilyRef.current })}
                     disabled={loadingExport || !pdfUrl}
                     className={`
                       ${isDarkMode
@@ -626,6 +692,18 @@ const CLPreview: React.FC = () => {
               )}
             </div>
           </div>
+
+          {designOpen && (
+            <DesignPanel
+              tab="font"
+              onTabChange={() => {}}
+              onClose={() => setDesignOpen(false)}
+              isDarkMode={isDarkMode}
+              template={template ?? 'aether'}
+              fontSaved={fontFamily}
+              onFontChange={handleFontChange}
+            />
+          )}
         </div>
       </div>
     )
