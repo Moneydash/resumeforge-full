@@ -4,6 +4,7 @@
 const NAMES = [
   '--doc-primary-bg', '--doc-primary', '--doc-primary-ink', '--doc-primary-dark', '--doc-primary-darker',
   '--doc-primary-light', '--doc-primary-lighter', '--doc-primary-tint', '--doc-primary-strip', '--doc-primary-fade',
+  '--doc-primary-link',
   '--doc-secondary', '--doc-secondary-ink', '--doc-secondary-dark', '--doc-secondary-light', '--doc-secondary-bg',
   '--doc-secondary-strip',
 ] as const;

@@ -188,12 +188,18 @@ function compact(template: ColorTemplate, primary?: PrimaryFill, secondary?: str
   return { template, ...(primary ? { primary } : {}), ...(secondary ? { secondary } : {}) };
 }
 
+/** Only an explicit `undefined` clears a slot; an invalid value (for example a half-typed hex) leaves the theme as it was. */
 export function withPrimary(template: ColorTemplate, theme: unknown, fill: PrimaryFill | undefined): ColorTheme | undefined {
-  return compact(template, readPrimary(fill), readTheme(template, theme)?.secondary);
+  const current = readTheme(template, theme);
+  if (fill === undefined) return compact(template, undefined, current?.secondary);
+  const next = readPrimary(fill);
+  return next ? compact(template, next, current?.secondary) : current;
 }
 
 export function withSecondary(template: ColorTemplate, theme: unknown, hex: string | undefined): ColorTheme | undefined {
-  return compact(template, readTheme(template, theme)?.primary, hex !== undefined && isHex(hex) ? normalizeHex(hex) : undefined);
+  const current = readTheme(template, theme);
+  if (hex === undefined) return compact(template, current?.primary, undefined);
+  return isHex(hex) ? compact(template, current?.primary, normalizeHex(hex)) : current;
 }
 
 // ---- previews for the UI -----------------------------------------------------------------------------
@@ -223,18 +229,20 @@ function primaryVars(fill: PrimaryFill): Record<string, string> {
   const B = ensureWhiteContrast(P); // readable under white text, also the ink color for text on white
   const dark = lightnessBetween(B, 8, 38);
   const darker = lightnessBetween(B, 6, 26);
-  const bg =
-    fill.type === 'solid'
-      ? B
-      : `linear-gradient(${DIRECTION_ANGLE[fill.direction]}deg, ${ensureWhiteContrast(fill.from)}, ${ensureWhiteContrast(fill.to)})`;
+  const stops = fill.type === 'solid' ? [B] : [ensureWhiteContrast(fill.from), ensureWhiteContrast(fill.to)];
+  const bg = fill.type === 'solid' ? B : `linear-gradient(${DIRECTION_ANGLE[fill.direction]}deg, ${stops[0]}, ${stops[1]})`;
+  // light text that sits on the fill (Athena's sidebar) must read against every stop; "lighter" never falls below "light"
+  const light = lightenToContrast(mix(B, WHITE, 0.75), stops);
+  const lighterRaw = lightenToContrast(mix(B, WHITE, 0.88), stops);
+  const lighter = luminance(lighterRaw) >= luminance(light) ? lighterRaw : light;
   return {
     '--doc-primary-bg': bg,
     '--doc-primary': P,
     '--doc-primary-ink': B,
     '--doc-primary-dark': dark,
     '--doc-primary-darker': darker,
-    '--doc-primary-light': mix(B, WHITE, 0.75),
-    '--doc-primary-lighter': mix(B, WHITE, 0.88),
+    '--doc-primary-light': light,
+    '--doc-primary-lighter': lighter,
     '--doc-primary-tint': mix(P, WHITE, 0.88),
     '--doc-primary-strip': `linear-gradient(90deg, ${darker}, ${dark}, ${B}, ${mix(B, WHITE, 0.4)}, ${mix(B, WHITE, 0.6)})`,
     '--doc-primary-fade': `linear-gradient(90deg, ${P}, ${rgbaFrom(P, 0.2)})`,
@@ -274,6 +282,8 @@ function secondaryVars(S: string, light: string): Record<string, string> {
 
 /** Zeus paints its name, contact links and laurels in the accent color on top of the header. */
 const ZEUS_DEFAULT_ACCENT = '#ffd700';
+/** Artemis paints its social links in this pale blue on the header. */
+const ARTEMIS_DEFAULT_LINK = '#63b3ed';
 
 /** Only the variables for slots with a valid choice for this template; an empty object means "render the default". */
 export function buildThemeVars(template: string, theme?: unknown): Record<string, string> {
@@ -282,9 +292,11 @@ export function buildThemeVars(template: string, theme?: unknown): Record<string
   // the accent text must read on whatever header the user ends up with, so it is lightened until it does
   const accentOn = (base: string) => lightenToContrast(base, headerStops(t.template, t.primary));
   const light = t.template === 'zeus' ? accentOn(t.secondary ? mix(t.secondary, WHITE, 0.35) : ZEUS_DEFAULT_ACCENT) : undefined;
+  const link: Record<string, string> = t.template === 'artemis' && t.primary ? { '--doc-primary-link': lightenToContrast(ARTEMIS_DEFAULT_LINK, headerStops(t.template, t.primary)) } : {};
   return {
     ...(t.primary ? primaryVars(t.primary) : {}),
     ...(t.secondary ? secondaryVars(t.secondary, light ?? mix(t.secondary, WHITE, 0.35)) : {}),
     ...(light && !t.secondary ? { '--doc-secondary-light': light } : {}),
+    ...link,
   };
 }

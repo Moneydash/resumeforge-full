@@ -11,7 +11,7 @@ const THEME_LITERALS: Record<string, string[]> = {
   "templates/galaxy/andromeda.css": ["#2563eb", "#dbeafe", "#0496c7", "rgba(73, 64, 245", "rgba(67, 67, 222", "rgba(0, 212, 255"],
   "templates/greek/athena.css": ["#2563eb", "#1e40af", "#1e3a8a", "#bfdbfe", "#e0e7ff", "#93c5fd", "#059669", "#2b6cb5", "#3b82f6", "#60a5fa", "rgba(147, 197, 253", "rgba(37, 99, 235"],
   "templates/greek/zeus.css": ["#d4af37", "#ffd700", "#b8860b", "#1a2855", "#2d4a9a", "rgba(255, 215, 0"],
-  "templates/greek/artemis.css": ["#667eea", "#764ba2", "linear-gradient(135deg, #1a202c"],
+  "templates/greek/artemis.css": ["#667eea", "#764ba2", "linear-gradient(135deg, #1a202c", "#63b3ed"],
 };
 
 /** Removes every var(--doc-primary*|secondary*, ...) construct, including its fallback, with balanced parentheses. */

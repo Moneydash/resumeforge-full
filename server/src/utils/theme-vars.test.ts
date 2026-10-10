@@ -65,3 +65,9 @@ describe("buildThemeHead", () => {
     expect(head).toContain("--doc-primary-ink:#be123c");
   });
 });
+
+describe("the Artemis header link variable", () => {
+  it("is allow-listed", () => {
+    expect(sanitizeThemeVars({ "--doc-primary-link": "#63b3ed" })).toEqual({ "--doc-primary-link": "#63b3ed" });
+  });
+});

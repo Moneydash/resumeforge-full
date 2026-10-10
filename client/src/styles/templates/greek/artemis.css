@@ -93,7 +93,7 @@ body {
 }
 
 .social-links a {
-  color: #63b3ed !important;
+  color: var(--doc-primary-link, #63b3ed) !important;
   font-size: 1.25rem !important;
   text-decoration: none !important;
   display: inline-flex !important;

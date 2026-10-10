@@ -6,6 +6,7 @@ import {
   COLOR_TEMPLATES,
   PALETTE,
   fillPreview,
+  isHex,
   mix,
   previewSecondary,
   rawFillPreview,
@@ -83,7 +84,7 @@ const SwatchGrid: React.FC<SwatchGridProps> = ({
           <HexColorPicker color={customColor} onChange={onPick} style={{ width: "100%" }} />
           <HexColorInput
             color={customColor}
-            onChange={onPick}
+            onChange={(hex) => isHex(hex) && onPick(hex)} // a half-typed code (3 digits is valid to the input) must not clear the slot
             prefixed
             aria-label="Hex color"
             className={`w-full rounded-md border px-2 py-1 text-sm ${isDarkMode ? "border-gray-600 bg-gray-700 text-gray-100" : "border-gray-300 bg-white text-gray-900"}`}

@@ -132,8 +132,9 @@ describe("buildThemeVars", () => {
     expect(lum(vars["--doc-primary-darker"])).toBeLessThanOrEqual(lum(vars["--doc-primary-dark"]));
     expect(lum(vars["--doc-primary-dark"])).toBeLessThanOrEqual(lum(vars["--doc-primary-bg"]));
     expect(lum(vars["--doc-primary-light"])).toBeGreaterThan(lum(vars["--doc-primary-bg"]));
-    expect(lum(vars["--doc-primary-lighter"])).toBeGreaterThan(lum(vars["--doc-primary-light"]));
-    expect(lum(vars["--doc-primary-tint"])).toBeGreaterThan(lum(vars["--doc-primary-light"]));
+    // light/lighter are lifted until they read on the fill, so they may pass the fixed-mix tint
+    expect(lum(vars["--doc-primary-lighter"])).toBeGreaterThanOrEqual(lum(vars["--doc-primary-light"]));
+    expect(lum(vars["--doc-primary-tint"])).toBeGreaterThan(lum(vars["--doc-primary-bg"]));
   });
 
   it("builds a gradient fill from the adjusted stops and uses the first stop for accents", () => {
@@ -257,5 +258,69 @@ describe("Zeus header accents stay readable on any header", () => {
   it("leaves other templates without a secondary-light when only the primary is set", () => {
     expect(buildThemeVars("artemis", { template: "artemis", primary: { type: "solid", color: "#334155" } })["--doc-secondary-light"]).toBeUndefined();
     expect(buildThemeVars("zeus", { template: "zeus", primary: { type: "solid", color: "#334155" } })["--doc-secondary-light"]).toBeDefined();
+  });
+});
+
+describe("invalid input never clears a saved choice", () => {
+  const gradient: ColorTheme = {
+    template: "zeus",
+    primary: { type: "gradient", from: "#1e3a8a", to: "#be123c", direction: "diagonal" },
+    secondary: "#d4af37",
+  };
+
+  it("withPrimary keeps the current theme when given an invalid fill", () => {
+    expect(withPrimary("zeus", gradient, { type: "gradient", from: "#abc", to: "#be123c", direction: "diagonal" })).toEqual(gradient);
+    expect(withPrimary("zeus", gradient, { type: "solid", color: "red" })).toEqual(gradient);
+  });
+
+  it("withSecondary keeps the current theme when given an invalid color (a half-typed hex)", () => {
+    expect(withSecondary("zeus", gradient, "#abc")).toEqual(gradient);
+    expect(withSecondary("zeus", gradient, "#be12")).toEqual(gradient);
+  });
+
+  it("only an explicit undefined clears a slot", () => {
+    expect(withSecondary("zeus", gradient, undefined)?.secondary).toBeUndefined();
+    expect(withPrimary("zeus", gradient, undefined)?.primary).toBeUndefined();
+  });
+});
+
+describe("text and links on a custom fill stay readable", () => {
+  const stopsOf = (vars: Record<string, string>) => {
+    const bg = vars["--doc-primary-bg"];
+    return bg.startsWith("#") ? [bg] : (bg.match(/#[0-9a-f]{6}/g) as string[]);
+  };
+  const SOLIDS = [...PALETTE.map((c) => c.hex), "#ffffff", "#000000", "#ffff00", "#ff0000", "#00ffff"];
+
+  it("Athena's light sidebar text reads against the fill for every kind of pick", () => {
+    for (const c of SOLIDS) {
+      const vars = buildThemeVars("athena", { template: "athena", primary: { type: "solid", color: c } });
+      for (const name of ["--doc-primary-light", "--doc-primary-lighter"]) {
+        for (const stop of stopsOf(vars)) expect(contrast(vars[name], stop), `${name} for ${c}`).toBeGreaterThanOrEqual(4.5);
+      }
+    }
+  });
+
+  it("the light text also reads against a light gradient end stop", () => {
+    const vars = buildThemeVars("athena", { template: "athena", primary: { type: "gradient", from: "#000000", to: "#ffff00", direction: "vertical" } });
+    for (const stop of stopsOf(vars)) expect(contrast(vars["--doc-primary-light"], stop)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("Artemis header links read against the header for every kind of pick", () => {
+    for (const c of SOLIDS) {
+      const vars = buildThemeVars("artemis", { template: "artemis", primary: { type: "solid", color: c } });
+      for (const stop of stopsOf(vars)) expect(contrast(vars["--doc-primary-link"], stop), `link for ${c}`).toBeGreaterThanOrEqual(4.5);
+    }
+    const grad = buildThemeVars("artemis", { template: "artemis", primary: { type: "gradient", from: "#1e3a8a", to: "#b45309", direction: "diagonal" } });
+    for (const stop of stopsOf(grad)) expect(contrast(grad["--doc-primary-link"], stop)).toBeGreaterThanOrEqual(4.5);
+  });
+
+  it("keeps the default link color when the header is already dark enough for it", () => {
+    expect(buildThemeVars("artemis", { template: "artemis", primary: { type: "solid", color: "#1a202c" } })["--doc-primary-link"]).toBe("#63b3ed");
+  });
+
+  it("only Artemis gets a link variable", () => {
+    for (const t of ["andromeda", "athena", "zeus"] as const) {
+      expect(buildThemeVars(t, { template: t, primary: { type: "solid", color: "#be123c" } })["--doc-primary-link"]).toBeUndefined();
+    }
   });
 });
