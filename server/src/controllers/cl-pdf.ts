@@ -3,6 +3,7 @@ import { formatDescription } from "../utils/helper";
 import puppeteer, { Browser, Page } from "puppeteer";
 import { execSync } from 'child_process';
 import { buildFontHead } from "../utils/fonts";
+import { measureDocumentHeightPx } from "../utils/pdf-height";
 
 const generate_cl_pdf: Controller = async (req, res) => {
   let browser: Browser | undefined;
@@ -115,36 +116,15 @@ const generate_cl_pdf: Controller = async (req, res) => {
     });
 
     // Get accurate content dimensions after everything is loaded
-    const dimensions = await page.evaluate(() => {
-      // Force layout recalculation
-      document.body.offsetHeight;
-      document.body.scrollHeight;
-
-      const body = document.body;
-      const html = document.documentElement;
-
-      // Get the actual rendered height
-      const bodyHeight = body.scrollHeight;
-      const htmlHeight = html.scrollHeight;
-      const offsetHeight = body.offsetHeight;
-
-      // Use the maximum height to ensure all content is captured
-      const contentHeight = Math.max(bodyHeight, htmlHeight, offsetHeight);
-
-      // Convert to inches (assuming 96 DPI)
-      const contentHeightInInches = contentHeight / 96;
-      const widthInInches = 8.5; // Standard letter width
-      const letterHeightInInches = 11; // Standard letter height
-
-      // Use letter height as default, but adjust if content is taller
-      const finalHeight = Math.max(letterHeightInInches, contentHeightInInches);
-
-      return {
-        width: widthInInches,
-        height: finalHeight, // finalHeight
-        heightPx: finalHeight * 96 // finalHeight
-      };
-    });
+    const contentHeightPx = await measureDocumentHeightPx(page);
+    const letterHeightInInches = 11; // Standard letter height
+    // Use letter height as default, but adjust if content is taller
+    const finalHeight = Math.max(letterHeightInInches, contentHeightPx / 96);
+    const dimensions = {
+      width: 8.5, // Standard letter width
+      height: finalHeight,
+      heightPx: finalHeight * 96,
+    };
 
     // const min_buffer = template === 'milky_way' ? 0.1 : 0;
     const min_buffer = 0;

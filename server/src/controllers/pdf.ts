@@ -4,6 +4,7 @@ import puppeteer, { Browser, Page } from "puppeteer";
 import { execSync } from 'child_process';
 import { buildFontHead } from "../utils/fonts";
 import { buildThemeHead } from "../utils/theme-vars";
+import { measureDocumentHeightPx } from "../utils/pdf-height";
 
 const generate_pdf: Controller = async (req, res) => {
   let browser: Browser | undefined;
@@ -117,32 +118,12 @@ const generate_pdf: Controller = async (req, res) => {
     });
 
     // Get accurate content dimensions after everything is loaded
-    const dimensions = await page.evaluate(() => {
-      // Force layout recalculation
-      document.body.offsetHeight;
-      document.body.scrollHeight;
-
-      const body = document.body;
-      const html = document.documentElement;
-
-      // Get the actual rendered height
-      const bodyHeight = body.scrollHeight;
-      const htmlHeight = html.scrollHeight;
-      const offsetHeight = body.offsetHeight;
-
-      // Use the maximum height to ensure all content is captured
-      const height = Math.max(bodyHeight, htmlHeight, offsetHeight);
-
-      // Convert to inches (assuming 96 DPI)
-      const heightInInches = height / 96;
-      const widthInInches = 8.5; // Standard letter width
-
-      return {
-        width: widthInInches,
-        height: heightInInches,
-        heightPx: height
-      };
-    });
+    const heightPx = await measureDocumentHeightPx(page);
+    const dimensions = {
+      width: 8.5, // Standard letter width
+      height: heightPx / 96, // inches (96 DPI)
+      heightPx,
+    };
 
     const min_buffer = template === 'milky_way' ? 0.1 : 0;
 
