@@ -1,4 +1,5 @@
 import type { SectionLayout } from "@/utils/section-layout";
+import type { SavedFont } from "@/utils/fonts";
 
 export interface ResumeFormData {
   personal: {
@@ -67,4 +68,5 @@ export interface ResumeFormData {
     hidden?: boolean;
   }>;
   sectionLayout?: SectionLayout;
+  fontFamily?: SavedFont;
 }

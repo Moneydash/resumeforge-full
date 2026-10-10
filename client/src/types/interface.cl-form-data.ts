@@ -1,3 +1,5 @@
+import type { SavedFont } from "@/utils/fonts";
+
 export interface CLFormData {
   sender: {
     name: string;
@@ -19,4 +21,5 @@ export interface CLFormData {
     body: string;
     closing?: string;
   };
+  fontFamily?: SavedFont;
 }

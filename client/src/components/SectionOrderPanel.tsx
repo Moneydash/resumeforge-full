@@ -18,7 +18,7 @@ import {
   verticalListSortingStrategy,
 } from '@dnd-kit/sortable';
 import { CSS } from '@dnd-kit/utilities';
-import { GripVertical, Lock, RotateCcw, X } from 'lucide-react';
+import { GripVertical, Lock, RotateCcw } from 'lucide-react';
 import { Button } from '@/components/ui/button';
 import type { TemplateType } from '@/types';
 import type { ResumeFormData } from '@/types/interface.resume-form-data';
@@ -37,9 +37,7 @@ interface SectionOrderPanelProps {
   template: TemplateType;
   data: ResumeFormData;
   layout: SectionLayout | undefined;
-  isDarkMode: boolean;
   onChange: (layout: SectionLayout | undefined) => void;
-  onClose: () => void;
 }
 
 const columnDroppableId = (index: number) => `column-${index}`;
@@ -83,7 +81,7 @@ const Column: React.FC<{ index: number; label: string; ids: SectionId[]; pinned:
   );
 };
 
-const SectionOrderPanel: React.FC<SectionOrderPanelProps> = ({ template, data, layout, isDarkMode, onChange, onClose }) => {
+const SectionOrderPanel: React.FC<SectionOrderPanelProps> = ({ template, data, layout, onChange }) => {
   const resolved = useMemo(() => resolveLayout(template, layout, data), [template, layout, data]);
   const resolvedKey = JSON.stringify(resolved);
   const [items, setItems] = useState<SectionId[][]>(resolved);
@@ -152,17 +150,9 @@ const SectionOrderPanel: React.FC<SectionOrderPanelProps> = ({ template, data, l
     if (JSON.stringify(normalized.columns) !== resolvedKey) onChange(normalized);
   };
 
+  // content only: DesignPanel supplies the side panel, its header and the tabs
   return (
-    <aside
-      className={`flex h-full w-80 shrink-0 flex-col border-l shadow-xl ${isDarkMode ? 'bg-gray-800/95 border-gray-700/50' : 'bg-white/95 border-gray-200/50'}`}
-      aria-label="Section order"
-    >
-      <div className="flex items-center justify-between border-b border-gray-200/50 p-4 dark:border-gray-700/50">
-        <h2 className="text-lg font-semibold">Section order</h2>
-        <Button variant="ghost" size="icon" onClick={onClose} aria-label="Close section order">
-          <X size={16} />
-        </Button>
-      </div>
+    <>
       <div className="flex-1 overflow-y-auto p-4 no-scrollbar">
         <p className="mb-4 text-xs text-gray-500">
           Drag sections to reorder them. Locked sections and the header stay where the template puts them.
@@ -181,7 +171,7 @@ const SectionOrderPanel: React.FC<SectionOrderPanelProps> = ({ template, data, l
           Reset to default
         </Button>
       </div>
-    </aside>
+    </>
   );
 };
 
