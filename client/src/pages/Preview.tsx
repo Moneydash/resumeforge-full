@@ -39,7 +39,7 @@ import { getCsrfToken, pdfPayload } from '@/utils/helper';
 import client from '@/api/axiosInstance';
 import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
-import DesignPanel, { type DesignTab } from '@/components/DesignPanel';
+import DesignPanel, { DESIGN_PANEL_WIDTH, type DesignTab } from '@/components/DesignPanel';
 import type { SavedFont } from '@/utils/fonts';
 import { isColorTemplate, type ColorTheme } from '@/utils/color-theme';
 import { convertLayout, type SectionLayout } from '@/utils/section-layout';
@@ -582,7 +582,7 @@ const Preview: React.FC = () => {
           <div
             className="h-1/2 lg:h-full flex flex-col overflow-hidden"
             style={{
-              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${designOpen ? 320 : 0}px)` : '100%',
+              width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${designOpen ? DESIGN_PANEL_WIDTH : 0}px)` : '100%',
             }}
           >
             {/* Preview Header - Fixed */}

@@ -19,6 +19,9 @@ import {
   type SavedFont,
 } from "@/utils/fonts";
 
+/** Width of the right-hand panel in px. The preview pages subtract it from the preview area, so keep them in sync through this constant. */
+export const DESIGN_PANEL_WIDTH = 360;
+
 export type DesignTab = "sections" | "font" | "color" | "templates";
 
 interface DesignPanelProps {
@@ -67,7 +70,8 @@ const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, is
 
   return (
     <aside
-      className={`flex h-full w-80 shrink-0 flex-col border-l shadow-xl ${isDarkMode ? "bg-gray-800/95 border-gray-700/50" : "bg-white/95 border-gray-200/50"}`}
+      className={`flex h-full shrink-0 flex-col border-l shadow-xl ${isDarkMode ? "bg-gray-800/95 border-gray-700/50" : "bg-white/95 border-gray-200/50"}`}
+      style={{ width: DESIGN_PANEL_WIDTH }}
       aria-label="Design"
     >
       <div className="flex items-center justify-between border-b border-gray-200/50 p-4 dark:border-gray-700/50">
@@ -78,26 +82,32 @@ const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, is
       </div>
 
       {available.length > 1 && (
-        <div role="tablist" aria-label="Design options" className="flex border-b border-gray-200/50 dark:border-gray-700/50">
-          {available.map((id) => {
-            const selected = id === active;
-            return (
-              <button
-                key={id}
-                type="button"
-                role="tab"
-                aria-selected={selected}
-                onClick={() => onTabChange(id)}
-                className={`flex-1 border-b-2 px-2 py-2 text-sm font-medium transition-colors ${
-                  selected
-                    ? "border-indigo-500 text-indigo-600 dark:text-indigo-400"
-                    : `border-transparent ${isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-800"}`
-                }`}
-              >
-                {TAB_LABELS[id]}
-              </button>
-            );
-          })}
+        <div className="border-b border-gray-200/50 px-3 py-3 dark:border-gray-700/50">
+          <div role="tablist" aria-label="Design options" className={`flex gap-1 rounded-full p-1 ${isDarkMode ? "bg-gray-900/60" : "bg-gray-100"}`}>
+            {available.map((id) => {
+              const selected = id === active;
+              return (
+                <button
+                  key={id}
+                  type="button"
+                  role="tab"
+                  aria-selected={selected}
+                  onClick={() => onTabChange(id)}
+                  className={`flex-auto whitespace-nowrap rounded-full px-2.5 py-1.5 text-xs font-medium outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+                    selected
+                      ? isDarkMode
+                        ? "bg-gray-700 text-white shadow"
+                        : "bg-white text-indigo-600 shadow-sm"
+                      : isDarkMode
+                        ? "text-gray-400 hover:text-gray-200"
+                        : "text-gray-500 hover:text-gray-800"
+                  }`}
+                >
+                  {TAB_LABELS[id]}
+                </button>
+              );
+            })}
+          </div>
         </div>
       )}
 

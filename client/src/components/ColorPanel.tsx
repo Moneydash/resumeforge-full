@@ -103,7 +103,11 @@ interface SectionProps {
 }
 
 const segmentClass = (active: boolean, isDarkMode: boolean) =>
-  `px-3 py-1 text-xs font-medium ${active ? "bg-indigo-500 text-white" : isDarkMode ? "bg-gray-700 text-gray-300" : "bg-white text-gray-700"}`;
+  `rounded-full px-3 py-1 text-xs font-medium outline-none transition-all duration-200 focus-visible:ring-2 focus-visible:ring-indigo-400 ${
+    active
+      ? isDarkMode ? "bg-gray-700 text-white shadow" : "bg-white text-indigo-600 shadow-sm"
+      : isDarkMode ? "text-gray-400 hover:text-gray-200" : "text-gray-500 hover:text-gray-800"
+  }`;
 
 const PrimarySection: React.FC<SectionProps> = ({ template, theme, onChange, isDarkMode }) => {
   const cfg = COLOR_TEMPLATES[template];
@@ -125,7 +129,7 @@ const PrimarySection: React.FC<SectionProps> = ({ template, theme, onChange, isD
       <h3 className="text-sm font-semibold">
         Primary <span className="font-normal text-gray-500">· {cfg.primaryLabel}</span>
       </h3>
-      <div role="group" aria-label="Fill type" className="my-3 inline-flex overflow-hidden rounded-md border border-gray-300 dark:border-gray-600">
+      <div role="group" aria-label="Fill type" className={`my-3 inline-flex gap-0.5 rounded-full p-0.5 ${isDarkMode ? "bg-gray-900/60" : "bg-gray-100"}`}>
         <button type="button" aria-pressed={!gradient} className={segmentClass(!gradient, isDarkMode)} onClick={() => gradient && set({ type: "solid", color: firstColor })}>
           Solid
         </button>

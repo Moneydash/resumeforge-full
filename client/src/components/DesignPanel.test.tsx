@@ -1,6 +1,6 @@
 import { describe, expect, it } from "vitest";
 import { renderToString } from "react-dom/server";
-import DesignPanel from "@/components/DesignPanel";
+import DesignPanel, { DESIGN_PANEL_WIDTH } from "@/components/DesignPanel";
 import { makeSampleResume } from "@/test/sample-resume";
 
 const noop = () => {};
@@ -90,5 +90,10 @@ describe("DesignPanel", () => {
     expect(html.match(/role="tab"/g)).toHaveLength(2);
     expect(html).toContain("Ventus");
     expect(html).not.toContain("Galaxy Collection");
+  });
+
+  it("is 360px wide, from one shared constant the pages use to size the preview", () => {
+    expect(DESIGN_PANEL_WIDTH).toBe(360);
+    expect(render()).toContain("width:360px");
   });
 });
