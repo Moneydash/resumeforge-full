@@ -1,4 +1,5 @@
 import client from "@/api/axiosInstance";
+import { buildThemeVars } from "@/utils/color-theme";
 import type { CLTemplateType, TemplateType } from "@/types";
 import React from "react";
 
@@ -68,7 +69,8 @@ export const pdfPayload = (data: object, htmlContent: string, template: Template
   const payload = {
     html: fullHtml,
     data: data,
-    template: template
+    template: template,
+    themeVars: buildThemeVars(template, (data as { colorTheme?: unknown }).colorTheme),
   }
 
   return payload;

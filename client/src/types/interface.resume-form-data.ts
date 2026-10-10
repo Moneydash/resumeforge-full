@@ -1,5 +1,6 @@
 import type { SectionLayout } from "@/utils/section-layout";
 import type { SavedFont } from "@/utils/fonts";
+import type { ColorTheme } from "@/utils/color-theme";
 
 export interface ResumeFormData {
   personal: {
@@ -69,4 +70,5 @@ export interface ResumeFormData {
   }>;
   sectionLayout?: SectionLayout;
   fontFamily?: SavedFont;
+  colorTheme?: ColorTheme;
 }
