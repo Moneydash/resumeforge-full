@@ -13,13 +13,14 @@ Color theming is a separate, later feature and is out of scope here.
 
 - Applies to both **resume templates** (10) and **cover letter templates** (5).
 - The chosen font applies to all text in the document (headings, body, contact info, everything). Font Awesome icons are not text and must keep working.
-- Curated list of **17 fonts** (below). Ubuntu is removed from the product.
+- Curated list of **18 entries**: 17 single fonts plus one named **pairing**, "DM Serif Text + Cinzel" (below). Ubuntu is removed from the product.
+- A font entry has two roles: a **body font** (all content) and a **heading font** (the document name and section titles such as Experience, Projects). A single font uses itself for both roles. The pairing uses Cinzel for headings and DM Serif Text for body, and is selectable on **every** template: choosing it on Athena puts Cinzel on Athena's section titles and name, and DM Serif Text on the content under them.
 - Each template has a default font (below). A document with no saved font choice renders with its template default.
 - The choice is saved in the document's JSON data (`user_resume_data.resume_data` for resumes, `user_cover_letter_data.cover_letter_data` for cover letters; both are text JSON columns), so it survives reload, clone and export. No DB migration.
 - A "Reset to template default" action clears the choice.
 - Preview and exported PDF must always use the same font (no more preview/PDF drift).
 
-## Font list (17)
+## Font list (18 entries)
 
 | Id | Name | Kind | Source |
 |---|---|---|---|
@@ -40,6 +41,9 @@ Color theming is a separate, later feature and is out of scope here.
 | merriweather | Merriweather | serif | new |
 | lora | Lora | serif | new |
 | libre-baskerville | Libre Baskerville | serif | new |
+| dm-serif-text-cinzel | DM Serif Text + Cinzel | pairing (heading: Cinzel, body: DM Serif Text) | existing (Zeus) |
+
+Cinzel is not offered on its own (it is all-caps and display-only); it exists only as the heading half of the pairing. Plain DM Serif Text stays as its own entry because Cigar uses it alone.
 
 Mozilla Headline is a display-style font and the least conservative entry; it stays only because every font in use today is retained. It can be dropped by removing one registry entry.
 
@@ -47,7 +51,8 @@ Mozilla Headline is a display-style font and the least conservative entry; it st
 
 | Template | Default font | Change from today |
 |---|---|---|
-| cigar, zeus | DM Serif Text | none |
+| cigar | DM Serif Text | none |
+| **zeus** | **DM Serif Text + Cinzel** (pairing) | same fonts as the CSS asks for; the PDF now actually loads Cinzel |
 | andromeda | IBM Plex Serif | none |
 | comet, apollo | Poppins | none |
 | milky_way | Lato | none |
@@ -61,7 +66,7 @@ Mozilla Headline is a display-style font and the least conservative entry; it st
 | terra | Poppins | none |
 | **ventus** | **IBM Plex Sans** | PDF was IBM Plex Serif; now matches its CSS |
 
-Hermes, Artemis and the Ventus PDF change visibly. Everything else renders as it does today.
+Hermes, Artemis, the Ventus PDF and the Zeus PDF headings (now real Cinzel instead of a generic serif fallback) change visibly. Everything else renders as it does today.
 
 ## Design
 
@@ -69,7 +74,7 @@ Hermes, Artemis and the Ventus PDF change visibly. Everything else renders as it
 
 Each package gets a small module exporting the same data (they are separate packages, so it is duplicated, with a test on each side that asserts every template default id exists in the registry):
 
-- `FONTS`: `{ id, name, kind: 'sans' | 'serif', stack, googleHref }`, where `stack` is the full CSS value (e.g. `'Inter', sans-serif`) and `googleHref` is the Google Fonts CSS URL for that family (all weights/italics the current links already use).
+- `FONTS`: `{ id, name, kind: 'sans' | 'serif' | 'pairing', bodyStack, headingStack, googleHrefs }`. `bodyStack` is the full CSS value for content (e.g. `'Inter', sans-serif`). `headingStack` is the value for the document name and section titles; for single fonts it equals `bodyStack`. `googleHrefs` is the list of Google Fonts CSS URLs needed (one for a single font, two for the pairing: DM Serif Text and Cinzel), with the weights/italics the current links already use.
 - `TEMPLATE_DEFAULT_FONT`: map from template id (resume and cover letter) to font id (table above).
 - `resolveFontId(template, saved)`: returns `saved.id` if `saved` is present, its `template` matches the active template, and the id is in the registry; otherwise the template default.
 
@@ -77,18 +82,23 @@ Client path: `client/src/utils/fonts.ts`. Server path: `server/src/utils/fonts.t
 
 ### 2. Template CSS: variable with the old font as fallback
 
-In every resume and cover letter template CSS file, each `font-family: <stack>` declaration becomes `font-family: var(--doc-font, <stack>)`, keeping any `!important` and the original stack as the fallback. A document with no choice therefore renders exactly as before; a choice only has to set one variable. Declarations that name a font only for non-text purposes are left alone (none expected; verified per file while editing). Font Awesome icon rules are untouched.
+Two CSS variables, one per role. Every resume and cover letter template CSS file is edited:
+
+- **Body role.** Each `font-family: <stack>` declaration on content becomes `font-family: var(--doc-font, <stack>)`, keeping any `!important` and the original stack as the fallback.
+- **Heading role.** The rules for the document **name** and the **section titles** (e.g. "Work Experience", "Projects") become `font-family: var(--doc-heading-font, var(--doc-font, <stack>))`. The chain means a single font (which sets both variables to the same value) and the no-choice default (neither variable set) both behave correctly. What counts as "name" and "section title" is identified per template by its existing class names (e.g. `.greek-name`, `.greek-section-title` in Zeus) while editing, and listed in the implementation plan. Item titles, dates and descriptions stay on the body role.
+- A document with no choice renders exactly as before. Declarations that name a font only for non-text purposes are left alone (none expected; verified per file). Font Awesome icon rules are untouched.
 
 Notes on specific files:
 
 - `hermes.css`, `artemis.css`: the Ubuntu stack is replaced by the new default font's stack (Roboto Slab / Source Sans 3) as the fallback.
-- `zeus.css` uses Cinzel for headings and DM Serif Text for body. Cinzel is not in the list. In default mode it keeps Cinzel in the fallback; when the user picks a font, that font replaces both. (Cinzel is not loaded by the PDF server today, so default PDFs already fall back to a generic serif for those headings; this is unchanged and not fixed here.)
+- `zeus.css` already uses Cinzel for the name, headline, section titles and item header rows, and DM Serif Text for the rest. Those four Cinzel rules take the heading role (an exception to "item headers stay body": it keeps the Zeus default identical in CSS terms), and the rest take the body role. Choosing the pairing on Zeus is therefore the same as the default.
+- On every other template, choosing the pairing puts Cinzel on that template's name and section titles and DM Serif Text on the rest. Choosing a single font puts it on both roles everywhere.
 - `andromeda.css` has an `@import` for IBM Plex Serif; it is removed since the PDF server now loads the font link.
 - `cigar.css`, `milky_way.css`, `comet.css`, `index.css` Georgia/Garamond/Cambria entries are reviewed; any that are template body fonts get the variable, generic fallbacks stay.
 
 ### 3. Setting the variable
 
-`TemplateComponent` and `CoverLetterTemplateComponent` receive the resolved font stack (or nothing) and set it as an inline style on their existing wrapper `div`: `style={{ '--doc-font': stack }}`. The variable is only set when the user has a valid saved choice for the active template; otherwise no style attribute is emitted, so default markup is byte-for-byte unchanged. Because the wrapper is part of the `renderToString` output that is already sent to the server, the PDF HTML carries the variable automatically.
+`TemplateComponent` and `CoverLetterTemplateComponent` receive the resolved font entry (or nothing) and set both variables as an inline style on their existing wrapper `div`: `style={{ '--doc-font': bodyStack, '--doc-heading-font': headingStack }}`. The variables are only set when the user has a valid saved choice for the active template; otherwise no style attribute is emitted, so default markup is byte-for-byte unchanged. Because the wrapper is part of the `renderToString` output that is already sent to the server, the PDF HTML carries the variable automatically.
 
 ### 4. Data
 
@@ -100,7 +110,7 @@ Notes on specific files:
 ### 5. PDF servers
 
 - The client adds `fontFamily` (the resolved font **id**, explicit or default) to the request payload for resume and cover letter PDF generation (`pdfPayload` / `pdfPayloadv2` in `client/src/utils/helper.ts`).
-- Server, in `pdf.ts`, `pdfGenerator.ts` and `cl-pdf.ts`: validate the id against the server registry (unknown or missing falls back to the template default), then emit **one** `<link>` for that font's `googleHref`. The per-template link ladders in `pdf.ts` and `pdfGenerator.ts` and the fixed `FONT_CONFIGS` in `cl-pdf.ts` are deleted.
+- Server, in `pdf.ts`, `pdfGenerator.ts` and `cl-pdf.ts`: validate the id against the server registry (unknown or missing falls back to the template default), then emit a `<link>` for each of that entry's `googleHrefs` (one, or two for the pairing, so Cinzel is now actually loaded for Zeus and for any template using the pairing). The per-template link ladders in `pdf.ts` and `pdfGenerator.ts` and the fixed `FONT_CONFIGS` in `cl-pdf.ts` are deleted.
 - `cl-pdf.ts` currently forces `body, * { font-family: … !important }`. That rule is dropped for cover letters; the template CSS variable now does the job, and it removes the risk of overriding icon fonts.
 - The font id is validated server-side against a fixed allow-list, so it never reaches the HTML as free text.
 - Existing wait logic (`networkidle0` plus `document.fonts.ready`) already waits for the font to load.
@@ -108,7 +118,7 @@ Notes on specific files:
 ### 6. UI
 
 - A new `FontPicker` component (lucide `Type` icon button with tooltip "Font", opening a popover) used in both `Preview.tsx` and `CLPreview.tsx` headers, placed next to the "Section order" button in the resume header.
-- The popover lists the 17 fonts grouped Sans / Serif, each name rendered in its own typeface, with a check on the active one and a "Template default" badge on the template's default. A "Reset to template default" action sits at the bottom.
+- The popover lists the 18 entries grouped Sans / Serif / Pairings, each name rendered in its own typeface (the pairing's row shows its name with "Cinzel" headings over "DM Serif Text" body text), with a check on the active one and a "Template default" badge on the template's default. A "Reset to template default" action sits at the bottom.
 - Fonts are loaded for the picker by lazily injecting one combined Google Fonts stylesheet the first time the popover opens (the picker is the only client place that needs the fonts; the document preview is the server-rendered PDF).
 - Each pick starts the existing debounce, then saves and regenerates the PDF through the existing path (`save-data`, `renderToString`, generate), reusing the `requestIdRef` stale-response guard.
 
@@ -121,11 +131,11 @@ Notes on specific files:
 
 ## Testing
 
-- Registry tests (both packages): every `TEMPLATE_DEFAULT_FONT` id exists; every font has a `googleHref` and `stack`; `resolveFontId` handles missing, wrong-template, and unknown-id inputs.
-- Template render tests (Vitest, existing setup): with a saved choice the wrapper carries `--doc-font`; with none it emits no style attribute. The existing template snapshots are regenerated once; the diff must consist only of `font-family` declarations (plus the Hermes/Artemis fallback changes).
-- A script-level check that no template CSS file still contains a raw `font-family:` without `var(--doc-font`, and no file references Ubuntu.
+- Registry tests (both packages): every `TEMPLATE_DEFAULT_FONT` id exists; every entry has at least one `googleHref`, a `bodyStack` and a `headingStack` (equal for single fonts, different for the pairing); `resolveFontId` handles missing, wrong-template, and unknown-id inputs.
+- Template render tests (Vitest, existing setup): with a saved choice the wrapper carries `--doc-font` and `--doc-heading-font`; with none it emits no style attribute. The existing template snapshots are regenerated once; the diff must consist only of `font-family` declarations (plus the Hermes/Artemis fallback changes).
+- A script-level check that no template CSS file still contains a raw `font-family:` without `var(--doc-font` or `var(--doc-heading-font`, and no file references Ubuntu.
 - Manual: for one template of each family (resume and cover letter), pick several fonts, confirm the PDF preview and the downloaded PDF match, icons still render, reset restores the default, clone keeps the choice. `tsc -b` and eslint pass on client and server.
 
 ## Out of scope
 
-Separate heading and body fonts, font size or weight controls, user-uploaded fonts, color theming (next feature), loading Cinzel for Zeus default PDFs, reordering or restyling templates beyond font-family.
+Letting users build their own heading/body combinations (only the one curated pairing exists; more can be added as registry entries later), font size or weight controls, user-uploaded fonts, color theming (next feature), reordering or restyling templates beyond font-family.
