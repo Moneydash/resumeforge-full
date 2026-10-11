@@ -1,7 +1,8 @@
 /* Landing page tokens and component classes. Scoped to .landing so the global theme is untouched.
    Unlayered on purpose: only color/appearance lives here; layout stays in Tailwind utilities. */
 
-.landing {
+.landing,
+.app-shell {
   --l-bg: #ffffff;
   --l-surface: #f6f5f2;
   --l-surface-2: #efeee9;
@@ -21,7 +22,8 @@
   -webkit-font-smoothing: antialiased;
 }
 
-.dark .landing {
+.dark .landing,
+.dark .app-shell {
   --l-bg: #0b0b0c;
   --l-surface: #151517;
   --l-surface-2: #1b1b1e;
@@ -34,8 +36,8 @@
   --l-shadow: rgba(0, 0, 0, 0.7);
 }
 
-.landing main:focus { outline: none; }
-.landing :focus-visible { outline: 2px solid var(--l-accent); outline-offset: 2px; }
+.landing main:focus, .app-shell main:focus { outline: none; }
+.landing :focus-visible, .app-shell :focus-visible { outline: 2px solid var(--l-accent); outline-offset: 2px; }
 .landing section[id] { scroll-margin-top: 5rem; }
 
 @media (prefers-reduced-motion: no-preference) {
@@ -175,7 +177,8 @@ a:hover > .l-thumb, a:focus-visible > .l-thumb { border-color: var(--l-hair-stro
 .l-fade-in { animation: l-fade-in 200ms ease-out both; }
 
 @media (prefers-reduced-motion: reduce) {
-  .landing *, .landing *::before, .landing *::after {
+  .landing *, .landing *::before, .landing *::after,
+  .app-shell *, .app-shell *::before, .app-shell *::after {
     animation: none !important;
     transition: none !important;
   }

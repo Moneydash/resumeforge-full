@@ -1,0 +1,114 @@
+/* Dashboard and app-shell classes. Variables come from the .app-shell scope in landing.css. */
+
+.app-sidebar { background: var(--l-surface); border-right: 1px solid var(--l-hair); }
+.app-topbar { background: var(--l-bg); border-bottom: 1px solid var(--l-hair); }
+.app-topbar-panel { background: var(--l-bg); border-top: 1px solid var(--l-hair); }
+
+.app-nav-item {
+  display: flex;
+  align-items: center;
+  gap: 0.625rem;
+  min-height: 2.75rem;
+  padding: 0 0.75rem;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--l-muted);
+  font: inherit;
+  font-size: 0.9375rem;
+  text-align: left;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+.app-nav-item:hover { background: var(--l-surface-2); color: var(--l-ink); }
+.app-nav-item[aria-current='page'] {
+  background: var(--l-bg);
+  color: var(--l-ink);
+  font-weight: 500;
+  box-shadow: inset 0 0 0 1px var(--l-hair);
+}
+.app-utility { margin-top: 0.5rem; padding-top: 0.5rem; border-top: 1px solid var(--l-hair); }
+
+.app-title { font-size: 1.75rem; line-height: 1.15; font-weight: 600; letter-spacing: -0.03em; }
+
+.app-card {
+  overflow: hidden;
+  border: 1px solid var(--l-hair);
+  border-radius: 8px;
+  background: var(--l-bg);
+  transition: border-color 150ms ease-out;
+}
+.app-card:hover { border-color: var(--l-hair-strong); }
+
+.app-thumb { aspect-ratio: 4 / 3; overflow: hidden; background: var(--l-surface); border-bottom: 1px solid var(--l-hair); }
+.app-thumb img { display: block; width: 100%; height: 100%; object-fit: cover; object-position: top; }
+.app-thumb--empty { display: flex; align-items: center; justify-content: center; color: var(--l-muted); font-size: 0.8125rem; }
+
+.app-iconbtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  width: 2.75rem;
+  height: 2.75rem;
+  flex: none;
+  border: 1px solid var(--l-hair-strong);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--l-muted);
+  cursor: pointer;
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+.app-iconbtn:hover { background: var(--l-surface); color: var(--l-ink); }
+
+.app-seg { display: inline-flex; overflow: hidden; border: 1px solid var(--l-hair-strong); border-radius: 6px; }
+.app-seg button {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  min-width: 2.75rem;
+  min-height: 2.75rem;
+  border: 0;
+  background: transparent;
+  color: var(--l-muted);
+  cursor: pointer;
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+.app-seg button:hover { background: var(--l-surface); color: var(--l-ink); }
+.app-seg button[aria-pressed='true'] { background: var(--l-ink); color: var(--l-ink-fg); }
+
+.app-newtile {
+  display: flex;
+  width: 100%;
+  min-height: 14rem;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  border: 1px dashed var(--l-hair-strong);
+  border-radius: 8px;
+  background: transparent;
+  color: var(--l-muted);
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+.app-newtile:hover { background: var(--l-surface); color: var(--l-ink); }
+
+.app-table { width: 100%; border-collapse: collapse; font-size: 0.875rem; }
+.app-table th {
+  padding: 0 0.75rem 0.625rem;
+  border-bottom: 1px solid var(--l-hair);
+  color: var(--l-muted);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.6875rem;
+  font-weight: 500;
+  letter-spacing: 0.12em;
+  text-align: left;
+  text-transform: uppercase;
+}
+.app-table td { padding: 0.75rem; border-bottom: 1px solid var(--l-hair); vertical-align: middle; }
+
+.app-skeleton { background: var(--l-surface-2); border-radius: 6px; }
