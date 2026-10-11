@@ -8,7 +8,7 @@ export const COLLECTIONS = [
 ] as const;
 
 export interface TemplateGroup {
-  id: 'galaxy' | 'greek';
+  id: string;
   heading: string;
   templates: Template[];
 }
