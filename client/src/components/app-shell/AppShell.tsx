@@ -25,7 +25,7 @@ function NavList({ pathname, pendingKey, go }: NavListProps) {
   return (
     <nav aria-label="Primary" className="flex flex-col gap-1">
       {NAV_ITEMS.map((item) => {
-        const active = isActive(pathname, item.to);
+        const active = isActive(pathname, item.to, item.activeFor);
         const pending = pendingKey === `nav:${item.key}`;
         const Icon = item.icon;
         return (
