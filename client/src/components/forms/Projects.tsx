@@ -31,10 +31,10 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Textarea } from "../ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface ProjectFieldsComponentInterface {
-  sectionDivClasses: string;
-  sectionHeaderClasses: string;
+  controls: SectionControls;
   appendProject: UseFieldArrayAppend<ResumeFormData>;
   addButtonClasses: string;
   projectFields: FieldArrayWithId<ResumeFormData, "projects", "id">[];
@@ -257,8 +257,7 @@ const SortableProjectCard: React.FC<SortableProjectCardProps> = ({
 };
 
 const ProjectFieldsComponent: React.FC<ProjectFieldsComponentInterface> = ({
-  sectionDivClasses,
-  sectionHeaderClasses,
+  controls,
   appendProject,
   addButtonClasses,
   projectFields,
@@ -302,49 +301,54 @@ const ProjectFieldsComponent: React.FC<ProjectFieldsComponentInterface> = ({
   return (
     <>
       <div className="space-y-4">
-        <div className={`${sectionDivClasses} flex justify-between items-center`}>
-          <h2 className={sectionHeaderClasses}>Projects</h2>
-          <button
-            type="button"
-            onClick={() => appendProject({ title: '', description: '', technologies: [] })}
-            className={addButtonClasses}
+        <SectionHeader
+          title="Projects"
+          controls={controls}
+          actions={
+            <button
+              type="button"
+              onClick={() => appendProject({ title: '', description: '', technologies: [] })}
+              className={addButtonClasses}
+            >
+              <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Project
+            </button>
+          }
+        />
+        <SectionBody collapsed={controls.collapsed} hidden={controls.hidden}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Project
-          </button>
-        </div>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={projectFields.map(field => field.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-4">
-              {projectFields.map((field, index) => (
-                <SortableProjectCard
-                  key={field.id}
-                  field={field}
-                  index={index}
-                  cardClasses={cardClasses}
-                  removeProject={removeProject}
-                  removeButtonClasses={removeButtonClasses}
-                  inputClasses={inputClasses}
-                  register={register}
-                  labelClasses={labelClasses}
-                  errors={errors}
-                  isEditing={editingIndex === index}
-                  setIsEditing={setIsEditing}
-                  watch={watch}
-                  onSave={() => forceUpdate(n => n + 1)}
-                  setValue={setValue}
-                  control={control}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={projectFields.map(field => field.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {projectFields.map((field, index) => (
+                  <SortableProjectCard
+                    key={field.id}
+                    field={field}
+                    index={index}
+                    cardClasses={cardClasses}
+                    removeProject={removeProject}
+                    removeButtonClasses={removeButtonClasses}
+                    inputClasses={inputClasses}
+                    register={register}
+                    labelClasses={labelClasses}
+                    errors={errors}
+                    isEditing={editingIndex === index}
+                    setIsEditing={setIsEditing}
+                    watch={watch}
+                    onSave={() => forceUpdate(n => n + 1)}
+                    setValue={setValue}
+                    control={control}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </SectionBody>
       </div>
     </>
   );

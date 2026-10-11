@@ -2,13 +2,15 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import andromedaCSS from "@/styles/templates/galaxy/andromeda.css?inline";
-import { getRenderColumns } from "@/utils/section-layout";
+import { getRenderColumns, getVisibleSocials } from "@/utils/section-layout";
+import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
+  const t = titlesFor('andromeda', data);
   const expSection = (
     <section className="section">
-      <h2 className="section-title">Experience</h2>
+      <h2 className={t.cls("section-title", "experience")}>{t.text("experience")}</h2>
       <div className="section-content">
         {data.experience
           .filter(exp => !exp.hidden)
@@ -31,7 +33,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const educSection = (
     <section className="section">
-      <h2 className="section-title">Education</h2>
+      <h2 className={t.cls("section-title", "education")}>{t.text("education")}</h2>
       <div className="section-content">
         {data.education
           .filter(educ => !educ.hidden)
@@ -51,7 +53,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const langSection = (
     <section className="section">
-      <h2 className="section-title">Languages</h2>
+      <h2 className={t.cls("section-title", "languages")}>{t.text("languages")}</h2>
       <div className="section-content">
         <div className="languages">
           {data.languages?.map((lang, i) => (
@@ -64,7 +66,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const interestSection = (
     <section className="section">
-      <h2 className="section-title">Interests</h2>
+      <h2 className={t.cls("section-title", "interests")}>{t.text("interests")}</h2>
       <div className="section-content">
         <div className="interests">
           {data.interests?.map((interest, i) => (
@@ -77,7 +79,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const certSection = (
     <section className="section">
-      <h2 className="section-title">Certifications</h2>
+      <h2 className={t.cls("section-title", "certifications")}>{t.text("certifications")}</h2>
       <div className="section-content">
         {data.certifications
           ?.filter(cert => !cert.hidden)
@@ -97,7 +99,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const skillSection = (
     <section className="section">
-      <h2 className="section-title">Skills</h2>
+      <h2 className={t.cls("section-title", "skills")}>{t.text("skills")}</h2>
       <div className="section-content">
         {data.skills
           ?.filter(s => !s.hidden)
@@ -118,7 +120,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const projSection = (
     <section className="section">
-      <h2 className="section-title">Projects</h2>
+      <h2 className={t.cls("section-title", "projects")}>{t.text("projects")}</h2>
       <div className="section-content">
         {data.projects
           ?.filter(proj => !proj.hidden)
@@ -144,7 +146,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const refSection = (
     <section className="section">
-      <h2 className="section-title">References</h2>
+      <h2 className={t.cls("section-title", "references")}>{t.text("references")}</h2>
       <div className="section-content">
         {data.references
           ?.filter(reference => !reference.hidden)
@@ -165,7 +167,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const awardsSection = (
     <section className="section">
-      <h2 className="section-title">Awards</h2>
+      <h2 className={t.cls("section-title", "awards")}>{t.text("awards")}</h2>
       <div className="section-content">
         {data.awards
           ?.filter(award => !award.hidden)
@@ -188,7 +190,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
   const sections: SectionMap = {
     summary: (
       <section className="section">
-        <h3 className="section-title">Summary</h3>
+        <h3 className={t.cls("section-title", "summary")}>{t.text("summary")}</h3>
         <div className="summary">
           <p>{data.summary}</p>
         </div>
@@ -221,7 +223,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
             <p className="website"><a href={`${data.personal.website.link}`}>{data.personal.website.name}</a></p>
           </div>
           <div className="social-links">
-            {data.socials.map((social, i) => (
+            {getVisibleSocials(data).map((social, i) => (
               <a key={i} href={`${social.link}`}><i className={`fab fa-${social.slug} fa-xl`}></i></a>
             ))}
           </div>

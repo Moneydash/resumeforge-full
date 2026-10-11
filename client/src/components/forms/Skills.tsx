@@ -30,10 +30,10 @@ import { CSS } from '@dnd-kit/utilities';
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface SkillsFieldsComponentInterface {
-  sectionDivClasses: string;
-  sectionHeaderClasses: string;
+  controls: SectionControls;
   appendSkill: UseFieldArrayAppend<ResumeFormData>;
   addButtonClasses: string;
   skillsFields: FieldArrayWithId<ResumeFormData, "skills", "id">[];
@@ -260,8 +260,7 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
 };
 
 const SkillsFieldsComponent: React.FC<SkillsFieldsComponentInterface> = ({
-  sectionDivClasses,
-  sectionHeaderClasses,
+  controls,
   appendSkill,
   addButtonClasses,
   skillsFields,
@@ -305,49 +304,54 @@ const SkillsFieldsComponent: React.FC<SkillsFieldsComponentInterface> = ({
   return (
     <>
       <div className="space-y-4">
-        <div className={`${sectionDivClasses} flex justify-between items-center`}>
-          <h2 className={sectionHeaderClasses}>Skills</h2>
-          <button
-            type="button"
-            onClick={() => appendSkill({ name: '', keywords: [] })}
-            className={addButtonClasses}
+        <SectionHeader
+          title="Skills"
+          controls={controls}
+          actions={
+            <button
+              type="button"
+              onClick={() => appendSkill({ name: '', keywords: [] })}
+              className={addButtonClasses}
+            >
+              <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Skill
+            </button>
+          }
+        />
+        <SectionBody collapsed={controls.collapsed} hidden={controls.hidden}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Skill
-          </button>
-        </div>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={skillsFields.map(field => field.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-4">
-              {skillsFields.map((field, index) => (
-                <SortableSkillCard
-                  key={field.id}
-                  field={field}
-                  index={index}
-                  cardClasses={cardClasses}
-                  removeSkill={removeSkill}
-                  removeButtonClasses={removeButtonClasses}
-                  inputClasses={inputClasses}
-                  register={register}
-                  labelClasses={labelClasses}
-                  errors={errors}
-                  isEditing={editingIndex === index}
-                  setIsEditing={setIsEditing}
-                  watch={watch}
-                  onSave={() => forceUpdate((n: number) => n + 1)}
-                  setValue={setValue}
-                  control={control}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={skillsFields.map(field => field.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {skillsFields.map((field, index) => (
+                  <SortableSkillCard
+                    key={field.id}
+                    field={field}
+                    index={index}
+                    cardClasses={cardClasses}
+                    removeSkill={removeSkill}
+                    removeButtonClasses={removeButtonClasses}
+                    inputClasses={inputClasses}
+                    register={register}
+                    labelClasses={labelClasses}
+                    errors={errors}
+                    isEditing={editingIndex === index}
+                    setIsEditing={setIsEditing}
+                    watch={watch}
+                    onSave={() => forceUpdate((n: number) => n + 1)}
+                    setValue={setValue}
+                    control={control}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </SectionBody>
       </div>
     </>
   );

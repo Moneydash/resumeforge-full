@@ -2,13 +2,15 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import ZeusCss from "@/styles/templates/greek/zeus.css?inline";
-import { getRenderColumns } from "@/utils/section-layout";
+import { getRenderColumns, getVisibleSocials } from "@/utils/section-layout";
+import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
+  const t = titlesFor('zeus', data);
   const socialSection = (
     <div className="greek-socials">
-      {data?.socials?.map((social, i) => (
+      {getVisibleSocials(data).map((social, i) => (
         <a href={social?.link} key={i} target="_blank">
           <i className={`fab fa-${social?.slug} fa-lg`}></i>
         </a>
@@ -18,14 +20,14 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const aboutSection = (
     <section className="greek-section">
-      <h2 className="greek-section-title"><span className="greek-icon">⚡</span>Professional Summary</h2>
+      <h2 className={t.cls("greek-section-title", "summary")}><span className="greek-icon">⚡</span>{t.text("summary")}</h2>
       <div className="greek-summary">{data?.summary}</div>
     </section>
   );
 
   const expSection = (
     <section className="greek-section">
-      <h2 className="greek-section-title"><span className="greek-icon">🏛️</span>Work Experience</h2>
+      <h2 className={t.cls("greek-section-title", "experience")}><span className="greek-icon">🏛️</span>{t.text("experience")}</h2>
       {data?.experience
         ?.filter(exp => !exp.hidden)
         ?.map((exp, i) => (
@@ -44,7 +46,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const educSection = (
     <section className="greek-section">
-      <h2 className="greek-section-title"><span className="greek-icon">🎓</span>Academic Background</h2>
+      <h2 className={t.cls("greek-section-title", "education")}><span className="greek-icon">🎓</span>{t.text("education")}</h2>
       {data?.education
         ?.filter(ed => !ed.hidden)
         ?.map((edu, i) => (
@@ -62,7 +64,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const projSection = (
     <section className="greek-section">
-      <h2 className="greek-section-title"><span className="greek-icon">⚔️</span>Notable Projects</h2>
+      <h2 className={t.cls("greek-section-title", "projects")}><span className="greek-icon">⚔️</span>{t.text("projects")}</h2>
       {data?.projects
         ?.filter(proj => !proj.hidden)
         ?.map((proj, i) => (
@@ -80,7 +82,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const skillSection = (
     <section className="greek-section">
-      <h2 className="greek-section-title"><span className="greek-icon">🔱</span>Professional Skills</h2>
+      <h2 className={t.cls("greek-section-title", "skills")}><span className="greek-icon">🔱</span>{t.text("skills")}</h2>
       <div className="greek-skills">
         {data?.skills
           ?.filter(s => !s.hidden)
@@ -101,7 +103,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const langSection = (
     <section className="greek-section">
-      <h2 className="greek-section-title"><span className="greek-icon">🗣️</span>Spoken Languages</h2>
+      <h2 className={t.cls("greek-section-title", "languages")}><span className="greek-icon">🗣️</span>{t.text("languages")}</h2>
       <div className="greek-languages">
         {data?.languages?.join(" • ")}
       </div>
@@ -110,7 +112,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const certSection = (
     <section className="greek-section">
-      <h2 className="greek-section-title"><span className="greek-icon">🏆</span>Certifications & Licenses</h2>
+      <h2 className={t.cls("greek-section-title", "certifications")}><span className="greek-icon">🏆</span>{t.text("certifications")}</h2>
       {data?.certifications
         ?.filter(cert => !cert.hidden)
         ?.map((cert, i) => (
@@ -128,7 +130,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const awardsSection = (
     <section className="greek-section">
-      <h2 className="greek-section-title"><span className="greek-icon">👑</span>Awards & Achievements</h2>
+      <h2 className={t.cls("greek-section-title", "awards")}><span className="greek-icon">👑</span>{t.text("awards")}</h2>
       {data?.awards
         ?.filter(award => !award.hidden)
         ?.map((award) => (
@@ -146,7 +148,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const refSection = (
     <section className="greek-section">
-      <h2 className="greek-section-title"><span className="greek-icon">🤝</span>Professional References</h2>
+      <h2 className={t.cls("greek-section-title", "references")}><span className="greek-icon">🤝</span>{t.text("references")}</h2>
       {data?.references
         ?.filter(reference => !reference.hidden)
         ?.map((reference, i) => (
@@ -192,7 +194,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
               {data?.personal?.contact_number && <span>📞 {data.personal.contact_number}</span>}
               {data?.personal?.website?.name && <span>🌐 <a href={data.personal.website.link}>{data.personal.website.name}</a></span>}
             </div>
-            {data?.socials && data?.socials?.length >= 1 && socialSection}
+            {getVisibleSocials(data).length >= 1 && socialSection}
           </div>
           <div className="greek-laurel-right">⚡</div>
         </header>

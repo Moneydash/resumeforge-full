@@ -2,13 +2,15 @@ import React from "react";
 import type { TemplateProps } from "@/types";
 import CometCss from "@/styles/templates/galaxy/comet.css?inline";
 import { getRenderColumns } from "@/utils/section-layout";
+import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const CometTemplate: React.FC<TemplateProps> = ({ data }) => {
+  const t = titlesFor('comet', data);
   const aboutSection = (
     <section className="comet-section">
-      <h2 className="comet-section-title">
-        About Me
+      <h2 className={t.cls("comet-section-title", "summary")}>
+        {t.text("summary")}
       </h2>
       <div className="comet-summary">{data?.summary}</div>
     </section>
@@ -16,7 +18,7 @@ const CometTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const skillSection = (
     <section className="comet-section">
-      <h2 className="comet-section-title">Skills</h2>
+      <h2 className={t.cls("comet-section-title", "skills")}>{t.text("skills")}</h2>
       {data?.skills
         ?.filter(skill => !skill.hidden)
         ?.map(skill => skill?.keywords?.join(", "))
@@ -27,7 +29,7 @@ const CometTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const projSection = (
     <section className="comet-section">
-      <h2 className="comet-section-title">Projects</h2>
+      <h2 className={t.cls("comet-section-title", "projects")}>{t.text("projects")}</h2>
       {data?.projects
         ?.filter(proj => !proj.hidden)
         ?.map((proj, i) => (
@@ -45,7 +47,7 @@ const CometTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const interestSection = (
     <section className="comet-section">
-      <h2 className="comet-section-title">Interests</h2>
+      <h2 className={t.cls("comet-section-title", "interests")}>{t.text("interests")}</h2>
       <div className="comet-interests">{data?.interests?.join(", ")}</div>
     </section>
   );

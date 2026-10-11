@@ -2,16 +2,18 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import HermesCss from "@/styles/templates/greek/hermes.css?inline";
-import { getRenderColumns } from "@/utils/section-layout";
+import { getRenderColumns, getVisibleSocials, getVisibleSummary } from "@/utils/section-layout";
+import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
+  const t = titlesFor('hermes', data);
   const headerSection = (
     <div className="resume-header">
       <div className="resume-header-content">
         <h1 className="resume-name">{data?.personal?.name}</h1>
         <p className="resume-title">{data?.personal?.headline}</p>
-        <p className="resume-summary">{data?.summary}</p>
+        <p className="resume-summary">{getVisibleSummary(data)}</p>
 
         <div className="contact-info">
           <div className="contact-item">
@@ -33,7 +35,7 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
         </div>
 
         <div className="social-links">
-          {data?.socials?.map((social, i) => (
+          {getVisibleSocials(data).map((social, i) => (
             <a key={i} href={social?.link} target="_blank" className="social-link" aria-label={social?.slug}>
               <i className={`fab fa-${social.slug}`} aria-hidden="true"></i>
             </a>
@@ -45,9 +47,9 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const workExperienceSection = (
     <div className="resume-section">
-      <h2 className="section-title">
+      <h2 className={t.cls("section-title", "experience")}>
         <i className="fas fa-briefcase section-icon" aria-hidden="true"></i>
-        WORK EXPERIENCE
+        {t.text("experience")}
       </h2>
       <div className="section-content">
         {data?.experience
@@ -79,9 +81,9 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const skillsSection = (
     <div className="resume-section">
-      <h2 className="section-title">
+      <h2 className={t.cls("section-title", "skills")}>
         <i className="fas fa-cogs section-icon" aria-hidden="true"></i>
-        SKILLS & COMPETENCIES
+        {t.text("skills")}
       </h2>
       <div className="section-content">
         <div className="skills-container">
@@ -102,9 +104,9 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const certificatesSection = (
     <div className="resume-section">
-      <h2 className="section-title">
+      <h2 className={t.cls("section-title", "certifications")}>
         <i className="fas fa-certificate section-icon" aria-hidden="true"></i>
-        CERTIFICATES
+        {t.text("certifications")}
       </h2>
       <div className="section-content">
         {data?.certifications
@@ -125,9 +127,9 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const educationSection = (
     <div className="resume-section">
-      <h2 className="section-title">
+      <h2 className={t.cls("section-title", "education")}>
         <i className="fas fa-graduation-cap section-icon" aria-hidden="true"></i>
-        EDUCATION
+        {t.text("education")}
       </h2>
       <div className="section-content">
         {data?.education
@@ -150,9 +152,9 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const projectsSection = (
     <div className="resume-section">
-      <h2 className="section-title">
+      <h2 className={t.cls("section-title", "projects")}>
         <i className="fas fa-project-diagram section-icon" aria-hidden="true"></i>
-        KEY PROJECTS
+        {t.text("projects")}
       </h2>
       <div className="section-content">
         {data?.projects
@@ -175,9 +177,9 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const awardsSection = (
     <div className="resume-section">
-      <h2 className="section-title">
+      <h2 className={t.cls("section-title", "awards")}>
         <i className="fas fa-award section-icon" aria-hidden="true"></i>
-        AWARDS
+        {t.text("awards")}
       </h2>
       <div className="section-content">
         {data?.awards
@@ -198,9 +200,9 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const interestsSection = (
     <div className="resume-section">
-      <h2 className="section-title">
+      <h2 className={t.cls("section-title", "interests")}>
         <i className="fas fa-heart section-icon" aria-hidden="true"></i>
-        INTERESTS
+        {t.text("interests")}
       </h2>
       <div className="section-content">
         <div className="interests-container">
@@ -214,9 +216,9 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const languagesSection = (
     <div className="resume-section">
-      <h2 className="section-title">
+      <h2 className={t.cls("section-title", "languages")}>
         <i className="fas fa-language section-icon" aria-hidden="true"></i>
-        LANGUAGES
+        {t.text("languages")}
       </h2>
       <div className="section-content">
         <div className="languages-container">
@@ -232,9 +234,9 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const referencesSection = (
     <div className="resume-section">
-      <h2 className="section-title">
+      <h2 className={t.cls("section-title", "references")}>
         <i className="fas fa-users section-icon" aria-hidden="true"></i>
-        REFERENCES
+        {t.text("references")}
       </h2>
       <div className="section-content">
         {data?.references

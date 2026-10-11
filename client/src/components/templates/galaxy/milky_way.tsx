@@ -3,19 +3,21 @@ import React from "react";
 import type { TemplateProps } from "@/types";
 import milkyWayCss from "@/styles/templates/galaxy/milky_way.css?inline";
 import { getRenderColumns } from "@/utils/section-layout";
+import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
+  const t = titlesFor('milky_way', data);
   const aboutSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">About Me</h2>
+      <h2 className={t.cls("mw-section-title", "summary")}>{t.text("summary")}</h2>
       <div className="mw-summary">{data?.summary}</div>
     </section>
   );
 
   const expSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">Work Experience</h2>
+      <h2 className={t.cls("mw-section-title", "experience")}>{t.text("experience")}</h2>
       {data?.experience
         ?.filter(exp => !exp.hidden)
         ?.map((exp, i) => (
@@ -33,7 +35,7 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const educSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">Education</h2>
+      <h2 className={t.cls("mw-section-title", "education")}>{t.text("education")}</h2>
       {data?.education
         ?.filter(edu => !edu.hidden)
         ?.map((edu, i) => (
@@ -51,7 +53,7 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const projSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">Projects</h2>
+      <h2 className={t.cls("mw-section-title", "projects")}>{t.text("projects")}</h2>
       {data?.projects
         ?.filter(proj => !proj.hidden)
         ?.map((proj, i) => (
@@ -69,7 +71,7 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const skillSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">Skills</h2>
+      <h2 className={t.cls("mw-section-title", "skills")}>{t.text("skills")}</h2>
       <div className="mw-skills">
         {data?.skills
           ?.filter(s => !s.hidden)
@@ -86,7 +88,7 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const langSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">Languages</h2>
+      <h2 className={t.cls("mw-section-title", "languages")}>{t.text("languages")}</h2>
       <div className="mw-languages">
         {data?.languages?.map((lang, i) => (
           <span key={i} className="mw-skill-pill">{lang}</span>
@@ -97,7 +99,7 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const certSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">Certifications</h2>
+      <h2 className={t.cls("mw-section-title", "certifications")}>{t.text("certifications")}</h2>
       {data?.certifications
         ?.filter(cert => !cert.hidden)
         ?.map((cert, i) => (
@@ -114,7 +116,7 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const awardsSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">Awards</h2>
+      <h2 className={t.cls("mw-section-title", "awards")}>{t.text("awards")}</h2>
       {data?.awards
         ?.filter(award => !award.hidden)
         ?.map((award, i) => (
@@ -132,7 +134,7 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const interestSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">Interests</h2>
+      <h2 className={t.cls("mw-section-title", "interests")}>{t.text("interests")}</h2>
       <div className="mw-interests">
         {data?.interests?.map((interest, i) => (
           <span key={i} className="mw-skill-pill">{interest}</span>
@@ -143,7 +145,7 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const refSection = (
     <section className="mw-section">
-      <h2 className="mw-section-title">References</h2>
+      <h2 className={t.cls("mw-section-title", "references")}>{t.text("references")}</h2>
       {data?.references
         ?.filter(reference => !reference.hidden)
         ?.map((reference, i) => (

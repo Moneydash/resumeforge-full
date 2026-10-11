@@ -31,10 +31,10 @@ import { CSS } from '@dnd-kit/utilities';
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import MonthPicker from "../MonthPicker";
+import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface CertificationFieldsComponentInterface {
-  sectionDivClasses: string;
-  sectionHeaderClasses: string;
+  controls: SectionControls;
   appendCertification: UseFieldArrayAppend<ResumeFormData>;
   addButtonClasses: string;
   certificationFields: FieldArrayWithId<ResumeFormData, "certifications", "id">[];
@@ -265,8 +265,7 @@ const SortableCertificationCard: React.FC<SortableCertificationCardProps> = ({
 };
 
 const CertificationFieldsComponent: React.FC<CertificationFieldsComponentInterface> = ({
-  sectionDivClasses,
-  sectionHeaderClasses,
+  controls,
   appendCertification,
   addButtonClasses,
   certificationFields,
@@ -310,49 +309,54 @@ const CertificationFieldsComponent: React.FC<CertificationFieldsComponentInterfa
   return (
     <>
       <div className="space-y-4">
-        <div className={`${sectionDivClasses} flex justify-between items-center`}>
-          <h2 className={sectionHeaderClasses}>Certifications</h2>
-          <button
-            type="button"
-            onClick={() => appendCertification({ name: '', issuingOrganization: '', date: '' })}
-            className={addButtonClasses}
+        <SectionHeader
+          title="Certifications"
+          controls={controls}
+          actions={
+            <button
+              type="button"
+              onClick={() => appendCertification({ name: '', issuingOrganization: '', date: '' })}
+              className={addButtonClasses}
+            >
+              <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Certification
+            </button>
+          }
+        />
+        <SectionBody collapsed={controls.collapsed} hidden={controls.hidden}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Certification
-          </button>
-        </div>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={certificationFields.map(field => field.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-4">
-              {certificationFields.map((field, index) => (
-                <SortableCertificationCard
-                  key={field.id}
-                  field={field}
-                  index={index}
-                  cardClasses={cardClasses}
-                  removeCertification={removeCertification}
-                  removeButtonClasses={removeButtonClasses}
-                  inputClasses={inputClasses}
-                  register={register}
-                  labelClasses={labelClasses}
-                  errors={errors}
-                  isEditing={editingIndex === index}
-                  setIsEditing={setIsEditing}
-                  watch={watch}
-                  setValue={setValue}
-                  onSave={() => forceUpdate(n => n + 1)}
-                  control={control}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={certificationFields.map(field => field.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {certificationFields.map((field, index) => (
+                  <SortableCertificationCard
+                    key={field.id}
+                    field={field}
+                    index={index}
+                    cardClasses={cardClasses}
+                    removeCertification={removeCertification}
+                    removeButtonClasses={removeButtonClasses}
+                    inputClasses={inputClasses}
+                    register={register}
+                    labelClasses={labelClasses}
+                    errors={errors}
+                    isEditing={editingIndex === index}
+                    setIsEditing={setIsEditing}
+                    watch={watch}
+                    setValue={setValue}
+                    onSave={() => forceUpdate(n => n + 1)}
+                    control={control}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </SectionBody>
       </div>
     </>
   );

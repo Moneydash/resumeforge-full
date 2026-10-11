@@ -43,6 +43,7 @@ import DesignPanel, { DESIGN_PANEL_WIDTH, type DesignTab } from '@/components/De
 import type { SavedFont } from '@/utils/fonts';
 import { isColorTemplate, type ColorTheme } from '@/utils/color-theme';
 import { convertLayout, type SectionLayout } from '@/utils/section-layout';
+import type { SectionTitles } from '@/utils/section-titles';
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
 
 const Preview: React.FC = () => {
@@ -88,6 +89,8 @@ const Preview: React.FC = () => {
   const fontFamilyRef = useRef<SavedFont | undefined>(undefined);
   const [colorTheme, setColorTheme] = useState<ColorTheme | undefined>(undefined);
   const colorThemeRef = useRef<ColorTheme | undefined>(undefined);
+  const [sectionTitles, setSectionTitles] = useState<SectionTitles | undefined>(undefined);
+  const sectionTitlesRef = useRef<SectionTitles | undefined>(undefined);
   const resumeDataRef = useRef<ResumeFormData | null>(null);
   const layoutTimerRef = useRef<ReturnType<typeof setTimeout> | undefined>(undefined);
   const handleFormSubmitRef = useRef<(data: ResumeFormData) => Promise<void>>(async () => { });
@@ -176,6 +179,8 @@ const Preview: React.FC = () => {
           setFontFamily(parsedData.fontFamily);
           colorThemeRef.current = parsedData.colorTheme;
           setColorTheme(parsedData.colorTheme);
+          sectionTitlesRef.current = parsedData.sectionTitles;
+          setSectionTitles(parsedData.sectionTitles);
           setResumeData(parsedData);
           handleFormSubmit(parsedData); // Use parsedData directly!
         } catch (e) {
@@ -294,8 +299,8 @@ const Preview: React.FC = () => {
     const requestId = ++requestIdRef.current;
     setLoading(true);
     if (liveEdit) setLiveStatus('updating');
-    // the layout, font and color theme live outside the form; always attach the current ones (undefined is dropped from the JSON)
-    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current };
+    // the layout, section names, font and color theme live outside the form; always attach the current ones (undefined is dropped from the JSON)
+    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current, sectionTitles: sectionTitlesRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current };
     try {
       resumeDataRef.current = data;
       setResumeData(data);
@@ -336,6 +341,12 @@ const Preview: React.FC = () => {
   const handleLayoutChange = (next: SectionLayout | undefined) => {
     sectionLayoutRef.current = next;
     setSectionLayout(next);
+    queueRegenerate();
+  };
+
+  const handleTitlesChange = (next: SectionTitles | undefined) => {
+    sectionTitlesRef.current = next;
+    setSectionTitles(next);
     queueRegenerate();
   };
 
@@ -653,7 +664,7 @@ const Preview: React.FC = () => {
 
                   <Button
                     id="exportButton"
-                    onClick={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current })}
+                    onClick={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current, sectionTitles: sectionTitlesRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current })}
                     disabled={loadingExport || !pdfUrl}
                     className={`
                       ${isDarkMode
@@ -747,7 +758,7 @@ const Preview: React.FC = () => {
               template={activeTemplate}
               fontSaved={fontFamily}
               onFontChange={handleFontChange}
-              sections={{ template: activeTemplate, data: resumeData, layout: sectionLayout, onChange: handleLayoutChange }}
+              sections={{ template: activeTemplate, data: resumeData, layout: sectionLayout, onChange: handleLayoutChange, titles: sectionTitles, onTitlesChange: handleTitlesChange }}
               color={isColorTemplate(activeTemplate) ? { template: activeTemplate, theme: colorTheme, onChange: handleColorChange } : undefined}
               templates={{ kind: 'resume', current: activeTemplate, onSelect: handleTemplateChange }}
             />

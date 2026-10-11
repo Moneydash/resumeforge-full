@@ -126,16 +126,34 @@ export const getPinned = (template: TemplateType): SectionId[] => LAYOUTS[templa
 
 export const getColumnLabels = (template: TemplateType): string[] => LAYOUTS[template].columnLabels;
 
+/** Parent toggle: true when the whole section is switched off, whatever its items' own state. */
+export const isSectionHidden = (id: SectionId, data: ResumeFormData): boolean =>
+  !!data.hiddenSections?.includes(id);
+
+/** Flip one section's parent toggle; returns a new list and never touches the items' own `hidden` flags. */
+export const toggleHiddenSection = (current: SectionId[] | undefined, id: SectionId): SectionId[] => {
+  const list = current ?? [];
+  return list.includes(id) ? list.filter((hiddenId) => hiddenId !== id) : [...list, id];
+};
+
+/** Social links a template should render: none when the section is off, else the links not hidden. */
+export const getVisibleSocials = (data: ResumeFormData): ResumeFormData['socials'] =>
+  isSectionHidden('socials', data) ? [] : (data.socials ?? []).filter((social) => !social.hidden);
+
+/** Summary text for templates that print it outside the section columns (e.g. a header). */
+export const getVisibleSummary = (data: ResumeFormData): string | undefined =>
+  isSectionHidden('summary', data) ? undefined : data.summary;
+
 export const hasContent = (id: SectionId, data: ResumeFormData): boolean => {
+  if (isSectionHidden(id, data)) return false;
   switch (id) {
     case 'summary':
       return !!data.summary;
-    case 'socials':
-      return (data.socials?.length ?? 0) >= 1;
     case 'languages':
       return (data.languages?.length ?? 0) >= 1;
     case 'interests':
       return (data.interests?.length ?? 0) >= 1;
+    case 'socials':
     case 'experience':
     case 'education':
     case 'skills':

@@ -2,6 +2,7 @@ import React from "react";
 import type { ResumeFormData } from "@/types/interface.resume-form-data";
 import AndromedaTemplate from "./templates/galaxy/andromeda";
 import type { TemplateType } from "@/types";
+import { CUSTOM_TITLE_CSS, hasCustomTitles } from "@/utils/section-titles";
 import CigarTemplate from "./templates/galaxy/cigar";
 import CometTemplate from "./templates/galaxy/comet";
 import MilkyWayTemplate from "./templates/galaxy/milky_way";
@@ -47,6 +48,7 @@ const TemplateComponent: React.FC<ResumePreviewProps> = ({ data, template = 'and
 
   return (
     <div className="p-6 min-h-screen">
+      {hasCustomTitles(data) && <style>{CUSTOM_TITLE_CSS}</style>}
       {renderTemplate()}
     </div>
   );

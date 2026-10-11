@@ -2,11 +2,13 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import ApolloCss from "@/styles/templates/greek/apollo.css?inline";
-import { getRenderColumns } from "@/utils/section-layout";
+import { getRenderColumns, getVisibleSocials } from "@/utils/section-layout";
+import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 import { buildMainVariants, buildSidebarVariants } from "@/components/templates/column-variants";
 
 const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
+  const t = titlesFor('apollo', data);
   const aboutSection = (
     <div className="sidebar-contact">
       {data?.personal?.website?.name && <div className="sidebar-contact-item"><i className="icon-globe fas fa-globe"></i><span className="contact-text"><a href={data.personal.website.link} target="_blank">{data.personal.website.name}</a></span></div>}
@@ -15,19 +17,17 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
       {data?.personal?.location && <div className="sidebar-contact-item"><i className="icon-location fas fa-map-marker-alt"></i><span className="contact-text">{data.personal.location}</span></div>}
 
       {/* social links */}
-      {data?.socials && data?.socials?.length >= 1 && (
-        data?.socials?.map((social, i) => (
-          <div className="sidebar-contact-item" key={i}>
-            <i className={`icon-social fab fa-${social.slug}`}></i><a href={social?.link} target="_blank" className="contact-text">{social?.name}</a>
-          </div>
-        ))
-      )}
+      {getVisibleSocials(data).map((social, i) => (
+        <div className="sidebar-contact-item" key={i}>
+          <i className={`icon-social fab fa-${social.slug}`}></i><a href={social?.link} target="_blank" className="contact-text">{social?.name}</a>
+        </div>
+      ))}
     </div>
   );
 
   const educSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">EDUCATION</div>
+      <div className={t.cls("sidebar-section-title", "education")}>{t.text("education")}</div>
       {data?.education
         ?.filter(edu => !edu.hidden)
         ?.map((educ, i) => (
@@ -43,7 +43,7 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const skillSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">SKILLS</div>
+      <div className={t.cls("sidebar-section-title", "skills")}>{t.text("skills")}</div>
       <ul className="sidebar-skills">
         {data?.skills
           ?.filter(s => !s.hidden)
@@ -59,7 +59,7 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const projSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">PROJECTS</div>
+      <div className={t.cls("sidebar-section-title", "projects")}>{t.text("projects")}</div>
       {data?.projects
         ?.filter(proj => !proj.hidden)
         ?.map((proj, i) => (
@@ -78,7 +78,7 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const certSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">CERTIFICATIONS</div>
+      <div className={t.cls("sidebar-section-title", "certifications")}>{t.text("certifications")}</div>
       {data?.certifications
         ?.filter(cert => !cert.hidden)
         ?.map((cert, i) => (
@@ -97,7 +97,7 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const interestSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">INTERESTS</div>
+      <div className={t.cls("sidebar-section-title", "interests")}>{t.text("interests")}</div>
       <ul className="sidebar-languages">
         {data?.interests?.map((interest, i) => (
           <li key={i}>{interest}</li>
@@ -108,7 +108,7 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const langSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">LANGUAGES</div>
+      <div className={t.cls("sidebar-section-title", "languages")}>{t.text("languages")}</div>
       <ul className="sidebar-languages">
         {data?.languages?.map((lang, i) => (
           <li key={i}>{lang}</li>
@@ -119,14 +119,14 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const summarySection = (
     <div className="main-section">
-      <div className="main-section-title">PROFILE</div>
+      <div className={t.cls("main-section-title", "summary")}>{t.text("summary")}</div>
       <div className="main-summary">{data?.summary}</div>
     </div>
   );
 
   const expSection = (
     <div className="main-section">
-      <div className="main-section-title">WORK EXPERIENCE</div>
+      <div className={t.cls("main-section-title", "experience")}>{t.text("experience")}</div>
       {data?.experience
         ?.filter(i => !i.hidden)
         ?.map((exp, i) => (
@@ -145,7 +145,7 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const awardsSection = (
     <div className="main-section">
-      <div className="main-section-title">AWARDS</div>
+      <div className={t.cls("main-section-title", "awards")}>{t.text("awards")}</div>
       {data?.awards
         ?.filter(i => !i.hidden)
         ?.map((award, i) => (
@@ -163,7 +163,7 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const refSection = (
     <div className="main-section">
-      <div className="main-section-title">REFERENCES</div>
+      <div className={t.cls("main-section-title", "references")}>{t.text("references")}</div>
       {data?.references
         ?.filter(i => !i.hidden)
         ?.map((reference, i) => (
@@ -179,25 +179,15 @@ const ApolloTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const columns = getRenderColumns('apollo', data);
   // a section dragged to the other column needs that column's markup/classes, see column-variants.tsx
-  const titles = {
-    education: 'EDUCATION',
-    skills: 'SKILLS',
-    projects: 'PROJECTS',
-    certifications: 'CERTIFICATIONS',
-    awards: 'AWARDS',
-    languages: 'LANGUAGES',
-    interests: 'INTERESTS',
-    references: 'REFERENCES',
-  };
   const mainSections: SectionMap = {
-    ...buildMainVariants(data, titles),
+    ...buildMainVariants(data, t),
     summary: summarySection,
     experience: expSection,
     awards: awardsSection,
     references: refSection,
   };
   const sidebarSections: SectionMap = {
-    ...buildSidebarVariants(data, titles),
+    ...buildSidebarVariants(data, t),
     education: educSection,
     skills: skillSection,
     interests: interestSection,

@@ -35,10 +35,10 @@ import MonthPicker from "../MonthPicker";
 import EditorComponent from "../EditorComponent";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useWatch } from "react-hook-form";
+import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface ExperienceFieldsComponentInterface {
-  sectionDivClasses: string;
-  sectionHeaderClasses: string;
+  controls: SectionControls;
   appendExperience: UseFieldArrayAppend<ResumeFormData>;
   addButtonClasses: string;
   experienceFields: FieldArrayWithId<ResumeFormData, "experience", "id">[];
@@ -318,8 +318,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
 };
 
 const ExperienceFieldsComponent: React.FC<ExperienceFieldsComponentInterface> = ({
-  sectionDivClasses,
-  sectionHeaderClasses,
+  controls,
   appendExperience,
   addButtonClasses,
   experienceFields,
@@ -365,50 +364,54 @@ const ExperienceFieldsComponent: React.FC<ExperienceFieldsComponentInterface> = 
   return (
     <>
       <div className="space-y-4">
-        <div className={`${sectionDivClasses} flex justify-between items-center`}>
-          <h2 className={sectionHeaderClasses}>Experience</h2>
-          <button
-            type="button"
-            onClick={() => appendExperience({ title: '', company: '', startDate: '', endDate: '', description: '', hidden: false })}
-            className={addButtonClasses}
+        <SectionHeader
+          title="Experience"
+          controls={controls}
+          actions={
+            <button
+              type="button"
+              onClick={() => appendExperience({ title: '', company: '', startDate: '', endDate: '', description: '', hidden: false })}
+              className={addButtonClasses}
+            >
+              <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Experience
+            </button>
+          }
+        />
+        <SectionBody collapsed={controls.collapsed} hidden={controls.hidden}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Experience
-          </button>
-        </div>
-
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={experienceFields.map(field => field.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-4">
-              {experienceFields.map((field, index) => (
-                <SortableExperienceCard
-                  key={field.id}
-                  field={field}
-                  index={index}
-                  cardClasses={cardClasses}
-                  removeExperience={removeExperience}
-                  removeButtonClasses={removeButtonClasses}
-                  inputClasses={inputClasses}
-                  register={register}
-                  labelClasses={labelClasses}
-                  errors={errors}
-                  control={control}
-                  isEditing={editingIndex === index}
-                  setIsEditing={setIsEditing}
-                  onSave={() => forceUpdate((n: number) => n + 1)}
-                  watch={watch}
-                  setValue={setValue}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={experienceFields.map(field => field.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {experienceFields.map((field, index) => (
+                  <SortableExperienceCard
+                    key={field.id}
+                    field={field}
+                    index={index}
+                    cardClasses={cardClasses}
+                    removeExperience={removeExperience}
+                    removeButtonClasses={removeButtonClasses}
+                    inputClasses={inputClasses}
+                    register={register}
+                    labelClasses={labelClasses}
+                    errors={errors}
+                    control={control}
+                    isEditing={editingIndex === index}
+                    setIsEditing={setIsEditing}
+                    onSave={() => forceUpdate((n: number) => n + 1)}
+                    watch={watch}
+                    setValue={setValue}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </SectionBody>
       </div>
     </>
   );

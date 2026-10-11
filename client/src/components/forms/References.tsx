@@ -29,10 +29,10 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface ReferencesFieldsComponentInterface {
-  sectionDivClasses: string;
-  sectionHeaderClasses: string;
+  controls: SectionControls;
   appendReference: UseFieldArrayAppend<ResumeFormData>;
   addButtonClasses: string;
   referenceFields: FieldArrayWithId<ResumeFormData, "references", "id">[];
@@ -292,8 +292,7 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
 };
 
 const ReferencesFieldsComponent: React.FC<ReferencesFieldsComponentInterface> = ({
-  sectionDivClasses,
-  sectionHeaderClasses,
+  controls,
   appendReference,
   addButtonClasses,
   referenceFields,
@@ -337,49 +336,54 @@ const ReferencesFieldsComponent: React.FC<ReferencesFieldsComponentInterface> = 
   return (
     <>
       <div className="space-y-4">
-        <div className={`${sectionDivClasses} flex justify-between items-center`}>
-          <h2 className={sectionHeaderClasses}>References</h2>
-          <button
-            type="button"
-            onClick={() => appendReference({ name: '', title: '', company: '', email: '', phone: '' })}
-            className={addButtonClasses}
+        <SectionHeader
+          title="References"
+          controls={controls}
+          actions={
+            <button
+              type="button"
+              onClick={() => appendReference({ name: '', title: '', company: '', email: '', phone: '' })}
+              className={addButtonClasses}
+            >
+              <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Reference
+            </button>
+          }
+        />
+        <SectionBody collapsed={controls.collapsed} hidden={controls.hidden}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Reference
-          </button>
-        </div>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={referenceFields.map(field => field.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-4">
-              {referenceFields.map((field, index) => (
-                <SortableReferenceCard
-                  key={field.id}
-                  field={field}
-                  index={index}
-                  cardClasses={cardClasses}
-                  removeReference={removeReference}
-                  removeButtonClasses={removeButtonClasses}
-                  inputClasses={inputClasses}
-                  register={register}
-                  labelClasses={labelClasses}
-                  errors={errors}
-                  isEditing={editingIndex === index}
-                  setIsEditing={setIsEditing}
-                  watch={watch}
-                  onSave={() => forceUpdate(n => n + 1)}
-                  setValue={setValue}
-                  control={control}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={referenceFields.map(field => field.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {referenceFields.map((field, index) => (
+                  <SortableReferenceCard
+                    key={field.id}
+                    field={field}
+                    index={index}
+                    cardClasses={cardClasses}
+                    removeReference={removeReference}
+                    removeButtonClasses={removeButtonClasses}
+                    inputClasses={inputClasses}
+                    register={register}
+                    labelClasses={labelClasses}
+                    errors={errors}
+                    isEditing={editingIndex === index}
+                    setIsEditing={setIsEditing}
+                    watch={watch}
+                    onSave={() => forceUpdate(n => n + 1)}
+                    setValue={setValue}
+                    control={control}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </SectionBody>
       </div>
     </>
   );

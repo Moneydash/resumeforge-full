@@ -1,9 +1,8 @@
 import React, { useEffect, useRef, useState } from 'react';
-import { useForm, useFieldArray } from 'react-hook-form';
+import { useForm, useFieldArray, Controller, type FieldErrors } from 'react-hook-form';
 import { yupResolver } from '@hookform/resolvers/yup';
 import type { ResumeFormData } from '@/types/interface.resume-form-data';
 import schema from '@/schema/schema';
-import { Input } from './ui/input';
 import { Button } from './ui/button';
 import { Label } from './ui/label';
 import { Textarea } from './ui/textarea';
@@ -16,6 +15,10 @@ import AwardFieldsComponent from './forms/Awards';
 import CertificationFieldsComponent from './forms/Certifications';
 import ReferencesFieldsComponent from './forms/References';
 import PersonalFieldsComponent from './forms/Personal';
+import { SectionBody, SectionHeader, type SectionControls } from './forms/SectionHeader';
+import ChipInput from './forms/ChipInput';
+import { SECTION_LABELS, toggleHiddenSection, type SectionId } from '@/utils/section-layout';
+import { collapseStore, useCollapsedSections } from '@/utils/section-collapse';
 import {
   inputClasses,
   labelClasses,
@@ -120,6 +123,22 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
     control,
     name: 'references'
   });
+
+  // Parent toggles (saved with the resume) and fold state (view-only, remembered in localStorage)
+  const hiddenSections = watch('hiddenSections') ?? [];
+  const collapsedSections = useCollapsedSections();
+
+  const controlsFor = (id: SectionId): SectionControls => ({
+    hidden: hiddenSections.includes(id),
+    collapsed: collapsedSections.includes(id),
+    onToggleHidden: () => setValue('hiddenSections', toggleHiddenSection(getValues('hiddenSections'), id), { shouldDirty: true }),
+    onToggleCollapsed: () => collapseStore.toggle(id),
+  });
+
+  // A collapsed section would hide its own validation errors, so open the ones that have any
+  const handleInvalid = (formErrors: FieldErrors<ResumeFormData>) => {
+    collapseStore.expandMany(Object.keys(formErrors).filter((key): key is SectionId => key in SECTION_LABELS));
+  };
 
   // Load saved data from localStorage when component mounts
   useEffect(() => {
@@ -243,7 +262,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
   }, [liveEdit, watch, getValues]);
 
   return (
-    <form onSubmit={handleSubmit(handleSubmitForm)} className="space-y-8">
+    <form onSubmit={handleSubmit(handleSubmitForm, handleInvalid)} className="space-y-8">
 
       {/* Personal Details */}
       <div ref={sectionRefs?.personalRef}>
@@ -259,8 +278,8 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
 
       {/* Professional Summary Field */}
       <div className="space-y-4" ref={sectionRefs?.summaryRef}>
-        <h2 className={`${sectionHeaderClasses} ${sectionDivClasses}`}>Summary</h2>
-        <div>
+        <SectionHeader title="Summary" controls={controlsFor('summary')} />
+        <SectionBody collapsed={collapsedSections.includes('summary')} hidden={hiddenSections.includes('summary')}>
           <Label htmlFor="summary" className={labelClasses}>Summary</Label>
           <Textarea
             id="summary"
@@ -268,14 +287,13 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
             rows={10}
             placeholder="Write a brief professional summary highlighting your key achievements and skills..."
           />
-        </div>
+        </SectionBody>
       </div>
 
       {/* Social Links Fields */}
       <div ref={sectionRefs?.socialsRef}>
         <SocialsFieldsComponent
-          sectionDivClasses={sectionDivClasses}
-          sectionHeaderClasses={sectionHeaderClasses}
+          controls={controlsFor('socials')}
           appendSocial={appendSocial}
           addButtonClasses={addButtonClasses}
           socialFields={socialFields}
@@ -289,8 +307,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
       {/* Experience Fields */}
       <div ref={sectionRefs?.experienceRef}>
         <ExperienceFieldsComponent
-          sectionDivClasses={sectionDivClasses}
-          sectionHeaderClasses={sectionHeaderClasses}
+          controls={controlsFor('experience')}
           appendExperience={appendExperience}
           addButtonClasses={addButtonClasses}
           experienceFields={experienceFields}
@@ -311,8 +328,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
       {/* Education Fields */}
       <div ref={sectionRefs?.educationRef}>
         <EducationFieldsComponent
-          sectionDivClasses={sectionDivClasses}
-          sectionHeaderClasses={sectionHeaderClasses}
+          controls={controlsFor('education')}
           appendEducation={appendEducation}
           addButtonClasses={addButtonClasses}
           educationFields={educationFields}
@@ -333,8 +349,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
       {/* Skills */}
       <div ref={sectionRefs?.skillsRef}>
         <SkillsFieldsComponent
-          sectionDivClasses={sectionDivClasses}
-          sectionHeaderClasses={sectionHeaderClasses}
+          controls={controlsFor('skills')}
           appendSkill={appendSkill}
           addButtonClasses={addButtonClasses}
           cardClasses={cardClasses}
@@ -354,38 +369,48 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
 
       {/* Languages */}
       <div className="space-y-4" ref={sectionRefs?.languagesRef}>
-        <h2 className={`${sectionHeaderClasses} ${sectionDivClasses}`}>Languages</h2>
-        <div>
+        <SectionHeader title="Languages" controls={controlsFor('languages')} />
+        <SectionBody collapsed={collapsedSections.includes('languages')} hidden={hiddenSections.includes('languages')}>
           <Label htmlFor="languages" className={labelClasses}>Spoken Languages</Label>
-          <Input
-            id="languages"
-            {...register('languages')}
-            className={inputClasses}
-            placeholder="English (Native), Spanish (Fluent) (separate with commas)"
+          <Controller
+            control={control}
+            name="languages"
+            render={({ field }) => (
+              <ChipInput
+                id="languages"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Type a language, then press Enter or comma  e.g. Spanish (Fluent)"
+              />
+            )}
           />
-        </div>
+        </SectionBody>
       </div>
 
       {/* Interests */}
       <div className="space-y-4" ref={sectionRefs?.interestsRef}>
-        <h2 className={`${sectionHeaderClasses} ${sectionDivClasses}`}>Interests & Hobbies</h2>
-        <div>
+        <SectionHeader title="Interests & Hobbies" controls={controlsFor('interests')} />
+        <SectionBody collapsed={collapsedSections.includes('interests')} hidden={hiddenSections.includes('interests')}>
           <Label htmlFor="interests" className={labelClasses}>Interests</Label>
-          <Input
-            type="text"
-            id="interests"
-            {...register('interests')}
-            className={inputClasses}
-            placeholder="Photography, Hiking, Open Source (separate with commas)"
+          <Controller
+            control={control}
+            name="interests"
+            render={({ field }) => (
+              <ChipInput
+                id="interests"
+                value={field.value}
+                onChange={field.onChange}
+                placeholder="Type an interest, then press Enter or comma  e.g. Photography"
+              />
+            )}
           />
-        </div>
+        </SectionBody>
       </div>
 
       {/* Projects */}
       <div ref={sectionRefs?.projectsRef}>
         <ProjectFieldsComponent
-          sectionDivClasses={sectionDivClasses}
-          sectionHeaderClasses={sectionHeaderClasses}
+          controls={controlsFor('projects')}
           appendProject={appendProject}
           addButtonClasses={addButtonClasses}
           cardClasses={cardClasses}
@@ -406,8 +431,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
       {/* Awards Fields */}
       <div ref={sectionRefs?.awardsRef}>
         <AwardFieldsComponent
-          sectionDivClasses={sectionDivClasses}
-          sectionHeaderClasses={sectionHeaderClasses}
+          controls={controlsFor('awards')}
           appendAward={appendAward}
           addButtonClasses={addButtonClasses}
           awardFields={awardFields}
@@ -428,8 +452,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
       {/* Certifications */}
       <div ref={sectionRefs?.certificationsRef}>
         <CertificationFieldsComponent
-          sectionDivClasses={sectionDivClasses}
-          sectionHeaderClasses={sectionHeaderClasses}
+          controls={controlsFor('certifications')}
           appendCertification={appendCertification}
           addButtonClasses={addButtonClasses}
           certificationFields={certificationFields}
@@ -450,8 +473,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
       {/* References */}
       <div ref={sectionRefs?.referencesRef}>
         <ReferencesFieldsComponent
-          sectionDivClasses={sectionDivClasses}
-          sectionHeaderClasses={sectionHeaderClasses}
+          controls={controlsFor('references')}
           appendReference={appendReference}
           addButtonClasses={addButtonClasses}
           cardClasses={cardClasses}

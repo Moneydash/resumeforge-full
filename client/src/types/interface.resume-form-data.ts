@@ -1,4 +1,4 @@
-import type { SectionLayout } from "@/utils/section-layout";
+import type { SectionId, SectionLayout } from "@/utils/section-layout";
 import type { SavedFont } from "@/utils/fonts";
 import type { ColorTheme } from "@/utils/color-theme";
 
@@ -18,6 +18,7 @@ export interface ResumeFormData {
     name: string;
     link: string;
     slug: string;
+    hidden?: boolean;
   }>;
   summary?: string;
   experience: Array<{
@@ -68,6 +69,10 @@ export interface ResumeFormData {
     phone: string;
     hidden?: boolean;
   }>;
+  /** Sections switched off at the parent level; their items keep their own `hidden` state. */
+  hiddenSections?: SectionId[];
+  /** Section names the user typed; a section not listed shows its template's default heading. */
+  sectionTitles?: Partial<Record<SectionId, string>>;
   sectionLayout?: SectionLayout;
   fontFamily?: SavedFont;
   colorTheme?: ColorTheme;
