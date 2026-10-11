@@ -1,12 +1,13 @@
 import { Plus } from 'lucide-react';
-import type { ViewMode } from './types';
+import { RESUME_LABELS } from './labels';
+import type { DocLabels, ViewMode } from './types';
 
 const SKELETON_COUNT = 6;
 
-export function ResumeSkeleton({ viewMode }: { viewMode: ViewMode }) {
+export function ResumeSkeleton({ viewMode, labels = RESUME_LABELS }: { viewMode: ViewMode; labels?: DocLabels }) {
   return (
     <div role="status" aria-live="polite" aria-busy="true">
-      <span className="sr-only">Loading resumes</span>
+      <span className="sr-only">{labels.loadingLabel}</span>
       {viewMode === 'grid' ? (
         <div className="grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-4">
           {Array.from({ length: SKELETON_COUNT }, (_, index) => (
@@ -31,23 +32,23 @@ export function ResumeSkeleton({ viewMode }: { viewMode: ViewMode }) {
   );
 }
 
-export function EmptyState({ onCreate }: { onCreate: () => void }) {
+export function EmptyState({ onCreate, labels = RESUME_LABELS }: { onCreate: () => void; labels?: DocLabels }) {
   return (
     <div className="flex flex-col items-center px-4 py-20 text-center">
-      <h2 className="m-0 text-xl font-semibold tracking-[-0.02em]">No resumes yet</h2>
-      <p className="l-muted m-0 mt-2 max-w-sm">Create your first resume, choose a template and start writing.</p>
+      <h2 className="m-0 text-xl font-semibold tracking-[-0.02em]">{labels.emptyTitle}</h2>
+      <p className="l-muted m-0 mt-2 max-w-sm">{labels.emptyBody}</p>
       <button type="button" className="l-btn l-btn--primary mt-6" onClick={onCreate}>
         <Plus aria-hidden="true" className="size-4" />
-        New resume
+        {labels.newButton}
       </button>
     </div>
   );
 }
 
-export function ErrorState({ onRetry }: { onRetry: () => void }) {
+export function ErrorState({ onRetry, labels = RESUME_LABELS }: { onRetry: () => void; labels?: DocLabels }) {
   return (
     <div role="alert" className="flex flex-col items-center px-4 py-20 text-center">
-      <h2 className="m-0 text-xl font-semibold tracking-[-0.02em]">We could not load your resumes</h2>
+      <h2 className="m-0 text-xl font-semibold tracking-[-0.02em]">{labels.errorTitle}</h2>
       <p className="l-muted m-0 mt-2 max-w-sm">Check your connection and try again.</p>
       <button type="button" className="l-btn l-btn--ghost mt-6" onClick={onRetry}>
         Retry

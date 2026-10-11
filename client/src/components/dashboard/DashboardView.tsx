@@ -4,7 +4,8 @@ import DashboardHeader from './DashboardHeader';
 import ResumeCard from './ResumeCard';
 import ResumeTable from './ResumeTable';
 import { EmptyState, ErrorState, ResumeSkeleton } from './DashboardStates';
-import type { DashboardStatus, ResumeHandlers, ViewMode } from './types';
+import { RESUME_LABELS } from './labels';
+import type { DashboardStatus, DocLabels, ResumeHandlers, ViewMode } from './types';
 
 export interface DashboardViewProps extends ResumeHandlers {
   resumes: ResumeSummary[];
@@ -14,6 +15,7 @@ export interface DashboardViewProps extends ResumeHandlers {
   onViewModeChange: (mode: ViewMode) => void;
   onCreate: () => void;
   onRetry: () => void;
+  labels?: DocLabels;
 }
 
 export default function DashboardView({
@@ -28,6 +30,7 @@ export default function DashboardView({
   onClone,
   onRename,
   onDelete,
+  labels = RESUME_LABELS,
 }: DashboardViewProps) {
   const handlers = { onEdit, onClone, onRename, onDelete };
 
@@ -38,11 +41,12 @@ export default function DashboardView({
         viewMode={viewMode}
         onViewModeChange={onViewModeChange}
         onCreate={onCreate}
+        labels={labels}
       />
 
-      {status === 'loading' && <ResumeSkeleton viewMode={viewMode} />}
-      {status === 'error' && <ErrorState onRetry={onRetry} />}
-      {status === 'ready' && resumes.length === 0 && <EmptyState onCreate={onCreate} />}
+      {status === 'loading' && <ResumeSkeleton viewMode={viewMode} labels={labels} />}
+      {status === 'error' && <ErrorState onRetry={onRetry} labels={labels} />}
+      {status === 'ready' && resumes.length === 0 && <EmptyState onCreate={onCreate} labels={labels} />}
 
       {status === 'ready' && resumes.length > 0 && viewMode === 'grid' && (
         <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-4 p-0">
@@ -54,14 +58,14 @@ export default function DashboardView({
           <li>
             <button type="button" className="app-newtile" onClick={onCreate}>
               <Plus aria-hidden="true" className="size-5" />
-              New resume
+              {labels.newButton}
             </button>
           </li>
         </ul>
       )}
 
       {status === 'ready' && resumes.length > 0 && viewMode === 'list' && (
-        <ResumeTable resumes={resumes} pendingEditId={pendingEditId} {...handlers} />
+        <ResumeTable resumes={resumes} pendingEditId={pendingEditId} labels={labels} {...handlers} />
       )}
     </div>
   );

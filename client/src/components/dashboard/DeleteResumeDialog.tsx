@@ -1,23 +1,24 @@
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from '@/components/ui/dialog';
+import { RESUME_LABELS } from './labels';
+import type { DocLabels } from './types';
 
 interface DeleteResumeDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
   onCancel: () => void;
   onConfirm: () => void;
+  labels?: DocLabels;
 }
 
-export default function DeleteResumeDialog({ open, onOpenChange, onCancel, onConfirm }: DeleteResumeDialogProps) {
+export default function DeleteResumeDialog({ open, onOpenChange, onCancel, onConfirm, labels = RESUME_LABELS }: DeleteResumeDialogProps) {
   return (
     <Dialog open={open} onOpenChange={onOpenChange}>
       <DialogContent>
         <DialogHeader>
-          <DialogTitle>Delete Resume?</DialogTitle>
+          <DialogTitle>{labels.deleteTitle}</DialogTitle>
         </DialogHeader>
-        <DialogDescription>
-          Are you sure you want to delete this resume? This action cannot be undone.
-        </DialogDescription>
+        <DialogDescription>{labels.deleteDescription}</DialogDescription>
         <DialogFooter>
           <Button variant="outline" onClick={onCancel}>
             Cancel

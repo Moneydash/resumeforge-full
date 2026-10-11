@@ -3,17 +3,19 @@ import type { ResumeSummary } from '@/types';
 import { TEMPLATE_THUMBS } from '@/utils/template-thumbs';
 import { formatDateDisplay, formatTemplateName } from '@/utils/helper';
 import ResumeActionsMenu from './ResumeActionsMenu';
-import type { ResumeHandlers } from './types';
+import { RESUME_LABELS } from './labels';
+import type { DocLabels, ResumeHandlers } from './types';
 
 interface ResumeTableProps extends ResumeHandlers {
   resumes: ResumeSummary[];
   pendingEditId: string | null;
+  labels?: DocLabels;
 }
 
-export default function ResumeTable({ resumes, pendingEditId, onEdit, onClone, onRename, onDelete }: ResumeTableProps) {
+export default function ResumeTable({ resumes, pendingEditId, onEdit, onClone, onRename, onDelete, labels = RESUME_LABELS }: ResumeTableProps) {
   return (
     <table className="app-table">
-      <caption className="sr-only">Your resumes</caption>
+      <caption className="sr-only">{labels.tableCaption}</caption>
       <thead>
         <tr>
           <th scope="col" className="w-16">

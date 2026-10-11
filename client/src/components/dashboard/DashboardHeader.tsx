@@ -1,20 +1,22 @@
 import { Grid3X3, List, Plus } from 'lucide-react';
-import type { ViewMode } from './types';
+import { RESUME_LABELS } from './labels';
+import type { DocLabels, ViewMode } from './types';
 
 interface DashboardHeaderProps {
   count: number | null;
   viewMode: ViewMode;
   onViewModeChange: (mode: ViewMode) => void;
   onCreate: () => void;
+  labels?: DocLabels;
 }
 
-export default function DashboardHeader({ count, viewMode, onViewModeChange, onCreate }: DashboardHeaderProps) {
+export default function DashboardHeader({ count, viewMode, onViewModeChange, onCreate, labels = RESUME_LABELS }: DashboardHeaderProps) {
   return (
     <div className="mb-8 flex flex-wrap items-end justify-between gap-4">
       <div>
-        <h1 className="app-title m-0">Resumes</h1>
+        <h1 className="app-title m-0">{labels.title}</h1>
         <p className="l-muted m-0 mt-1 text-sm">
-          {count === null ? ' ' : `${count} ${count === 1 ? 'resume' : 'resumes'}`}
+          {count === null ? ' ' : `${count} ${count === 1 ? labels.singular : labels.plural}`}
         </p>
       </div>
       <div className="flex items-center gap-3">
@@ -28,7 +30,7 @@ export default function DashboardHeader({ count, viewMode, onViewModeChange, onC
         </div>
         <button type="button" className="l-btn l-btn--primary" onClick={onCreate}>
           <Plus aria-hidden="true" className="size-4" />
-          New resume
+          {labels.newButton}
         </button>
       </div>
     </div>
