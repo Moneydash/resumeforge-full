@@ -295,7 +295,7 @@ resumeforge/
 │   │   │       ├── hermes.tsx
 │   │   │       └── zeus.tsx
 │   │   ├── 📁 ui/               # Shadcn/UI components
-│   │   ├── TemplateCard.tsx     # Template selection card with background images
+│   │   ├── template-picker/     # Template picker pieces (card, collection filter, view)
 │   │   ├── ResumeForm.tsx       # Main resume editing form
 │   │   └── ...
 │   ├── 📁 contexts/             # React context providers
