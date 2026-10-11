@@ -49,6 +49,7 @@ New files:
 - `client/src/components/LogoutDialog.tsx`: the confirm dialog extracted from [LogoutButton.tsx](../../../client/src/components/LogoutButton.tsx). The floating `LogoutButton` keeps its look and behavior; the sidebar's Log out item opens the same dialog.
 - `client/src/hooks/usePendingNavigation.ts`: `go(key, to, message)` navigates immediately and exposes `pendingKey`; shows a loading toast with an id and dismisses it on unmount. Used by the sidebar and the Edit buttons.
 - `client/src/components/dashboard/`: `DashboardView`, `DashboardHeader`, `ResumeCard`, `ResumeTable`, `ResumeActionsMenu`, `ResumeFormDialog`, `DeleteResumeDialog`, `DashboardStates` (skeleton, empty, error).
+- `client/src/routes.tsx`: one added condition hides the global fixed `Footer` on `/dashboard` (it would overlap the sidebar). `/cl-dashboard` keeps its footer.
 - `client/src/styles/dashboard.css`: only the sidebar, card and table classes; everything else reuses landing tokens and helpers.
 
 **Data flow:** the zustand stores are unchanged. A local `status` of `loading | ready | error` is set by the **initial** fetch only, so a failed refresh after a delete, clone or rename never replaces the list with the error screen. Thumbnails come from `TEMPLATE_THUMBS` (`utils/template-thumbs.ts`), not the large snapshots. Names, template labels and dates keep using `formatTemplateName` and `formatDateDisplay`.
