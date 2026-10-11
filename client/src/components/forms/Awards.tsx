@@ -33,10 +33,10 @@ import { Input } from "../ui/input";
 import MonthPicker from "../MonthPicker";
 import { Textarea } from "../ui/textarea";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface AwardFieldsComponentInterface {
-  sectionDivClasses: string;
-  sectionHeaderClasses: string;
+  controls: SectionControls;
   appendAward: UseFieldArrayAppend<ResumeFormData>;
   addButtonClasses: string;
   awardFields: FieldArrayWithId<ResumeFormData, "awards", "id">[];
@@ -275,8 +275,7 @@ const SortableAwardCard: React.FC<SortableAwardCardProps> = ({
 };
 
 const AwardFieldsComponent: React.FC<AwardFieldsComponentInterface> = ({
-  sectionDivClasses,
-  sectionHeaderClasses,
+  controls,
   appendAward,
   addButtonClasses,
   awardFields,
@@ -320,49 +319,54 @@ const AwardFieldsComponent: React.FC<AwardFieldsComponentInterface> = ({
   return (
     <>
       <div className="space-y-4">
-        <div className={`${sectionDivClasses} flex justify-between items-center`}>
-          <h2 className={sectionHeaderClasses}>Awards & Achievements</h2>
-          <button
-            type="button"
-            onClick={() => appendAward({ title: '', date: '', description: '' })}
-            className={addButtonClasses}
+        <SectionHeader
+          title="Awards & Achievements"
+          controls={controls}
+          actions={
+            <button
+              type="button"
+              onClick={() => appendAward({ title: '', date: '', description: '' })}
+              className={addButtonClasses}
+            >
+              <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Award
+            </button>
+          }
+        />
+        <SectionBody collapsed={controls.collapsed} hidden={controls.hidden}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Award
-          </button>
-        </div>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={awardFields.map(field => field.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-4">
-              {awardFields.map((field, index) => (
-                <SortableAwardCard
-                  key={field.id}
-                  field={field}
-                  index={index}
-                  cardClasses={cardClasses}
-                  removeAward={removeAward}
-                  removeButtonClasses={removeButtonClasses}
-                  inputClasses={inputClasses}
-                  register={register}
-                  labelClasses={labelClasses}
-                  errors={errors}
-                  control={control}
-                  isEditing={editingIndex === index}
-                  setIsEditing={setIsEditing}
-                  watch={watch}
-                  onSave={() => forceUpdate(n => n + 1)}
-                  setValue={setValue}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={awardFields.map(field => field.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {awardFields.map((field, index) => (
+                  <SortableAwardCard
+                    key={field.id}
+                    field={field}
+                    index={index}
+                    cardClasses={cardClasses}
+                    removeAward={removeAward}
+                    removeButtonClasses={removeButtonClasses}
+                    inputClasses={inputClasses}
+                    register={register}
+                    labelClasses={labelClasses}
+                    errors={errors}
+                    control={control}
+                    isEditing={editingIndex === index}
+                    setIsEditing={setIsEditing}
+                    watch={watch}
+                    onSave={() => forceUpdate(n => n + 1)}
+                    setValue={setValue}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </SectionBody>
       </div>
     </>
   );

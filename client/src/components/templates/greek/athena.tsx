@@ -2,11 +2,13 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import AthenaCss from "@/styles/templates/greek/athena.css?inline";
-import { getRenderColumns } from "@/utils/section-layout";
+import { getRenderColumns, getVisibleSocials } from "@/utils/section-layout";
+import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 import { buildMainVariants, buildSidebarVariants } from "@/components/templates/column-variants";
 
 const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
+  const t = titlesFor('athena', data);
   const personalSection = (
     <>
       <div className="sidebar-header">
@@ -24,7 +26,7 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const educSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Education</div>
+      <div className={t.cls("sidebar-section-title", "education")}>{t.text("education")}</div>
       {data?.education
         ?.filter(ed => !ed.hidden)
         ?.map((edu, i) => (
@@ -40,7 +42,7 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const skillSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Skills</div>
+      <div className={t.cls("sidebar-section-title", "skills")}>{t.text("skills")}</div>
       <div className="sidebar-skills">
         {data?.skills
           ?.filter(s => !s.hidden)
@@ -61,7 +63,7 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const projSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Key Projects</div>
+      <div className={t.cls("sidebar-section-title", "projects")}>{t.text("projects")}</div>
       {data?.projects
         ?.filter(proj => !proj.hidden)
         ?.map((proj, i) => (
@@ -81,7 +83,7 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const certSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Certifications</div>
+      <div className={t.cls("sidebar-section-title", "certifications")}>{t.text("certifications")}</div>
       {data?.certifications
         ?.filter(cert => !cert.hidden)
         ?.map((cert, i) => (
@@ -97,7 +99,7 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const awardsSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Awards</div>
+      <div className={t.cls("sidebar-section-title", "awards")}>{t.text("awards")}</div>
       {data?.awards
         ?.filter(award => !award.hidden)
         ?.map((award, i) => (
@@ -112,7 +114,7 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const langSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Languages</div>
+      <div className={t.cls("sidebar-section-title", "languages")}>{t.text("languages")}</div>
       <div className="sidebar-languages">
         {data?.languages?.map((lang, i) => (
           <span className="sidebar-language-tag" key={i}>{lang}</span>
@@ -123,9 +125,9 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const socialSection = (
     <div className="main-section">
-      <div className="main-section-title">Professional Links</div>
+      <div className={t.cls("main-section-title", "socials")}>{t.text("socials")}</div>
       <div className="main-socials">
-        {data?.socials?.map((social, i) => (
+        {getVisibleSocials(data).map((social, i) => (
           <a href={social?.link} className="main-social-link" key={i}><i className={`fab fa-${social?.slug} fa-lg`}></i></a>
         ))}
       </div>
@@ -134,14 +136,14 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const aboutSection = (
     <div className="main-section">
-      <div className="main-section-title">Professional Summary</div>
+      <div className={t.cls("main-section-title", "summary")}>{t.text("summary")}</div>
       <div className="main-summary">{data?.summary}</div>
     </div>
   );
 
   const expSection = (
     <div className="main-section">
-      <div className="main-section-title">Professional Experience</div>
+      <div className={t.cls("main-section-title", "experience")}>{t.text("experience")}</div>
       {data?.experience
         ?.filter(exp => !exp.hidden)
         ?.map((exp, i) => (
@@ -162,7 +164,7 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const refSection = (
     <div className="main-section">
-      <div className="main-section-title">References</div>
+      <div className={t.cls("main-section-title", "references")}>{t.text("references")}</div>
       {data?.references
         ?.filter(r => !r.hidden)
         ?.map((reference, i) => (
@@ -180,24 +182,15 @@ const AthenaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const columns = getRenderColumns('athena', data);
   // a section dragged to the other column needs that column's markup/classes, see column-variants.tsx
-  const titles = {
-    education: 'Education',
-    skills: 'Skills',
-    projects: 'Key Projects',
-    certifications: 'Certifications',
-    awards: 'Awards',
-    languages: 'Languages',
-    references: 'References',
-  };
   const mainSections: SectionMap = {
-    ...buildMainVariants(data, titles),
+    ...buildMainVariants(data, t),
     socials: socialSection,
     summary: aboutSection,
     experience: expSection,
     references: refSection,
   };
   const sidebarSections: SectionMap = {
-    ...buildSidebarVariants(data, titles),
+    ...buildSidebarVariants(data, t),
     education: educSection,
     skills: skillSection,
     projects: projSection,

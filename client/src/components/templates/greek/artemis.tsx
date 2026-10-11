@@ -2,14 +2,16 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import ArtemisCss from "@/styles/templates/greek/artemis.css?inline";
-import { getRenderColumns } from "@/utils/section-layout";
+import { getRenderColumns, getVisibleSocials } from "@/utils/section-layout";
+import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 import { buildMainVariants, buildSidebarVariants } from "@/components/templates/column-variants";
 
 const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
+  const t = titlesFor('artemis', data);
   const socialSection = (
     <div className="social-links">
-      {data?.socials?.map((soc, i) => (
+      {getVisibleSocials(data).map((soc, i) => (
         <a href={soc?.link} target="_blank" key={i}><i className={`fab fa-${soc?.slug}`}></i></a>
       ))}
     </div>
@@ -17,14 +19,14 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const summarySection = (
     <div className="main-section">
-      <div className="main-section-title">Summary</div>
+      <div className={t.cls("main-section-title", "summary")}>{t.text("summary")}</div>
       <div className="main-summary">{data?.summary}</div>
     </div>
   );
 
   const expSection = (
     <div className="main-section">
-      <div className="main-section-title">Experience</div>
+      <div className={t.cls("main-section-title", "experience")}>{t.text("experience")}</div>
       {data?.experience
         ?.filter(i => !i.hidden)
         ?.map((exp, i) => (
@@ -45,7 +47,7 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const refSection = (
     <div className="main-section">
-      <div className="main-section-title">References</div>
+      <div className={t.cls("main-section-title", "references")}>{t.text("references")}</div>
       {data?.references
         ?.filter(i => !i.hidden)
         ?.map((reference, i) => (
@@ -73,7 +75,7 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const educSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Education</div>
+      <div className={t.cls("sidebar-section-title", "education")}>{t.text("education")}</div>
       {data?.education
         ?.filter(i => !i.hidden)
         ?.map((edu, i) => (
@@ -89,7 +91,7 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const skillSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Skills</div>
+      <div className={t.cls("sidebar-section-title", "skills")}>{t.text("skills")}</div>
       <div className="sidebar-skills">
         {data?.skills
           ?.filter(i => !i.hidden)
@@ -105,7 +107,7 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const projSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Projects</div>
+      <div className={t.cls("sidebar-section-title", "projects")}>{t.text("projects")}</div>
       {data?.projects
         ?.filter(i => !i.hidden)
         ?.map((proj, i) => (
@@ -121,7 +123,7 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const certSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Certifications</div>
+      <div className={t.cls("sidebar-section-title", "certifications")}>{t.text("certifications")}</div>
       {data?.certifications
         ?.filter(i => !i.hidden)
         ?.map((cert, i) => (
@@ -137,7 +139,7 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const awardsSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Awards</div>
+      <div className={t.cls("sidebar-section-title", "awards")}>{t.text("awards")}</div>
       {data?.awards
         ?.filter(i => !i.hidden)
         ?.map((award, i) => (
@@ -153,7 +155,7 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const langSection = (
     <div className="sidebar-section">
-      <div className="sidebar-section-title">Languages</div>
+      <div className={t.cls("sidebar-section-title", "languages")}>{t.text("languages")}</div>
       <div className="sidebar-languages">
         {data?.languages?.map((lang, i) => (
           <span className="language-tag" key={i}>{lang}</span>
@@ -164,23 +166,14 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const columns = getRenderColumns('artemis', data);
   // a section dragged to the other column needs that column's markup/classes, see column-variants.tsx
-  const titles = {
-    education: 'Education',
-    skills: 'Skills',
-    projects: 'Projects',
-    certifications: 'Certifications',
-    awards: 'Awards',
-    languages: 'Languages',
-    references: 'References',
-  };
   const mainSections: SectionMap = {
-    ...buildMainVariants(data, titles),
+    ...buildMainVariants(data, t),
     summary: summarySection,
     experience: expSection,
     references: refSection,
   };
   const sidebarSections: SectionMap = {
-    ...buildSidebarVariants(data, titles),
+    ...buildSidebarVariants(data, t),
     education: educSection,
     skills: skillSection,
     projects: projSection,
@@ -214,7 +207,7 @@ const ArtemisTemplate: React.FC<TemplateProps> = ({ data }) => {
               <div className="resume-header-content">
                 <div className="resume-header-name">{data?.personal?.name}</div>
                 <div className="resume-header-title">{data?.personal?.headline}</div>
-                {data?.socials && data?.socials?.length >= 1 && socialSection}
+                {getVisibleSocials(data).length >= 1 && socialSection}
               </div>
             </div>
             {mainSection}

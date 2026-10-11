@@ -1,0 +1,65 @@
+import React from "react";
+import { ChevronDown, ChevronRight, Eye, EyeOff } from "lucide-react";
+import { sectionDivClasses, sectionHeaderClasses } from "@/styles/form-classes";
+
+/** What every section form needs to show its two toggles; supplied by ResumeForm. */
+export interface SectionControls {
+  /** Parent toggle is off: the whole section is left out of the resume. */
+  hidden: boolean;
+  /** Form-only view state: the section's fields are folded away. */
+  collapsed: boolean;
+  onToggleHidden: () => void;
+  onToggleCollapsed: () => void;
+}
+
+interface SectionHeaderProps {
+  title: string;
+  controls: SectionControls;
+  /** Buttons that belong to the section itself, e.g. "Add Award". */
+  actions?: React.ReactNode;
+}
+
+const iconButtonClasses = "p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300";
+
+export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, controls, actions }) => {
+  const { hidden, collapsed, onToggleHidden, onToggleCollapsed } = controls;
+  return (
+    <div className={`${sectionDivClasses} flex justify-between items-center gap-2`}>
+      <div className="flex items-center gap-1 min-w-0">
+        <button
+          type="button"
+          onClick={onToggleCollapsed}
+          aria-expanded={!collapsed}
+          aria-label={`${collapsed ? 'Expand' : 'Collapse'} ${title}`}
+          title={collapsed ? 'Expand section' : 'Collapse section'}
+          className={iconButtonClasses}
+        >
+          {collapsed ? <ChevronRight size={18} /> : <ChevronDown size={18} />}
+        </button>
+        <h2 className={`${sectionHeaderClasses} ${hidden ? 'opacity-50' : ''}`}>{title}</h2>
+      </div>
+      <div className="flex items-center gap-2">
+        {!collapsed && actions}
+        <button
+          type="button"
+          onClick={onToggleHidden}
+          aria-pressed={hidden}
+          aria-label={hidden ? `Show ${title} on resume` : `Hide ${title} from resume`}
+          title={hidden ? 'Show section on resume' : 'Hide section from resume'}
+          className={`${iconButtonClasses} mb-1.5`}
+        >
+          {hidden ? <EyeOff size={18} /> : <Eye size={18} />}
+        </button>
+      </div>
+    </div>
+  );
+};
+
+/** Content stays mounted while collapsed so react-hook-form keeps its inputs and errors. */
+export const SectionBody: React.FC<{ collapsed: boolean; hidden?: boolean; className?: string; children: React.ReactNode }> = ({
+  collapsed, hidden = false, className = '', children,
+}) => (
+  <div hidden={collapsed} className={`${hidden ? 'opacity-50' : ''} ${className}`.trim() || undefined}>
+    {children}
+  </div>
+);

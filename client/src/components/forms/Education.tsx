@@ -32,10 +32,10 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import MonthPicker from "../MonthPicker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface EducationFieldsComponentInterface {
-  sectionDivClasses: string;
-  sectionHeaderClasses: string;
+  controls: SectionControls;
   appendEducation: UseFieldArrayAppend<ResumeFormData>;
   addButtonClasses: string;
   educationFields: FieldArrayWithId<ResumeFormData, "education", "id">[];
@@ -293,8 +293,7 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
 };
 
 const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
-  sectionDivClasses,
-  sectionHeaderClasses,
+  controls,
   appendEducation,
   addButtonClasses,
   educationFields,
@@ -338,49 +337,54 @@ const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
   return (
     <>
       <div className="space-y-4">
-        <div className={`${sectionDivClasses} flex justify-between items-center`}>
-          <h2 className={sectionHeaderClasses}>Education</h2>
-          <button
-            type="button"
-            onClick={() => appendEducation({ degree: '', institution: '', startDate: '', endDate: '', hidden: false })}
-            className={addButtonClasses}
+        <SectionHeader
+          title="Education"
+          controls={controls}
+          actions={
+            <button
+              type="button"
+              onClick={() => appendEducation({ degree: '', institution: '', startDate: '', endDate: '', hidden: false })}
+              className={addButtonClasses}
+            >
+              <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Education
+            </button>
+          }
+        />
+        <SectionBody collapsed={controls.collapsed} hidden={controls.hidden}>
+          <DndContext
+            sensors={sensors}
+            collisionDetection={closestCenter}
+            onDragEnd={handleDragEnd}
           >
-            <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Education
-          </button>
-        </div>
-        <DndContext
-          sensors={sensors}
-          collisionDetection={closestCenter}
-          onDragEnd={handleDragEnd}
-        >
-          <SortableContext
-            items={educationFields.map(field => field.id)}
-            strategy={verticalListSortingStrategy}
-          >
-            <div className="space-y-4">
-              {educationFields.map((field, index) => (
-                <SortableEducationCard
-                  key={field.id}
-                  field={field}
-                  index={index}
-                  cardClasses={cardClasses}
-                  removeEducation={removeEducation}
-                  removeButtonClasses={removeButtonClasses}
-                  inputClasses={inputClasses}
-                  register={register}
-                  labelClasses={labelClasses}
-                  errors={errors}
-                  control={control}
-                  isEditing={editingIndex === index}
-                  setIsEditing={setIsEditing}
-                  watch={watch}
-                  onSave={() => forceUpdate((n: number) => n + 1)}
-                  setValue={setValue}
-                />
-              ))}
-            </div>
-          </SortableContext>
-        </DndContext>
+            <SortableContext
+              items={educationFields.map(field => field.id)}
+              strategy={verticalListSortingStrategy}
+            >
+              <div className="space-y-4">
+                {educationFields.map((field, index) => (
+                  <SortableEducationCard
+                    key={field.id}
+                    field={field}
+                    index={index}
+                    cardClasses={cardClasses}
+                    removeEducation={removeEducation}
+                    removeButtonClasses={removeButtonClasses}
+                    inputClasses={inputClasses}
+                    register={register}
+                    labelClasses={labelClasses}
+                    errors={errors}
+                    control={control}
+                    isEditing={editingIndex === index}
+                    setIsEditing={setIsEditing}
+                    watch={watch}
+                    onSave={() => forceUpdate((n: number) => n + 1)}
+                    setValue={setValue}
+                  />
+                ))}
+              </div>
+            </SortableContext>
+          </DndContext>
+        </SectionBody>
       </div>
     </>
   );

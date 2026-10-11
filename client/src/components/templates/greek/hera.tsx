@@ -2,13 +2,15 @@ import { parseMonthYear } from "@/utils/helper";
 import React from "react";
 import type { TemplateProps } from "@/types";
 import cigarCss from "@/styles/templates/greek/hera.css?inline";
-import { getRenderColumns } from "@/utils/section-layout";
+import { getRenderColumns, getVisibleSocials } from "@/utils/section-layout";
+import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
 
 const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
+  const t = titlesFor('hera', data);
   const aboutSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">Summary</h2>
+      <h2 className={t.cls("classic-section-title", "summary")}>{t.text("summary")}</h2>
       <div className="classic-summary">
         {data?.summary || '-'}
       </div>
@@ -17,7 +19,7 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const expSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">Work Experience</h2>
+      <h2 className={t.cls("classic-section-title", "experience")}>{t.text("experience")}</h2>
       {data?.experience
         ?.filter(exp => !exp.hidden)
         ?.map((exp, i) => (
@@ -36,7 +38,7 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const educSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">Education</h2>
+      <h2 className={t.cls("classic-section-title", "education")}>{t.text("education")}</h2>
       {data?.education
         ?.filter(ed => !ed.hidden)
         ?.map((educ, i) => (
@@ -54,7 +56,7 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const projSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">Projects</h2>
+      <h2 className={t.cls("classic-section-title", "projects")}>{t.text("projects")}</h2>
       {data?.projects
         ?.filter(proj => !proj.hidden)
         ?.map((proj, i) => (
@@ -72,7 +74,7 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const skillSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">Skills</h2>
+      <h2 className={t.cls("classic-section-title", "skills")}>{t.text("skills")}</h2>
       <div className="classic-skills-grid">
         {data?.skills?.filter(skill => !skill.hidden)?.map((skill) =>
           skill?.keywords?.map((keyword, j) => (
@@ -85,14 +87,14 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const langSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">Languages</h2>
+      <h2 className={t.cls("classic-section-title", "languages")}>{t.text("languages")}</h2>
       <div className="classic-languages">{data?.languages?.join(" • ")}</div>
     </section>
   );
 
   const interestsSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">Interests</h2>
+      <h2 className={t.cls("classic-section-title", "interests")}>{t.text("interests")}</h2>
       <div className="classic-interests-grid">
         {data?.interests?.map((interest, i) => (
           <div key={i} className="classic-interest-item">• {interest}</div>
@@ -103,7 +105,7 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const certSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">Certifications</h2>
+      <h2 className={t.cls("classic-section-title", "certifications")}>{t.text("certifications")}</h2>
       {data?.certifications
         ?.filter(cert => !cert.hidden)
         ?.map((cert, i) => (
@@ -120,7 +122,7 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const awardsSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">Awards</h2>
+      <h2 className={t.cls("classic-section-title", "awards")}>{t.text("awards")}</h2>
       {data?.awards
         ?.filter(award => !award.hidden)
         ?.map((award, i) => (
@@ -138,7 +140,7 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const refSection = (
     <section className="classic-section">
-      <h2 className="classic-section-title">References</h2>
+      <h2 className={t.cls("classic-section-title", "references")}>{t.text("references")}</h2>
       {data?.references
         ?.filter(reference => !reference.hidden)
         ?.map((reference, i) => (
@@ -183,7 +185,7 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
             <span><a href={data.personal?.website?.link}>{data.personal?.website?.name}</a></span>
           </div>
           <div className="classic-socials">
-            {data.socials?.map((social, i) => (
+            {getVisibleSocials(data).map((social, i) => (
               <a key={i} href={social.link}><i className={`fab fa-${social.slug} fa-lg`}></i></a>
             ))}
           </div>

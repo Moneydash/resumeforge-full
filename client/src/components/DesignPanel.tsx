@@ -9,6 +9,7 @@ import { ensurePickerFontsLoaded } from "@/utils/load-picker-fonts";
 import type { TemplateType } from "@/types";
 import type { ResumeFormData } from "@/types/interface.resume-form-data";
 import type { SectionLayout } from "@/utils/section-layout";
+import type { SectionTitles } from "@/utils/section-titles";
 import type { ColorTemplate, ColorTheme } from "@/utils/color-theme";
 import {
   TEMPLATE_DEFAULT_FONT,
@@ -20,7 +21,7 @@ import {
 } from "@/utils/fonts";
 
 /** Width of the right-hand panel in px. The preview pages subtract it from the preview area, so keep them in sync through this constant. */
-export const DESIGN_PANEL_WIDTH = 360;
+export const DESIGN_PANEL_WIDTH = 420;
 
 export type DesignTab = "sections" | "font" | "color" | "templates";
 
@@ -38,6 +39,9 @@ interface DesignPanelProps {
     data: ResumeFormData;
     layout: SectionLayout | undefined;
     onChange: (layout: SectionLayout | undefined) => void;
+    /** Headings the user typed for the resume; they follow the user across templates. */
+    titles: SectionTitles | undefined;
+    onTitlesChange: (titles: SectionTitles | undefined) => void;
   };
   /** Themeable resume templates only (Andromeda, Athena, Zeus, Artemis). */
   color?: {
@@ -112,7 +116,7 @@ const DesignPanel: React.FC<DesignPanelProps> = ({ tab, onTabChange, onClose, is
       )}
 
       {active === "sections" && sections ? (
-        <SectionOrderPanel template={sections.template} data={sections.data} layout={sections.layout} onChange={sections.onChange} />
+        <SectionOrderPanel template={sections.template} data={sections.data} layout={sections.layout} onChange={sections.onChange} titles={sections.titles} onTitlesChange={sections.onTitlesChange} />
       ) : active === "color" && color ? (
         <ColorPanel template={color.template} theme={color.theme} onChange={color.onChange} isDarkMode={isDarkMode} />
       ) : active === "templates" && templates ? (
