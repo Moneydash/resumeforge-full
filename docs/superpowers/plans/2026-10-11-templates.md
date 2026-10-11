@@ -42,8 +42,8 @@ All paths are relative to the repo root. Run client commands from `client/`.
 
 **Files:**
 - Create: `client/src/assets/template-previews/<id>.jpg` (10 files: `andromeda`, `cigar`, `comet`, `milky_way`, `apollo`, `artemis`, `athena`, `hera`, `hermes`, `zeus`)
-- Create: `client/src/components/templates/template-previews.ts`
-- Test (temporary, never committed): `client/src/components/templates/template-previews.test.ts`
+- Create: `client/src/components/template-picker/template-previews.ts`
+- Test (temporary, never committed): `client/src/components/template-picker/template-previews.test.ts`
 - Scratch (outside the repo, in the session scratchpad directory): `make_previews.py`
 
 **Interfaces:**
@@ -51,7 +51,7 @@ All paths are relative to the repo root. Run client commands from `client/`.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `client/src/components/templates/template-previews.test.ts`:
+Create `client/src/components/template-picker/template-previews.test.ts`:
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -83,7 +83,7 @@ describe('template previews', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run (from `client/`): `npx vitest run src/components/templates/template-previews.test.ts`
+Run (from `client/`): `npx vitest run src/components/template-picker/template-previews.test.ts`
 Expected: FAIL, "Failed to resolve import './template-previews'".
 
 - [ ] **Step 3: Generate the previews**
@@ -127,7 +127,7 @@ print(f"total {total / 1024:.0f} KB (was about 7 MB of snapshots)")
 
 Expected: ten lines, each `560x<height>` (a snapshot narrower than 560px would keep its own width; if that happens, note it in the ledger), each size well under 200 KB, a total well under 1 MB.
 
-- [ ] **Step 4: Create `client/src/components/templates/template-previews.ts`**
+- [ ] **Step 4: Create `client/src/components/template-picker/template-previews.ts`**
 
 ```ts
 // Medium previews (about 560px wide, generated from the full-size snapshots) for the template picker.
@@ -158,7 +158,7 @@ export const TEMPLATE_PREVIEWS: Record<string, string> = {
 
 - [ ] **Step 5: Run test and type-check**
 
-Run (from `client/`): `npx vitest run src/components/templates && npx tsc -b`
+Run (from `client/`): `npx vitest run src/components/template-picker && npx tsc -b`
 Expected: 2 tests PASS; tsc exit 0.
 
 - [ ] **Step 6: Check dimensions with a script (Review Focus 4)**
@@ -169,7 +169,7 @@ Expected: ten lines, every width `560`.
 - [ ] **Step 7: Commit (explicit paths; the test file is never staged)**
 
 ```bash
-git add client/src/assets/template-previews client/src/components/templates/template-previews.ts
+git add client/src/assets/template-previews client/src/components/template-picker/template-previews.ts
 git commit -m "$(cat <<'EOF'
 feat(templates): add medium template previews
 
@@ -183,15 +183,15 @@ EOF
 ### Task 2: Collection grouping
 
 **Files:**
-- Create: `client/src/components/templates/collections.ts`
-- Test (temporary, never committed): `client/src/components/templates/collections.test.ts`
+- Create: `client/src/components/template-picker/collections.ts`
+- Test (temporary, never committed): `client/src/components/template-picker/collections.test.ts`
 
 **Interfaces:**
 - Produces: `type CollectionFilterId = 'all' | 'galaxy' | 'greek'`; `COLLECTIONS: readonly { id: 'galaxy' | 'greek'; filterLabel: string; heading: string }[]`; `interface TemplateGroup { id: 'galaxy' | 'greek'; heading: string; templates: Template[] }`; `groupTemplates(templates: Template[], selected: CollectionFilterId): TemplateGroup[]`; `filterCounts(templates: Template[]): Record<CollectionFilterId, number>`.
 
 - [ ] **Step 1: Write the failing test**
 
-Create `client/src/components/templates/collections.test.ts`:
+Create `client/src/components/template-picker/collections.test.ts`:
 
 ```ts
 import { describe, expect, it } from 'vitest';
@@ -245,10 +245,10 @@ describe('COLLECTIONS', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run (from `client/`): `npx vitest run src/components/templates/collections.test.ts`
+Run (from `client/`): `npx vitest run src/components/template-picker/collections.test.ts`
 Expected: FAIL, "Failed to resolve import './collections'".
 
-- [ ] **Step 3: Create `client/src/components/templates/collections.ts`**
+- [ ] **Step 3: Create `client/src/components/template-picker/collections.ts`**
 
 ```ts
 import type { Template } from '@/types';
@@ -288,13 +288,13 @@ export function filterCounts(templates: Template[]): Record<CollectionFilterId, 
 
 - [ ] **Step 4: Run tests, type-check and lint**
 
-Run (from `client/`): `npx vitest run src/components/templates && npx tsc -b && npx eslint src/components/templates --ignore-pattern "**/*.test.ts" --ignore-pattern "**/*.test.tsx"`
+Run (from `client/`): `npx vitest run src/components/template-picker && npx tsc -b && npx eslint src/components/template-picker --ignore-pattern "**/*.test.ts" --ignore-pattern "**/*.test.tsx"`
 Expected: all tests PASS; tsc exit 0; eslint prints nothing.
 
 - [ ] **Step 5: Commit**
 
 ```bash
-git add client/src/components/templates/collections.ts
+git add client/src/components/template-picker/collections.ts
 git commit -m "$(cat <<'EOF'
 feat(templates): add collection grouping and counts
 
@@ -436,10 +436,10 @@ EOF
 
 **Files:**
 - Create: `client/src/styles/templates.css`
-- Create: `client/src/components/templates/TemplateCard.tsx`
-- Create: `client/src/components/templates/CollectionFilter.tsx`
-- Create: `client/src/components/templates/TemplatesView.tsx`
-- Test (temporary, never committed): `client/src/components/templates/templates-view.test.tsx`
+- Create: `client/src/components/template-picker/TemplateCard.tsx`
+- Create: `client/src/components/template-picker/CollectionFilter.tsx`
+- Create: `client/src/components/template-picker/TemplatesView.tsx`
+- Test (temporary, never committed): `client/src/components/template-picker/templates-view.test.tsx`
 
 **Interfaces:**
 - Consumes: Task 1 (`TEMPLATE_PREVIEWS`), Task 2 (`CollectionFilterId`, `COLLECTIONS`, `groupTemplates`, `filterCounts`), `Template` from `@/types`, `.app-card`, `.app-seg`, `.app-title`, `.l-*` classes.
@@ -448,7 +448,7 @@ EOF
 
 - [ ] **Step 1: Write the failing test**
 
-Create `client/src/components/templates/templates-view.test.tsx`:
+Create `client/src/components/template-picker/templates-view.test.tsx`:
 
 ```tsx
 import { describe, expect, it } from 'vitest';
@@ -562,7 +562,7 @@ describe('TemplatesView', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run (from `client/`): `npx vitest run src/components/templates/templates-view.test.tsx`
+Run (from `client/`): `npx vitest run src/components/template-picker/templates-view.test.tsx`
 Expected: FAIL, "Failed to resolve import './TemplateCard'".
 
 - [ ] **Step 3: Create `client/src/styles/templates.css`**
@@ -609,7 +609,7 @@ Expected: FAIL, "Failed to resolve import './TemplateCard'".
 .tpl-count { margin-left: 0.375rem; font-variant-numeric: tabular-nums; opacity: 0.7; }
 ```
 
-- [ ] **Step 4: Create `client/src/components/templates/TemplateCard.tsx`**
+- [ ] **Step 4: Create `client/src/components/template-picker/TemplateCard.tsx`**
 
 ```tsx
 import { Loader2 } from 'lucide-react';
@@ -656,7 +656,7 @@ export default function TemplateCard({ template, pending, onSelect }: TemplateCa
 }
 ```
 
-- [ ] **Step 5: Create `client/src/components/templates/CollectionFilter.tsx`**
+- [ ] **Step 5: Create `client/src/components/template-picker/CollectionFilter.tsx`**
 
 ```tsx
 import { COLLECTIONS } from './collections';
@@ -693,7 +693,7 @@ export default function CollectionFilter({ selected, counts, onChange }: Collect
 }
 ```
 
-- [ ] **Step 6: Create `client/src/components/templates/TemplatesView.tsx`**
+- [ ] **Step 6: Create `client/src/components/template-picker/TemplatesView.tsx`**
 
 ```tsx
 import type { Template } from '@/types';
@@ -749,13 +749,13 @@ export default function TemplatesView({ templates, selected, onSelectedChange, p
 
 - [ ] **Step 7: Run tests, type-check and lint**
 
-Run (from `client/`): `npx vitest run src/components/templates && npx tsc -b && npx eslint src/components/templates --ignore-pattern "**/*.test.ts" --ignore-pattern "**/*.test.tsx"`
+Run (from `client/`): `npx vitest run src/components/template-picker && npx tsc -b && npx eslint src/components/template-picker --ignore-pattern "**/*.test.ts" --ignore-pattern "**/*.test.tsx"`
 Expected: all tests PASS; tsc exit 0; eslint prints nothing. (If `>10<` style assertions fail because React inserted comment nodes between a label and its count, keep the count in its own `<span>` as written rather than loosening the test.)
 
 - [ ] **Step 8: Commit**
 
 ```bash
-git add client/src/styles/templates.css client/src/components/templates/TemplateCard.tsx client/src/components/templates/CollectionFilter.tsx client/src/components/templates/TemplatesView.tsx
+git add client/src/styles/templates.css client/src/components/template-picker/TemplateCard.tsx client/src/components/template-picker/CollectionFilter.tsx client/src/components/template-picker/TemplatesView.tsx
 git commit -m "$(cat <<'EOF'
 feat(templates): add template card, collection filter and view
 
@@ -773,7 +773,7 @@ EOF
 - Modify: `client/src/routes.tsx` (one added condition)
 - Delete: `client/src/components/TemplateCard.tsx`
 - Modify: `client/README.md` (one line)
-- Test (temporary, never committed): `client/src/components/templates/templates-page.test.tsx`
+- Test (temporary, never committed): `client/src/components/template-picker/templates-page.test.tsx`
 
 **Interfaces:**
 - Consumes: `TemplatesView`, `CollectionFilterId`, `AppShell`, `usePendingNavigation`, `templates` data, `client` (axios), `Cookies`.
@@ -781,7 +781,7 @@ EOF
 
 - [ ] **Step 1: Write the failing test**
 
-Create `client/src/components/templates/templates-page.test.tsx`:
+Create `client/src/components/template-picker/templates-page.test.tsx`:
 
 ```tsx
 import { afterEach, describe, expect, it, vi } from 'vitest';
@@ -842,7 +842,7 @@ describe('Templates page (first render)', () => {
 
 - [ ] **Step 2: Run test to verify it fails**
 
-Run (from `client/`): `npx vitest run src/components/templates/templates-page.test.tsx`
+Run (from `client/`): `npx vitest run src/components/template-picker/templates-page.test.tsx`
 Expected: FAIL (the old page has no `app-shell`, shows gradients, and renders content without a resume id).
 
 - [ ] **Step 3: Replace `client/src/pages/Templates.tsx` entirely**
@@ -853,8 +853,8 @@ import { useLocation, useNavigate } from 'react-router-dom';
 import Cookies from 'js-cookie';
 import client from '@/api/axiosInstance';
 import AppShell from '@/components/app-shell/AppShell';
-import TemplatesView from '@/components/templates/TemplatesView';
-import type { CollectionFilterId } from '@/components/templates/collections';
+import TemplatesView from '@/components/template-picker/TemplatesView';
+import type { CollectionFilterId } from '@/components/template-picker/collections';
 import { usePendingNavigation } from '@/hooks/usePendingNavigation';
 import templates from '@/utils/templates-type';
 import '@/styles/templates.css';
@@ -931,7 +931,7 @@ Run (from the repo root):
 grep -rn "TemplateCard" -I . --exclude-dir=node_modules --exclude-dir=dist --exclude-dir=.git --exclude-dir=.superpowers | grep -v "CLTemplateCard"
 ```
 
-Expected: the only hits are the old file itself (`client/src/components/TemplateCard.tsx`), the new `client/src/components/templates/TemplateCard.tsx` and its imports in `TemplatesView.tsx`, the line in `client/README.md`, and docs under `docs/superpowers/`. There must be **no** import of `@/components/TemplateCard`, `./TemplateCard` from `components/`, or `../components/TemplateCard` anywhere in `client/src` (`pages/Templates.tsx` no longer imports it after Step 3). If any remaining importer of the old path is found, stop and report it instead of deleting. Then:
+Expected: the only hits are the old file itself (`client/src/components/TemplateCard.tsx`), the new `client/src/components/template-picker/TemplateCard.tsx` and its imports in `TemplatesView.tsx`, the line in `client/README.md`, and docs under `docs/superpowers/`. There must be **no** import of `@/components/TemplateCard`, `./TemplateCard` from `components/`, or `../components/TemplateCard` anywhere in `client/src` (`pages/Templates.tsx` no longer imports it after Step 3). If any remaining importer of the old path is found, stop and report it instead of deleting. Then:
 
 ```bash
 git rm client/src/components/TemplateCard.tsx
@@ -943,7 +943,7 @@ Read `client/README.md` around line 298 (the file tree under `components/`). Rep
 
 - [ ] **Step 7: Type-check, lint, run all temporary tests, build**
 
-Run (from `client/`): `npx tsc -b && npx eslint src/pages/Templates.tsx src/routes.tsx src/components/templates src/components/app-shell --ignore-pattern "**/*.test.ts" --ignore-pattern "**/*.test.tsx" && npx vitest run && npx vite build --outDir node_modules/.tmp/templates-build --emptyOutDir`
+Run (from `client/`): `npx tsc -b && npx eslint src/pages/Templates.tsx src/routes.tsx src/components/template-picker src/components/app-shell --ignore-pattern "**/*.test.ts" --ignore-pattern "**/*.test.tsx" && npx vitest run && npx vite build --outDir node_modules/.tmp/templates-build --emptyOutDir`
 Expected: tsc exit 0; eslint reports at most the one `react-hooks/exhaustive-deps` warning for the `useEffect` in `Templates.tsx` (the same pattern as the old page, which had it too) and no errors; all temporary tests PASS; the build completes and the output no longer contains the ten large snapshot images for this page. Then `rm -rf node_modules/.tmp/templates-build` and run `git status --short` (expect the modified and deleted files only, plus untracked temporary tests).
 
 - [ ] **Step 8: Commit**

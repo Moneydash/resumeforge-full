@@ -43,9 +43,9 @@ Reuses the shared tokens through the existing `.app-shell` scope and the dashboa
 
 `Templates.tsx` stays the container (resume id, redirect, data fetch, selection and navigation) and renders a presentational `TemplatesView` inside `AppShell`.
 
-- `client/src/components/templates/collections.ts`: `COLLECTIONS` (id, filter label, heading) and the pure `groupTemplates(templates, selected)` returning the groups to show (`selected` is `'all' | 'galaxy' | 'greek'`; groups keep the data order and empty groups are dropped).
-- `client/src/components/templates/TemplateCard.tsx`, `CollectionFilter.tsx`, `TemplatesView.tsx`.
-- `client/src/components/templates/template-previews.ts`: maps each template id to its medium preview image.
+- `client/src/components/template-picker/collections.ts`: `COLLECTIONS` (id, filter label, heading) and the pure `groupTemplates(templates, selected)` returning the groups to show (`selected` is `'all' | 'galaxy' | 'greek'`; groups keep the data order and empty groups are dropped).
+- `client/src/components/template-picker/TemplateCard.tsx`, `CollectionFilter.tsx`, `TemplatesView.tsx`.
+- `client/src/components/template-picker/template-previews.ts`: maps each template id to its medium preview image.
 - `client/src/assets/template-previews/<id>.jpg` (10 files): medium previews, about 560px wide JPEG at quality 75, generated once from the existing full-size snapshots with Pillow (cropped to the same aspect as the page's cards by CSS, not by the image). Expected size is roughly 40 to 90 KB each, so the page drops from about 7 MB of images to well under 1 MB, and they load lazily with explicit width and height. The generation command is recorded in the plan; the generated images are committed.
 - `client/src/components/TemplateCard.tsx` (the old card) is deleted: this page was its only importer.
 - `client/src/routes.tsx`: one added condition hides the global fixed `Footer` on `/templates`.
