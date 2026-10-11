@@ -29,3 +29,29 @@ export const SAMPLE_RESUME = {
   projects: 'Open-source command-line tool for validating OpenAPI specs.',
   skills: 'Go · PostgreSQL · Kafka · Docker · AWS',
 } as const;
+
+export type NavItem = { label: string; href: string } | { label: string; to: string };
+
+export const NAV_ITEMS: readonly NavItem[] = [
+  { label: 'Features', href: '#features' },
+  { label: 'Templates', href: '#templates' },
+  { label: 'Privacy', to: '/privacy-policy' },
+];
+
+export const NAV_COPY = {
+  brand: 'ResumeForge',
+  signIn: 'Sign in',
+  cta: 'Get started',
+  skip: 'Skip to content',
+  openMenu: 'Open menu',
+  closeMenu: 'Close menu',
+} as const;
+
+export const HERO_COPY = {
+  eyebrow: 'Resume & cover letter builder',
+  headline: 'Build a resume you can stand behind.',
+  sub: 'Pick a template, shape every section, preview it live and export a clean PDF.',
+  primary: 'Build your resume',
+  secondary: 'Browse templates',
+  note: 'No credit card required · PDF export · Sign in with Google or GitHub',
+} as const;
