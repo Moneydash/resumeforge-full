@@ -100,3 +100,20 @@ export const FEATURE_ROWS = [
 export const ATS_STEPS = ['Reading the text layer', 'Checking sections and structure', 'Evaluating results'] as const;
 
 export const LETTER_PREVIEW_IDS = ['aether', 'aqua', 'terra'] as const;
+
+export const templateStripCopy = (resumeCount: number, letterCount: number) => ({
+  heading: 'Pick a template, then make it yours.',
+  sub: `${resumeCount} resume templates and ${letterCount} cover letter templates. Every one is editable, and any of them can use any font.`,
+});
+
+export const CTA_COPY = {
+  heading: 'Start your resume today.',
+  sub: 'Sign in with Google or GitHub to begin.',
+  button: 'Get started',
+} as const;
+
+export const FOOTER_COPY = {
+  brand: 'ResumeForge',
+  privacy: 'Privacy Policy',
+  terms: 'Terms of Service',
+} as const;
