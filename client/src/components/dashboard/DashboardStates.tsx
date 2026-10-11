@@ -8,7 +8,7 @@ export function ResumeSkeleton({ viewMode }: { viewMode: ViewMode }) {
     <div role="status" aria-live="polite" aria-busy="true">
       <span className="sr-only">Loading resumes</span>
       {viewMode === 'grid' ? (
-        <div className="grid gap-4 sm:grid-cols-2 xl:grid-cols-3">
+        <div className="grid grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-4">
           {Array.from({ length: SKELETON_COUNT }, (_, index) => (
             <div key={index} className="app-card">
               <div className="app-skeleton aspect-[4/3] animate-pulse rounded-none" />

@@ -32,7 +32,7 @@ export default function DashboardView({
   const handlers = { onEdit, onClone, onRename, onDelete };
 
   return (
-    <div className="mx-auto w-full max-w-6xl px-4 py-8 sm:px-8 lg:px-10 lg:py-12">
+    <div className="w-full px-4 py-8 sm:px-8 lg:px-10 lg:py-12">
       <DashboardHeader
         count={status === 'ready' ? resumes.length : null}
         viewMode={viewMode}
@@ -45,7 +45,7 @@ export default function DashboardView({
       {status === 'ready' && resumes.length === 0 && <EmptyState onCreate={onCreate} />}
 
       {status === 'ready' && resumes.length > 0 && viewMode === 'grid' && (
-        <ul className="m-0 grid list-none gap-4 p-0 sm:grid-cols-2 xl:grid-cols-3">
+        <ul className="m-0 grid list-none grid-cols-[repeat(auto-fill,minmax(17rem,1fr))] gap-4 p-0">
           {resumes.map((resume) => (
             <li key={resume.id}>
               <ResumeCard resume={resume} pending={pendingEditId === resume.id} {...handlers} />
