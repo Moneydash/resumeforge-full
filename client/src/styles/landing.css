@@ -1,0 +1,182 @@
+/* Landing page tokens and component classes. Scoped to .landing so the global theme is untouched.
+   Unlayered on purpose: only color/appearance lives here; layout stays in Tailwind utilities. */
+
+.landing {
+  --l-bg: #ffffff;
+  --l-surface: #f6f5f2;
+  --l-surface-2: #efeee9;
+  --l-ink: #111110;
+  --l-ink-fg: #ffffff;
+  --l-muted: #5c5b56;
+  --l-hair: #e5e3dc;
+  --l-hair-strong: #cfcdc5;
+  --l-accent: #1f3f8f;
+  --l-shadow: rgba(0, 0, 0, 0.28);
+
+  position: relative;
+  min-height: 100vh;
+  background: var(--l-bg);
+  color: var(--l-ink);
+  font-family: 'Geist', ui-sans-serif, system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+  -webkit-font-smoothing: antialiased;
+}
+
+.dark .landing {
+  --l-bg: #0b0b0c;
+  --l-surface: #151517;
+  --l-surface-2: #1b1b1e;
+  --l-ink: #f4f4f2;
+  --l-ink-fg: #0b0b0c;
+  --l-muted: #a3a29c;
+  --l-hair: rgba(255, 255, 255, 0.1);
+  --l-hair-strong: rgba(255, 255, 255, 0.22);
+  --l-accent: #8fb0ff;
+  --l-shadow: rgba(0, 0, 0, 0.7);
+}
+
+.landing main:focus { outline: none; }
+.landing :focus-visible { outline: 2px solid var(--l-accent); outline-offset: 2px; }
+.landing section[id] { scroll-margin-top: 5rem; }
+
+@media (prefers-reduced-motion: no-preference) {
+  html:has(.landing) { scroll-behavior: smooth; }
+}
+
+/* Color helpers */
+.l-bg { background: var(--l-bg); }
+.l-surface { background: var(--l-surface); }
+.l-ink { color: var(--l-ink); }
+.l-muted { color: var(--l-muted); }
+.l-accent { color: var(--l-accent); }
+.l-border { border-color: var(--l-hair); }
+
+.l-eyebrow {
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+}
+
+/* Buttons and links */
+.l-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  min-height: 2.75rem;
+  padding: 0 1.125rem;
+  border: 1px solid transparent;
+  border-radius: 6px;
+  font-size: 0.9375rem;
+  font-weight: 500;
+  line-height: 1;
+  text-decoration: none;
+  cursor: pointer;
+  transition: background-color 150ms ease-out, color 150ms ease-out, border-color 150ms ease-out;
+}
+.l-btn--primary { background: var(--l-ink); color: var(--l-ink-fg); }
+.l-btn--primary:hover { background: color-mix(in srgb, var(--l-ink) 82%, var(--l-bg)); }
+.l-btn--ghost { border-color: var(--l-hair-strong); color: var(--l-ink); background: transparent; }
+.l-btn--ghost:hover { background: var(--l-surface); }
+.l-btn--inverse { background: var(--l-ink-fg); color: var(--l-ink); }
+.l-btn--inverse:hover { background: color-mix(in srgb, var(--l-ink-fg) 88%, var(--l-ink)); }
+
+.l-navlink { color: var(--l-muted); text-decoration: none; transition: color 150ms ease-out; }
+.l-navlink:hover { color: var(--l-ink); }
+
+.l-link { color: var(--l-ink); text-decoration: underline; text-decoration-color: var(--l-accent); text-underline-offset: 3px; transition: color 150ms ease-out; }
+.l-link:hover { color: var(--l-accent); }
+
+.l-skip {
+  position: absolute;
+  left: 0.75rem;
+  top: -4rem;
+  z-index: 60;
+  padding: 0.625rem 1rem;
+  border-radius: 6px;
+  background: var(--l-ink);
+  color: var(--l-ink-fg);
+  font-weight: 500;
+}
+.l-skip:focus { top: 0.75rem; }
+
+/* Inverted band (closing CTA) */
+.l-inverse { background: var(--l-ink); color: var(--l-ink-fg); }
+.l-inverse-muted { color: color-mix(in srgb, var(--l-ink-fg) 78%, var(--l-ink)); }
+
+/* Editor mock */
+.l-window {
+  background: var(--l-surface);
+  border: 1px solid var(--l-hair);
+  border-radius: 10px;
+  box-shadow: 0 24px 48px -24px var(--l-shadow);
+  overflow: hidden;
+}
+.l-canvas { background: var(--l-surface-2); }
+
+.l-switch {
+  position: relative;
+  display: inline-block;
+  flex: none;
+  width: 1.625rem;
+  height: 0.9375rem;
+  border-radius: 999px;
+  background: var(--l-hair-strong);
+  transition: background-color 150ms ease-out;
+}
+.l-switch::after {
+  content: '';
+  position: absolute;
+  top: 2px;
+  left: 2px;
+  width: calc(0.9375rem - 4px);
+  height: calc(0.9375rem - 4px);
+  border-radius: 50%;
+  background: var(--l-bg);
+  transition: transform 150ms ease-out;
+}
+.l-switch[data-on='true'] { background: var(--l-ink); }
+.l-switch[data-on='true']::after { transform: translateX(0.6875rem); }
+
+/* The resume paper stays white in both themes, like a real page. */
+.l-paper {
+  height: 18rem;
+  padding: 1.125rem 1.25rem;
+  overflow: hidden;
+  border-radius: 3px 3px 0 0;
+  background: #ffffff;
+  color: #27272a;
+  font-size: 0.625rem;
+  line-height: 1.5;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.1);
+}
+.l-paper-name { font-size: 1rem; font-weight: 700; letter-spacing: -0.01em; color: #111111; }
+.l-paper-role { margin-bottom: 0.5rem; font-size: 0.6875rem; color: #2f4a8a; }
+.l-paper-h {
+  margin: 0.625rem 0 0.25rem;
+  padding-bottom: 2px;
+  border-bottom: 1px solid #d4d4d8;
+  font-size: 0.5625rem;
+  font-weight: 700;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: #111111;
+}
+.l-paper b { color: #111111; }
+
+/* Template thumbnails */
+.l-thumb { border: 1px solid var(--l-hair); transition: border-color 150ms ease-out; }
+a:hover > .l-thumb, a:focus-visible > .l-thumb { border-color: var(--l-hair-strong); }
+
+/* Motion */
+@keyframes l-fade-up { from { opacity: 0; transform: translateY(12px); } to { opacity: 1; transform: none; } }
+@keyframes l-fade-in { from { opacity: 0; } to { opacity: 1; } }
+.l-fade-up { animation: l-fade-up 300ms ease-out both; }
+.l-fade-in { animation: l-fade-in 200ms ease-out both; }
+
+@media (prefers-reduced-motion: reduce) {
+  .landing *, .landing *::before, .landing *::after {
+    animation: none !important;
+    transition: none !important;
+  }
+}
