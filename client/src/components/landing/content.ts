@@ -55,3 +55,48 @@ export const HERO_COPY = {
   secondary: 'Browse templates',
   note: 'No credit card required · PDF export · Sign in with Google or GitHub',
 } as const;
+
+export const TRUST_ITEMS = [
+  {
+    title: 'Check ATS readability',
+    body: 'Upload a PDF to the built-in scanner and see what an applicant tracking system can read from it.',
+  },
+  {
+    title: 'Control the details',
+    body: 'Reorder, hide and rename sections. Choose fonts, and recolor selected templates.',
+  },
+  {
+    title: 'Straightforward privacy',
+    body: 'We do not sell your personal information. Export your resume as a PDF whenever you need it.',
+    link: { label: 'Read the privacy policy', to: '/privacy-policy' },
+  },
+] as const;
+
+export const FEATURES_COPY = {
+  srTrustHeading: 'Why ResumeForge',
+  heading: 'What you can do',
+  sub: 'The tools are the same whether you are writing a first resume or updating an old one.',
+} as const;
+
+export const FEATURE_ROWS = [
+  {
+    id: 'controls',
+    title: 'Shape every section',
+    body: 'Reorder sections, hide what does not apply, rename headings to suit your field, and pick fonts and colors. The preview updates as you work.',
+  },
+  {
+    id: 'ats',
+    title: 'See what an ATS reads',
+    body: 'Upload your exported PDF to the scanner. It reads the text layer, checks sections and structure, and reports what it could extract.',
+  },
+  {
+    id: 'letters',
+    title: 'Match it with a cover letter',
+    body: 'Write a cover letter in the same editor, with its own templates and the same font choices.',
+  },
+] as const;
+
+/** Mirrors the scanner's own progress steps in ATSScanner.tsx. */
+export const ATS_STEPS = ['Reading the text layer', 'Checking sections and structure', 'Evaluating results'] as const;
+
+export const LETTER_PREVIEW_IDS = ['aether', 'aqua', 'terra'] as const;
