@@ -61,7 +61,7 @@ New folder `client/src/components/landing/`, one file per block:
 - `EditorMock`: cropped editor window.
 - `TrustStrip`, `FeatureRows`, `TemplateStrip`, `ClosingCta`, `LandingFooter`.
 
-`Home.tsx` becomes a thin composer that wraps the blocks in `.landing`. Blocks take no props except where they need a link. Copy lives as plain constants at the top of each file.
+`Home.tsx` becomes a thin composer that wraps the blocks in `.landing`. Blocks take no props. All copy lives as plain constants in `landing/content.ts` (one place to check every claim against the code), and the mock's section and frame data lives in `landing/mock-frames.ts`. Both are separate from the component files because the repo's `react-refresh/only-export-components` lint rule warns when a component file also exports arrays or objects.
 
 **EditorMock:** pure presentational. The resume is built in HTML/CSS (template thumbnails are about 270px wide and blur at hero size). A static, correct first frame renders without JS. The toggle loop runs only while the mock is on screen (IntersectionObserver) and not at all under reduced motion.
 
