@@ -25,14 +25,15 @@ Third page of the `page-revamp` effort (landing page: [2026-10-11-landing-page-d
 - **Color restraint:** status colors (pass, warn, fail) appear only on the status icon, the verdict chip and the score bar, always with an icon and text. The yellow accent is removed; focus, links and the active step use the shared ink-blue accent.
 - **Findings:** failures first, then warnings; passed checks are collapsed behind "N checks passed" (a disclosure with `aria-expanded`). If nothing needs attention, the passed checks are shown expanded.
 - **Behavior kept exactly:** the `POST /ats/scan` call (CSRF token first, `FormData` field `resume`), PDF only, 5 MB maximum, the validation toasts, the error messages (rate limit with minutes, expired session, API message, generic), the step wording, "Scan another" resetting the file and result, and the "No text could be extracted from this file." empty text.
-- **Copy honesty:** nothing claims how long files are kept or what happens to them (not verifiable from here); the score is described as it is today ("how completely and cleanly an ATS can read your file").
+- **Privacy reassurance (user request):** the page tells users plainly that their file is not stored, so they do not think it is kept or sold. Only claims verified in the code and the privacy policy are used: the upload is held in memory only and never written to disk (`multer.memoryStorage()`, route documented as stateless), scanning uses the local `pdfjs-dist` library with no network calls and no logging of content, and the privacy policy says "We do not sell your personal information" (it also allows sharing with service providers, legal authorities and with consent, so the page must not say "never shared with anyone"). The line is: "Your PDF is read in memory to build this report and is not stored. We do not sell your personal information." followed by a link to the Privacy Policy (`/privacy-policy`). It shows in the idle and file-selected states, under the drop zone or the Scan button. If the server's behavior ever changes, this line must be revisited.
+- **Copy honesty (rest of the page):** the score is described as it is today ("how completely and cleanly an ATS can read your file"); nothing else is claimed about retention or privacy.
 
 ## Page structure
 
 1. **AppShell** with the page content to the right of the sidebar (full width, same padding as the dashboards).
 2. **Header**: h1 "ATS scanner", one line of sub-copy ("Upload your resume and see if an ATS can read it.").
-3. **Idle**: a dashed hairline drop zone (real keyboard-reachable control: drag and drop, Enter or Space to browse, "PDF only, up to 5 MB"), then the three analysis step names and a one-line note that they run after upload.
-4. **File selected**: a file row (name, size, a labeled Remove button) and a **Scan resume** primary button.
+3. **Idle**: a dashed hairline drop zone (real keyboard-reachable control: drag and drop, Enter or Space to browse, "PDF only, up to 5 MB"), then the three analysis step names and a one-line note that they run after upload, then the privacy line described above.
+4. **File selected**: a file row (name, size, a labeled Remove button), a **Scan resume** primary button, and the same privacy line under it.
 5. **Scanning**: the file row, then the step list as a bordered card with `role="status"` and `aria-live="polite"`. Per step: done (check), current (spinner), upcoming (muted); a completed step shows its one-line data. The button reads "Scanning..." and is disabled.
 6. **Results**: header row with "Results" eyebrow, the file name, and **Scan another** at the top right. Two columns from `lg`:
    - Left: verdict card (status chip, description, large tabular score out of 100, thin bar with `role="progressbar"`, one mono line "x.x s to read · N of M pages read"), then "Needs attention · N" with the failing and warning findings, then the collapsed "N checks passed".
@@ -53,7 +54,7 @@ Reuses the landing and dashboard tokens through the existing `.app-shell` scope 
 
 - `types.ts`: `ScanResult`, `ScanCheck`, `Verdict`, `CheckStatus` (moved out of the page file; shapes unchanged).
 - `scan-progress.ts`: pure helpers, unit-testable without a DOM: `SCAN_STEPS`, `STEP_MIN_MS`, `canAdvance(step, elapsedInStepMs, responseReady)` and `stepDetail(step, file, result)`.
-- `ScanDropzone`, `ScanFileCard`, `ScanProgress`, `ScanResults`, `VerdictCard`, `FindingsList`, `ExtractedTextPanel`.
+- `ScanDropzone`, `ScanFileCard`, `ScanProgress`, `ScanResults`, `VerdictCard`, `FindingsList`, `ExtractedTextPanel`, `PrivacyNote` (the reassurance line and the policy link; its copy lives in one exported constant so it can be checked in one place).
 - `client/src/routes.tsx`: one added condition hides the global fixed `Footer` on `/ats-scanner`.
 
 **Pacing:** the container drives a `scanStep` (0 to 3) and a `complete` flag from a small timer loop that asks `canAdvance` whether the current step may be checked off. The response is held in state until the steps finish, then `phase` becomes `results`. Timers are cleared on unmount and on failure.
@@ -64,7 +65,7 @@ Reuses the landing and dashboard tokens through the existing `.app-shell` scope 
 
 - Any page other than `/ats-scanner`.
 - The API, the server, the scoring, or new scan features (exporting the report, history, copying text).
-- Claims about retention or privacy of the uploaded file.
+- Storing uploaded files or reports (the scanner stays stateless), or any change to server behavior.
 - New dependencies or fonts.
 
 ## Verification
