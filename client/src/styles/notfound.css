@@ -1,0 +1,41 @@
+/* 404 page. Tokens come from the .landing scope in landing.css. Nothing here moves. */
+
+.nf { display: flex; flex-direction: column; }
+
+.nf__nav {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.5rem 1.25rem;
+  border-bottom: 1px solid var(--l-hair);
+}
+
+.nf__main { display: flex; flex: 1; align-items: center; justify-content: center; padding: 2rem 1.25rem; }
+.nf__col { width: 100%; max-width: 30rem; }
+
+.nf__code {
+  margin: 0 0 1.25rem;
+  font-size: clamp(4.5rem, 16vw, 6.5rem);
+  font-weight: 600;
+  line-height: 0.9;
+  letter-spacing: -0.06em;
+  font-variant-numeric: tabular-nums;
+  color: var(--l-ink);
+}
+.nf__code span { color: var(--l-hair-strong); }
+
+.nf__title { margin: 0.5rem 0; font-size: 1.875rem; font-weight: 600; line-height: 1.1; letter-spacing: -0.035em; }
+
+.nf__path {
+  display: inline-block;
+  max-width: 100%;
+  margin: 0.875rem 0 0;
+  padding: 0.3125rem 0.5625rem;
+  border: 1px solid var(--l-hair);
+  border-radius: 6px;
+  background: var(--l-surface);
+  color: var(--l-muted);
+  font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+  font-size: 0.75rem;
+  overflow-wrap: anywhere;
+}

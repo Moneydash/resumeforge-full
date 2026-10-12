@@ -56,6 +56,14 @@ export interface ResumeSummary {
   updated_at: string;
 };
 
+export interface CoverLetterSummary {
+  id: string;
+  cover_letter_name: string;
+  cover_letter_slug_name: string;
+  template: string;
+  updated_at: string;
+};
+
 export interface CLTemplateProps {
   data: CLFormData;
 };

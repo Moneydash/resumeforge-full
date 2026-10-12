@@ -96,7 +96,7 @@ client/
 │   │   ├── ResumeForm.tsx          # Resume form (supports live edit)
 │   │   ├── LogoutButton.tsx        # Floating logout button with confirmation dialog
 │   │   ├── ProtectedRoute.tsx      # Redirects unauthenticated users to /login
-│   │   ├── TemplateCard.tsx / CLTemplateCard.tsx
+│   │   ├── template-picker/        # Template picker pieces shared by the resume and cover letter pages
 │   │   ├── ThemeToggle.tsx
 │   │   └── ...
 │   ├── contexts/

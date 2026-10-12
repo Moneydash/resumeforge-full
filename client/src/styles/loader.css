@@ -1,0 +1,39 @@
+/* Route loader (the Suspense fallback). Tokens come from the .app-loader scope in landing.css. */
+
+.app-loader {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.875rem;
+}
+
+.app-loader__mark { display: block; width: 2.75rem; height: 2.75rem; border-radius: 10px; }
+
+.app-loader__track { width: 6rem; height: 2px; overflow: hidden; border-radius: 2px; background: var(--l-hair); }
+.app-loader__track i {
+  display: block;
+  width: 40%;
+  height: 100%;
+  background: var(--l-ink);
+  animation: app-loader-slide 1.4s ease-in-out infinite;
+}
+
+.app-loader__label { margin: 0; color: var(--l-muted); }
+
+/* Fade in after a short delay so fast navigations never flash the loader; the page background shows meanwhile. */
+.app-loader > * { animation: app-loader-in 300ms ease-out 150ms both; }
+
+@keyframes app-loader-slide {
+  0% { transform: translateX(-120%); }
+  100% { transform: translateX(320%); }
+}
+@keyframes app-loader-in {
+  from { opacity: 0; transform: translateY(6px); }
+  to { opacity: 1; transform: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .app-loader > *, .app-loader__track i { animation: none; }
+  .app-loader__track i { width: 100%; background: var(--l-hair-strong); }
+}
