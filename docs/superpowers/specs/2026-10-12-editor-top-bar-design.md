@@ -32,9 +32,9 @@ Everything above the `return (` of the component stays identical: every state, r
 
 ## Implementation structure
 
-- `client/src/components/editor/EditorTopBar.tsx`: presentational, props only: `templateLabel`, `status` (`'idle' | 'updating' | 'saved' | 'error'`, already folded with `liveEdit` by the page), `designOpen`, `canOpenDesign`, `onToggleDesign`, `onDashboard`, `onExport`, `exporting`, `canExport`. It renders the theme toggle itself and keeps `id="exportButton"` on the export button. Reusable by the cover letter editor later.
-- `client/src/components/editor/SectionRail.tsx`: presentational: `items` (`{ icon, label, ref }[]`, exactly the page's `sidebarItems`) and `onSelect(ref)` (the page's `scrollToSection`). It renders the labeled, keyboard-friendly rail.
-- `client/src/components/editor/status.ts`: `liveStatusLabel(status)` and `statusTone(status)` as pure helpers (texts above), unit-testable.
+- `client/src/components/editor-chrome/EditorTopBar.tsx`: presentational, props only: `templateLabel`, `status` (`'idle' | 'updating' | 'saved' | 'error'`, already folded with `liveEdit` by the page), `designOpen`, `canOpenDesign`, `onToggleDesign`, `onDashboard`, `onExport`, `exporting`, `canExport`. It renders the theme toggle itself and keeps `id="exportButton"` on the export button. Reusable by the cover letter editor later.
+- `client/src/components/editor-chrome/SectionRail.tsx`: presentational: `items` (`{ icon, label, ref }[]`, exactly the page's `sidebarItems`) and `onSelect(ref)` (the page's `scrollToSection`). It renders the labeled, keyboard-friendly rail.
+- `client/src/components/editor-chrome/status.ts`: `liveStatusLabel(status)` and `statusTone(status)` as pure helpers (texts above), unit-testable.
 - `client/src/styles/editor-chrome.css` (new; the existing `client/src/styles/editor.css` belongs to the Lexical text editor and is not touched): the top bar, rail, column header, resize handle, canvas and state boxes; tokens come from `.app-shell`.
 - `client/src/pages/Preview.tsx`: markup only. The root div gets the `app-shell` class, the old rail, form header and preview header JSX is replaced by the two components, and the canvas and state boxes are restyled. No logic line changes.
 - `client/src/components/SuspenseLoader.tsx`: optional `label` prop (default "Loading").
@@ -65,3 +65,7 @@ I cannot sign in or run the live PDF generation, so the click-through flows abov
 ## Out of scope reminders
 
 The Design panel will look slightly different from the new chrome until scope B; that is expected. The cover letter editor keeps its current look until it gets the same treatment with the same components.
+
+## Note on folder naming
+
+`client/src/components/editor/` already holds the Lexical text editor (`editor-ui`, `themes`), so the new components live in `client/src/components/editor-chrome/`.
