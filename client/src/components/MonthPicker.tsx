@@ -8,6 +8,7 @@ interface DatePickerInterface {
   yearPlaceholder?: string;
   monthRequired: boolean;
   yearRequired?: boolean;
+  disabled?: boolean;
 }
 
 // Generate years array (adjust range as needed)
@@ -38,7 +39,7 @@ const months = [
 const years = generateYears();
 
 // Custom DatePicker Component
-const MonthPicker: React.FC<DatePickerInterface> = ({ value, setValue, monthPlaceholder = "Select Month", yearPlaceholder = "Select Year", monthRequired = false, yearRequired = false}) => {
+const MonthPicker: React.FC<DatePickerInterface> = ({ value, setValue, monthPlaceholder = "Select Month", yearPlaceholder = "Select Year", monthRequired = false, yearRequired = false, disabled = false}) => {
   const [year, month] = value ? value.split('-') : ['', ''];
 
   const handleMonthChange = (newMonth: string) => {
@@ -57,6 +58,7 @@ const MonthPicker: React.FC<DatePickerInterface> = ({ value, setValue, monthPlac
     <div className="grid grid-cols-2 gap-2">
       <Select
         required={monthRequired}
+        disabled={disabled}
         value={month}
         onValueChange={handleMonthChange}
       >
@@ -76,6 +78,7 @@ const MonthPicker: React.FC<DatePickerInterface> = ({ value, setValue, monthPlac
       
       <Select
         required={yearRequired}
+        disabled={disabled}
         value={year}
         onValueChange={handleYearChange}
       >

@@ -156,11 +156,11 @@ const Preview: React.FC = () => {
     document.body.style.userSelect = 'none'; // Prevent text selection during resize
   };
 
-  const fetchResumeData = async () => {
+  const fetchResumeData = async (ownerId: string) => {
     setResumeLoading(true);
     const resume_id = localStorage.getItem('id'); // resume id
     if (resume_id) {
-      const request = await client.get(`/resume/fetch-data/${resume_id}/${userId}`);
+      const request = await client.get(`/resume/fetch-data/${resume_id}/${ownerId}`);
       localStorage.setItem('resumeFormData', request.data?.resume_data);
       if (request.data?.resume_data) {
         try {
@@ -191,20 +191,19 @@ const Preview: React.FC = () => {
     setResumeLoading(false);
   };
 
-  // set the first effect to get the user id
+  // The store is empty after a reload, so take the user id from the cookie (what ProtectedRoute checks)
+  // instead of the store: waiting on the store sent every reload back to the dashboard.
   useEffect(() => {
     toast.dismiss();
-    setUserId(Cookies.get('user.id') || '');
-  }, []);
-
-  useEffect(() => {
     getCsrfToken();
-    if (userId && resumeId) {
-      fetchResumeData();
+    const ownerId = Cookies.get('user.id') || '';
+    setUserId(ownerId);
+    if (ownerId && resumeId) {
+      fetchResumeData(ownerId);
     } else {
       navigate('/dashboard');
     }
-  }, [userId]);
+  }, []);
 
   // Fixed resize effect with better event handling
   useEffect(() => {
@@ -527,7 +526,7 @@ const Preview: React.FC = () => {
                 <div className="ec-page h-full overflow-hidden">
                   <iframe
                     src={`${pdfUrl}#sidebar=0&zoom=100&toolbar=0`}
-                    className="w-full h-full border-none"
+                    className={`w-full h-full border-none ${isResizing ? 'pointer-events-none' : ''}`} // the iframe would swallow mouseup and the drag would never end
                     title="Resume Preview"
                   />
                 </div>
