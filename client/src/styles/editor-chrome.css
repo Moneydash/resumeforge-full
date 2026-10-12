@@ -1,0 +1,134 @@
+/* Resume editor chrome. Tokens come from the .app-shell scope in landing.css. */
+
+.app-shell {
+  --ec-ok: #17673f;
+  --ec-err: #b3261e;
+}
+.dark .app-shell {
+  --ec-ok: #4cc38a;
+  --ec-err: #ff8a80;
+}
+
+/* Top bar */
+.ec-topbar {
+  display: flex;
+  height: 3.5rem;
+  flex-shrink: 0;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem;
+  padding: 0 0.75rem 0 1rem;
+  border-bottom: 1px solid var(--l-hair);
+  background: var(--l-bg);
+}
+.ec-topbar__left, .ec-topbar__right { display: flex; min-width: 0; align-items: center; gap: 0.75rem; }
+.ec-topbar__right { flex-shrink: 0; gap: 0.5rem; }
+.ec-brand { display: flex; align-items: center; gap: 0.5rem; color: var(--l-ink); font-size: 0.9375rem; font-weight: 600; white-space: nowrap; }
+.ec-brand img { width: 1.375rem; height: 1.375rem; border-radius: 5px; }
+.ec-sep { width: 1px; height: 1.125rem; background: var(--l-hair-strong); }
+.ec-template { overflow: hidden; text-overflow: ellipsis; white-space: nowrap; }
+
+.ec-status { align-items: center; gap: 0.375rem; color: var(--l-muted); font-size: 0.75rem; white-space: nowrap; }
+.ec-status[data-tone='error'] { color: var(--ec-err); }
+.ec-dot { display: block; width: 6px; height: 6px; flex: none; border-radius: 50%; background: var(--l-hair-strong); }
+.ec-dot[data-tone='ok'] { background: var(--ec-ok); }
+.ec-dot[data-tone='error'] { background: var(--ec-err); }
+
+.ec-iconbtn {
+  display: inline-flex;
+  width: 2.75rem;
+  height: 2.75rem;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid var(--l-hair-strong);
+  border-radius: 6px;
+  background: transparent;
+  color: var(--l-ink);
+  cursor: pointer;
+  transition: background-color 150ms ease-out, border-color 150ms ease-out;
+}
+.ec-iconbtn:hover:not(:disabled) { background: var(--l-surface); }
+.ec-iconbtn[aria-pressed='true'] { border-color: var(--l-ink); box-shadow: inset 0 0 0 1px var(--l-ink); }
+.ec-iconbtn:disabled { opacity: 0.55; cursor: not-allowed; }
+
+/* Section rail: exactly 48px wide, because the resize math subtracts 48 */
+.ec-rail {
+  position: fixed;
+  left: 0;
+  top: 3.5rem;
+  bottom: 0;
+  z-index: 40;
+  display: flex;
+  width: 3rem;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.25rem;
+  border-right: 1px solid var(--l-hair);
+  background: var(--l-surface);
+}
+.ec-rail__item { position: relative; }
+.ec-rail__btn {
+  display: flex;
+  width: 2.5rem;
+  height: 2.5rem;
+  align-items: center;
+  justify-content: center;
+  border: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: var(--l-muted);
+  cursor: pointer;
+  transition: background-color 150ms ease-out, color 150ms ease-out;
+}
+.ec-rail__btn:hover { background: var(--l-bg); color: var(--l-ink); }
+.ec-rail__tip {
+  position: absolute;
+  left: 100%;
+  top: 50%;
+  z-index: 50;
+  margin-left: 0.5rem;
+  padding: 0.25rem 0.5rem;
+  border-radius: 6px;
+  background: var(--l-ink);
+  color: var(--l-ink-fg);
+  font-size: 0.75rem;
+  white-space: nowrap;
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(-50%);
+  transition: opacity 150ms ease-out;
+}
+.ec-rail__item:hover .ec-rail__tip,
+.ec-rail__item:focus-within .ec-rail__tip { opacity: 1; }
+
+/* Form column. The header must never be positioned (scroll-to-section uses offsetTop). */
+.ec-colhead { flex-shrink: 0; padding: 0.875rem 1.5rem; border-bottom: 1px solid var(--l-hair); }
+.ec-formcol { border-right: 1px solid var(--l-hair); background: var(--l-bg); }
+.ec-resize { background: transparent; transition: background-color 150ms ease-out; }
+.ec-resize:hover, .ec-resize.is-active { background: var(--l-surface); }
+.ec-resize__grip { color: var(--l-hair-strong); }
+.ec-resize:hover .ec-resize__grip, .ec-resize.is-active .ec-resize__grip { color: var(--l-ink); }
+
+/* Preview canvas and its states */
+.ec-canvas { background: var(--l-surface-2); }
+.ec-page {
+  border: 1px solid var(--l-hair-strong);
+  border-radius: 4px;
+  background: #ffffff;
+  box-shadow: 0 18px 36px -22px var(--l-shadow);
+}
+.ec-state {
+  display: flex;
+  height: 100%;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 1.5rem;
+  border: 1px dashed var(--l-hair-strong);
+  border-radius: 10px;
+  color: var(--l-muted);
+  text-align: center;
+}
+.ec-state__title { margin: 0; color: var(--l-ink); font-size: 1rem; font-weight: 500; }
