@@ -1,32 +1,15 @@
 import React from "react";
+import "@/styles/landing.css";
+import "@/styles/loader.css";
 
+// Fallback shown while a lazy route's code loads. Calm and brand-forward: the mark, a thin moving bar and a label.
 const Loader: React.FC = () => (
-  <div style={{
-    minHeight: "60vh",
-    display: "flex",
-    flexDirection: "column",
-    alignItems: "center",
-    justifyContent: "center"
-  }}>
-    <div className="loader-spinner" />
-    <div style={{ marginTop: 20, color: "#555", fontWeight: 500, fontSize: 18 }}>
-      Loading, please wait...
+  <div className="app-loader" role="status" aria-live="polite">
+    <img className="app-loader__mark" src="/icon.png" alt="" width={44} height={44} />
+    <div className="app-loader__track" aria-hidden="true">
+      <i />
     </div>
-    <style>
-      {`
-        .loader-spinner {
-          width: 48px;
-          height: 48px;
-          border: 5px solid #e0e0e0;
-          border-top: 5px solid #6366f1;
-          border-radius: 50%;
-          animation: spin 1s linear infinite;
-        }
-        @keyframes spin {
-          to { transform: rotate(360deg); }
-        }
-      `}
-    </style>
+    <p className="l-eyebrow app-loader__label">Loading</p>
   </div>
 );
 

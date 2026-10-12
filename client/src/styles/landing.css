@@ -2,7 +2,8 @@
    Unlayered on purpose: only color/appearance lives here; layout stays in Tailwind utilities. */
 
 .landing,
-.app-shell {
+.app-shell,
+.app-loader {
   --l-bg: #ffffff;
   --l-surface: #f6f5f2;
   --l-surface-2: #efeee9;
@@ -23,7 +24,8 @@
 }
 
 .dark .landing,
-.dark .app-shell {
+.dark .app-shell,
+.dark .app-loader {
   --l-bg: #0b0b0c;
   --l-surface: #151517;
   --l-surface-2: #1b1b1e;
