@@ -133,7 +133,7 @@ const SocialsFieldsComponent: React.FC<socialFieldComponentInterface> = ({
                   {socials?.[index]?.hidden ? <EyeOff size={20} /> : <Eye size={20} />}
                 </Button>
               </TooltipTrigger>
-              <TooltipContent className="bg-blue-500 dark:bg-blue-600 dark:text-white">
+              <TooltipContent className="bg-[#111110] text-white dark:bg-[#f4f4f2] dark:text-[#111110]">
                 <p>{socials?.[index]?.hidden ? 'Show on resume' : 'Hide from resume'}</p>
               </TooltipContent>
             </Tooltip>
@@ -142,7 +142,7 @@ const SocialsFieldsComponent: React.FC<socialFieldComponentInterface> = ({
               <TooltipTrigger asChild>
                 <Button variant="destructive" size="icon" onClick={() => removeSocial(index)}><Trash2Icon size={20} /></Button>
               </TooltipTrigger>
-              <TooltipContent className="bg-blue-500 dark:bg-blue-600 dark:text-white">
+              <TooltipContent className="bg-[#111110] text-white dark:bg-[#f4f4f2] dark:text-[#111110]">
                 <p>Remove Link</p>
               </TooltipContent>
             </Tooltip>

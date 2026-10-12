@@ -60,7 +60,7 @@ const MonthPicker: React.FC<DatePickerInterface> = ({ value, setValue, monthPlac
         value={month}
         onValueChange={handleMonthChange}
       >
-        <SelectTrigger className="w-full truncate">
+        <SelectTrigger className="w-full truncate min-h-10 pointer-coarse:min-h-11 border-[#e5e3dc] dark:border-white/12 bg-white dark:bg-[#0b0b0c] text-[#111110] dark:text-[#f4f4f2] focus-visible:ring-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff]">
           <SelectValue placeholder={monthPlaceholder} />
         </SelectTrigger>
         <SelectContent>
@@ -79,7 +79,7 @@ const MonthPicker: React.FC<DatePickerInterface> = ({ value, setValue, monthPlac
         value={year}
         onValueChange={handleYearChange}
       >
-        <SelectTrigger className="w-full truncate">
+        <SelectTrigger className="w-full truncate min-h-10 pointer-coarse:min-h-11 border-[#e5e3dc] dark:border-white/12 bg-white dark:bg-[#0b0b0c] text-[#111110] dark:text-[#f4f4f2] focus-visible:ring-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff]">
           <SelectValue placeholder={yearPlaceholder} />
         </SelectTrigger>
         <SelectContent>

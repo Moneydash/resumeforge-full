@@ -248,7 +248,7 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
           return keywordArr.map((kw, i) => (
             <span
               key={i}
-              className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-200"
+              className="inline-block border border-[#e5e3dc] bg-[#f6f5f2] text-[#111110] text-xs font-semibold px-2.5 py-0.5 rounded dark:border-white/12 dark:bg-[#151517] dark:text-[#f4f4f2]"
             >
               {kw}
             </span>
