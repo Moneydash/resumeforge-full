@@ -7,6 +7,7 @@ import type { ResumeFormData } from '@/types/interface.resume-form-data';
 import type { TemplateType } from '@/types';
 import { useNavigate } from 'react-router-dom';
 import EditorTopBar from '@/components/editor-chrome/EditorTopBar';
+import SectionRail from '@/components/editor-chrome/SectionRail';
 import { toast } from 'sonner';
 import { formRequest } from '@/api/request';
 import '@react-pdf-viewer/core/lib/styles/index.css';
@@ -447,30 +448,7 @@ const Preview: React.FC = () => {
           canExport={!!pdfUrl}
         />
         {/* Fixed Navigation Sidebar */}
-        <div className="fixed left-0 top-14 bottom-0 w-12 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg z-50 flex flex-col">
-          <div className="flex-1 flex flex-col justify-center py-4">
-            <div className="flex flex-col items-center space-y-2">
-              {sidebarItems.map((item, index) => {
-                const Icon = item.icon;
-                return (
-                  <div key={index} className="group relative">
-                    <button
-                      type="button"
-                      onClick={() => scrollToSection(item.ref)}
-                      className="p-2 rounded-md text-gray-600 hover:text-indigo-600 hover:bg-indigo-50 dark:text-gray-400 dark:hover:text-indigo-400 dark:hover:bg-indigo-900/20 transition-colors duration-200"
-                    >
-                      <Icon size={16} />
-                    </button>
-                    {/* Tooltip */}
-                    <div className="absolute left-full ml-2 px-2 py-1 bg-gray-900 text-white text-xs rounded opacity-0 group-hover:opacity-100 transition-opacity duration-200 pointer-events-none whitespace-nowrap z-10">
-                      {item.label}
-                    </div>
-                  </div>
-                );
-              })}
-            </div>
-          </div>
-        </div>
+        <SectionRail items={sidebarItems} onSelect={scrollToSection} />
 
         {/* Main Content Area - Adjusted for fixed sidebar */}
         <div className="flex-1 pl-12 flex flex-col lg:flex-row overflow-hidden">
