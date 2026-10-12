@@ -33,6 +33,20 @@ export class UserModel {
     }
   }
 
+  // Find user by LinkedIn ID
+  async findByLinkedinId(linkedinId: string): Promise<User | null> {
+    try {
+      const user = await knex(this.tableName)
+        .where('linkedin_id', linkedinId)
+        .first();
+
+      return user || null;
+    } catch (error) {
+      console.error('Error finding user by LinkedIn ID:', error);
+      throw error;
+    }
+  }
+
   // Find user by ID
   async findById(id: string): Promise<User | null> {
     try {

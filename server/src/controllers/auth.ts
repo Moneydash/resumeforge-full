@@ -6,7 +6,9 @@ import { Controller } from "@/types/types.controller-type";
 import { userModel } from '../models/User';
 import { generateId } from '../utils/helper';
 import { CreateUserData, User } from '@/types/interface.user';
+import { Strategy as OAuth2Strategy } from 'passport-oauth2';
 import jwt from 'jsonwebtoken';
+import { fetchLinkedinUserInfo, resolveLinkedinUser } from '../utils/linkedin';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -147,6 +149,26 @@ passport.use(new GithubStrategy({
 
   } catch (error) {
     console.error('Error in GitHub OAuth strategy:', error);
+    return done(error, false);
+  }
+}));
+
+// Configure LinkedIn OAuth Strategy (Sign In with LinkedIn using OpenID Connect)
+passport.use('linkedin', new OAuth2Strategy({
+  authorizationURL: 'https://www.linkedin.com/oauth/v2/authorization',
+  tokenURL: 'https://www.linkedin.com/oauth/v2/accessToken',
+  clientID: process.env.LINKEDIN_CLIENT_ID!,
+  clientSecret: process.env.LINKEDIN_CLIENT_SECRET!,
+  callbackURL: `${process.env.BASE_URL}/auth/linkedin/callback`,
+  scope: ['openid', 'profile', 'email'],
+  state: true
+}, async (accessToken: string, refreshToken: string, params: any, profile: any, done: any) => {
+  try {
+    const userInfo = await fetchLinkedinUserInfo(accessToken);
+    const user = await resolveLinkedinUser(userInfo);
+    return done(null, user);
+  } catch (error) {
+    console.error('Error in LinkedIn OAuth strategy:', error);
     return done(error, false);
   }
 }));
@@ -337,6 +359,72 @@ const githubCallback = async (req: Request, res: Response, next: NextFunction) =
   })(req, res, next);
 };
 
+// Controller for initiating LinkedIn OAuth
+const linkedinLogin: Controller = async (req, res) => {
+  passport.authenticate('linkedin')(req, res);
+};
+
+// Controller for handling LinkedIn OAuth callback
+const linkedinCallback = async (req: Request, res: Response, next: NextFunction) => {
+  passport.authenticate('linkedin', (err: any, user: User | false, info: any) => {
+    if (err) {
+      console.error('LinkedIn OAuth error:', err);
+      return res.redirect('/login?error=oauth_error&message=' + encodeURIComponent(err.message));
+    }
+
+    if (!user) {
+      console.error('LinkedIn OAuth failed - no user returned', info);
+      return res.redirect('/login?error=oauth_failed');
+    }
+
+    req.logIn(user, (loginErr) => {
+      if (loginErr) {
+        console.error('Login error:', loginErr);
+        return res.redirect('/login?error=login_failed');
+      }
+
+      const token = jwt.sign(
+        { id: user.id, email: user.email, name: user.name },
+        JWT_SECRET,
+        { expiresIn: '1h' }
+      );
+
+      // JSON-encode the payload (and neutralise "<") so names with quotes can't break out of the script
+      const payload = JSON.stringify({
+        type: 'LOGIN_SUCCESS',
+        user: {
+          id: user.id,
+          email: user.email,
+          name: user.name,
+          avatar: user.avatar || '',
+          token
+        }
+      }).replace(/</g, '\\u003c');
+      const targetOrigin = JSON.stringify(process.env.FRONTEND_URL);
+
+      res.send(`
+        <!DOCTYPE html>
+        <html>
+        <head>
+          <title>Login Success</title>
+        </head>
+        <body>
+          <script>
+            if (window.opener) {
+              window.opener.postMessage(${payload}, ${targetOrigin});
+              window.close();
+            } else {
+              window.location.href = '/dashboard';
+            }
+          </script>
+          <p>Login successful! Closing window...</p>
+        </body>
+        </html>
+      `);
+    });
+  })(req, res, next);
+};
+
 // Logout controller
 const logout: Controller = async (req, res) => {
   req.logout((err) => {
@@ -380,6 +468,8 @@ export {
   googleCallbackCustom,
   githubLogin,
   githubCallback,
+  linkedinLogin,
+  linkedinCallback,
   logout,
   isAuthenticated
 };
