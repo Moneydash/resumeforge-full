@@ -141,14 +141,14 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
             <button
               type="button"
               onClick={handleSave}
-              className="px-3 py-1 text-sm text-white rounded bg-blue-500"
+              className="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-md min-h-9 pointer-coarse:min-h-11 bg-[#111110] text-white hover:bg-[#2a2a28] dark:bg-[#f4f4f2] dark:text-[#111110] dark:hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff] focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0b0b0c] transition-colors duration-150"
             >
               Save
             </button>
             <button
               type="button"
               onClick={handleCancel}
-              className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+              className="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-md min-h-9 pointer-coarse:min-h-11 border border-[#cfcdc5] dark:border-white/25 bg-white dark:bg-transparent text-[#111110] dark:text-[#f4f4f2] hover:bg-[#f6f5f2] dark:hover:bg-[#151517] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff] focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0b0b0c] transition-colors duration-150"
             >
               Cancel
             </button>
@@ -171,7 +171,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               placeholder="Software Engineer"
             />
             {errors.experience?.[index]?.title && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.experience[index]?.title?.message}
               </p>
             )}
@@ -185,7 +185,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               placeholder="Company Name"
             />
             {errors.experience?.[index]?.company && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.experience[index]?.company?.message}
               </p>
             )}
@@ -210,7 +210,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               )}
             />
             {errors.experience?.[index]?.startDate && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.experience[index]?.startDate?.message}
               </p>
             )}
@@ -247,7 +247,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               />
             )}
           />
-          <p className="text-xs text-gray-500 mt-1 ml-1">
+          <p className="text-xs text-[#5c5b56] dark:text-[#a3a29c] mt-1 ml-1">
             Press Enter for new lines. These will be preserved when generating your resume.
           </p>
         </div>

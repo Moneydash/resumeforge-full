@@ -38,3 +38,46 @@
 .tiptap h6 {
   font-size: 1rem;
 }
+
+/* Formatting toolbar: neutral buttons that match the form's icon buttons */
+.rte-toolbar button {
+  width: 34px;
+  height: 34px;
+  min-width: 0;
+  padding: 0;
+  border-radius: 6px;
+  background: transparent;
+  color: #5c5b56;
+}
+@media (pointer: coarse) {
+  .rte-toolbar button {
+    width: 44px;
+    height: 44px;
+  }
+}
+.rte-toolbar button:hover:not([data-state="on"]) {
+  background: #ffffff;
+  color: #111110;
+}
+.rte-toolbar button[data-state="on"] {
+  background: #111110;
+  color: #ffffff;
+}
+.rte-toolbar button:focus-visible {
+  outline: 2px solid #1f3f8f;
+  outline-offset: 1px;
+}
+.dark .rte-toolbar button {
+  color: #a3a29c;
+}
+.dark .rte-toolbar button:hover:not([data-state="on"]) {
+  background: rgba(255, 255, 255, 0.1);
+  color: #f4f4f2;
+}
+.dark .rte-toolbar button[data-state="on"] {
+  background: #f4f4f2;
+  color: #111110;
+}
+.dark .rte-toolbar button:focus-visible {
+  outline-color: #8fb0ff;
+}

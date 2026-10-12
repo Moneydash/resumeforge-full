@@ -2,6 +2,7 @@ import type { ResumeFormData } from "@/types/interface.resume-form-data";
 import { CirclePlusIcon, Trash2Icon, GripVerticalIcon, EyeOffIcon, EyeIcon } from "lucide-react";
 import React, { useState } from "react";
 import {
+  Controller,
   useWatch,
   type Control,
   type FieldArrayWithId,
@@ -29,6 +30,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import ChipInput from "./ChipInput";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
@@ -136,14 +138,14 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
             <button
               type="button"
               onClick={handleSave}
-              className="px-3 py-1 text-sm text-white rounded bg-blue-500"
+              className="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-md min-h-9 pointer-coarse:min-h-11 bg-[#111110] text-white hover:bg-[#2a2a28] dark:bg-[#f4f4f2] dark:text-[#111110] dark:hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff] focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0b0b0c] transition-colors duration-150"
             >
               Save
             </button>
             <button
               type="button"
               onClick={handleCancel}
-              className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+              className="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-md min-h-9 pointer-coarse:min-h-11 border border-[#cfcdc5] dark:border-white/25 bg-white dark:bg-transparent text-[#111110] dark:text-[#f4f4f2] hover:bg-[#f6f5f2] dark:hover:bg-[#151517] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff] focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0b0b0c] transition-colors duration-150"
             >
               Cancel
             </button>
@@ -165,17 +167,24 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
               placeholder="Programming Language"
             />
             {errors.skills?.[index]?.name && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.skills[index]?.name?.message}
               </p>
             )}
           </div>
           <div>
-            <Label className={labelClasses}>Keywords</Label>
-            <Input
-              {...register(`skills.${index}.keywords`)}
-              className={inputClasses}
-              placeholder="PHP, Java, Javascript(separate with commas)"
+            <Label htmlFor={`skill-keywords-${index}`} className={labelClasses}>Keywords</Label>
+            <Controller
+              control={control}
+              name={`skills.${index}.keywords`}
+              render={({ field: keywordField }) => (
+                <ChipInput
+                  id={`skill-keywords-${index}`}
+                  value={keywordField.value}
+                  onChange={keywordField.onChange}
+                  placeholder="Type a keyword, then press Enter or comma  e.g. Java"
+                />
+              )}
             />
           </div>
         </div>
@@ -248,7 +257,7 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
           return keywordArr.map((kw, i) => (
             <span
               key={i}
-              className="inline-block bg-blue-100 text-blue-800 text-xs font-semibold px-2.5 py-0.5 rounded dark:bg-blue-900 dark:text-blue-200"
+              className="inline-block border border-[#e5e3dc] bg-[#f6f5f2] text-[#111110] text-xs font-semibold px-2.5 py-0.5 rounded-md dark:border-white/12 dark:bg-[#151517] dark:text-[#f4f4f2]"
             >
               {kw}
             </span>

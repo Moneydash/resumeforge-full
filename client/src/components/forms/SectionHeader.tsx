@@ -19,7 +19,7 @@ interface SectionHeaderProps {
   actions?: React.ReactNode;
 }
 
-const iconButtonClasses = "p-1 rounded hover:bg-gray-100 dark:hover:bg-gray-700 text-gray-600 dark:text-gray-300";
+const iconButtonClasses = "inline-flex items-center justify-center size-[34px] pointer-coarse:size-11 rounded-md text-[#5c5b56] dark:text-[#a3a29c] hover:bg-[#f6f5f2] dark:hover:bg-[#151517] hover:text-[#111110] dark:hover:text-[#f4f4f2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff]";
 
 export const SectionHeader: React.FC<SectionHeaderProps> = ({ title, controls, actions }) => {
   const { hidden, collapsed, onToggleHidden, onToggleCollapsed } = controls;

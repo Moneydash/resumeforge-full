@@ -500,9 +500,10 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
             w-full flex justify-center items-center gap-2 py-3 px-4 
             border border-transparent rounded-lg shadow-sm 
             text-sm font-medium text-white 
-            bg-indigo-600 hover:bg-indigo-700 
-            focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500
-            dark:focus:ring-offset-gray-800
+            bg-[#111110] hover:bg-[#2a2a28] dark:bg-[#f4f4f2] dark:text-[#111110] dark:hover:bg-white
+            focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2
+            focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff]
+            focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0b0b0c]
             transition-colors duration-200
             disabled:opacity-50 disabled:cursor-not-allowed
           `}
