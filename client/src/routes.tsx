@@ -1,5 +1,5 @@
 import { lazy, Suspense } from 'react';
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 
 // lazy imports for faster imports
 const Home = lazy(() => import('./pages/Home'));
@@ -14,16 +14,10 @@ const ATSScanner = lazy(() => import('./pages/ATSScanner'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const ToS = lazy(() => import('./pages/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
-import Footer from './components/Footer';
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Loader from './components/SuspenseLoader';
 
 const RouteComponent = () => {
-  const location = useLocation();
-
-  // Define the paths where the footer should be shown
-  const showFooter = location.pathname !== '/' && !location.pathname.startsWith('/dashboard') && !location.pathname.startsWith('/cl-dashboard') && !location.pathname.startsWith('/ats-scanner') && !location.pathname.startsWith('/templates') && !location.pathname.startsWith('/cl-templates') && !location.pathname.startsWith('/preview') && !location.pathname.startsWith('/cl-preview') && !location.pathname.startsWith('/terms-of-service') && !location.pathname.startsWith('/privacy-policy') && !location.pathname.startsWith('/login');
-
   return (
     <>
       <Suspense fallback={<Loader />}>
@@ -91,7 +85,6 @@ const RouteComponent = () => {
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
         </Routes>
       </Suspense>
-      {showFooter && <Footer />}
     </>
   );
 };
