@@ -454,18 +454,7 @@ const Preview: React.FC = () => {
         <div className="flex-1 pl-12 flex flex-col lg:flex-row overflow-hidden">
           {/* Form Sidebar */}
           <div
-            className={`
-              ${isDarkMode
-                ? 'bg-gray-800/95 backdrop-blur-xl border-gray-700/50'
-                : 'bg-white/95 backdrop-blur-xl border-gray-200/50'
-              }
-              h-1/2 lg:h-full
-              border-r
-              shadow-xl
-              flex flex-col
-              overflow-hidden
-              relative
-            `}
+            className="ec-formcol h-1/2 lg:h-full flex flex-col overflow-hidden relative"
             style={{
               width: window.innerWidth >= 1024 ? `${sidebarWidth}px` : '100%',
               minWidth: window.innerWidth >= 1024 ? `${sidebarMin}px` : 'auto',
@@ -510,18 +499,14 @@ const Preview: React.FC = () => {
             <div
               onMouseDown={startResize}
               onTouchStart={startResize}
-              className={`
-                  hidden lg:flex absolute top-0 right-0 h-full w-4 items-center justify-center cursor-ew-resize z-30
-                  transition-colors duration-200
-                  ${isResizing ? 'bg-blue-200/60' : 'bg-transparent hover:bg-blue-100/60'}
-                `}
+              className={`ec-resize hidden lg:flex absolute top-0 right-0 h-full w-4 items-center justify-center cursor-ew-resize z-30 ${isResizing ? 'is-active' : ''}`}
               style={{
                 touchAction: 'none',
               }}
               aria-label="Resize sidebar"
               role="separator"
             >
-              <GripVertical size={22} className="text-black dark:text-white" />
+              <GripVertical size={22} className="ec-resize__grip" />
             </div>
           </div>
 
@@ -533,54 +518,28 @@ const Preview: React.FC = () => {
             }}
           >
             {/* Preview Content - Scrollable */}
-            <div className="flex-1 overflow-y-auto p-6 no-scrollbar">
+            <div className="ec-canvas flex-1 overflow-y-auto p-4 sm:p-6 no-scrollbar">
               {loading && !liveEdit ? (
-                <div className={`
-                  h-full flex flex-col items-center justify-center rounded-xl border-2 border-dashed
-                  ${isDarkMode
-                    ? 'border-gray-700 bg-gray-800/50 text-gray-400'
-                    : 'border-gray-300 bg-gray-50/50 text-gray-500'
-                  }
-                  transition-all duration-200
-                `}>
-                  <Loader2 className="w-10 h-10 animate-spin mb-4" />
-                  <p className="text-lg font-medium mb-2">Generating your PDF preview...</p>
-                  <p className="text-sm text-center max-w-md">
+                <div className="ec-state">
+                  <Loader2 className="w-8 h-8 animate-spin mb-2" />
+                  <p className="ec-state__title">Generating your PDF preview...</p>
+                  <p className="text-sm text-center max-w-md m-0">
                     Please wait while we generate your resume preview.
                   </p>
                 </div>
               ) : pdfUrl ? (
-                <div className={`
-                  h-full rounded-xl overflow-hidden shadow-2xl
-                  ${isDarkMode ? 'bg-gray-800 border border-gray-700' : 'bg-white border border-gray-200'}
-                  hover:shadow-3xl transition-shadow duration-300
-                `}>
+                <div className="ec-page h-full overflow-hidden">
                   <iframe
                     src={`${pdfUrl}#sidebar=0&zoom=100&toolbar=0`}
-                    className="w-full h-full border-none rounded-xl"
+                    className="w-full h-full border-none"
                     title="Resume Preview"
                   />
                 </div>
               ) : (
-                <div className={`
-                  h-full flex flex-col items-center justify-center rounded-xl border-2 border-dashed
-                  ${isDarkMode
-                    ? 'border-gray-700 bg-gray-800/50 text-gray-400'
-                    : 'border-gray-300 bg-gray-50/50 text-gray-500'
-                  }
-                  transition-all duration-200
-                `}>
-                  <div className={`
-                    w-16 h-16 rounded-full flex items-center justify-center mb-4
-                    ${isDarkMode
-                      ? 'bg-gray-700 text-gray-500'
-                      : 'bg-gray-200 text-gray-400'
-                    }
-                  `}>
-                    <FileIcon className="w-8 h-8" />
-                  </div>
-                  <p className="text-lg font-medium mb-2">No PDF generated yet</p>
-                  <p className="text-sm text-center max-w-md">
+                <div className="ec-state">
+                  <FileIcon className="w-8 h-8 mb-2" />
+                  <p className="ec-state__title">No PDF generated yet</p>
+                  <p className="text-sm text-center max-w-md m-0">
                     Please complete and submit the form to generate your resume preview
                   </p>
                 </div>
