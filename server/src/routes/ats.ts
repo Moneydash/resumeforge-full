@@ -9,7 +9,7 @@ const atsRouter = express.Router();
 // Auth runs first so the rate limit can count per user.
 atsRouter.post('/scan',
   isAuthenticated,
-  validateSocialLogin(['google', 'github']),
+  validateSocialLogin(['google', 'github', 'linkedin']),
   atsRateLimit,
   uploadResume,
   scan_resume
