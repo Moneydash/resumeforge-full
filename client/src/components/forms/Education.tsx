@@ -167,7 +167,7 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
               placeholder="Bachelor of Science in Computer Science"
             />
             {errors.education?.[index]?.degree && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.education[index]?.degree?.message}
               </p>
             )}
@@ -180,7 +180,7 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
               placeholder="University Name"
             />
             {errors.education?.[index]?.institution && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.education[index]?.institution?.message}
               </p>
             )}
@@ -204,7 +204,7 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
               )}
             />
             {errors.education?.[index]?.startDate && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.education[index]?.startDate?.message}
               </p>
             )}

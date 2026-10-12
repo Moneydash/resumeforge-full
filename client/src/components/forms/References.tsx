@@ -164,7 +164,7 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
               placeholder="John Doe"
             />
             {errors.references?.[index]?.name && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.references[index]?.name?.message}
               </p>
             )}
@@ -177,7 +177,7 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
               placeholder="Senior Manager"
             />
             {errors.references?.[index]?.title && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.references[index]?.title?.message}
               </p>
             )}
@@ -191,7 +191,7 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
             placeholder="Company Name"
           />
           {errors.references?.[index]?.company && (
-            <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+            <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
               {errors.references[index]?.company?.message}
             </p>
           )}
@@ -206,7 +206,7 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
               placeholder="john.doe@company.com"
             />
             {errors.references?.[index]?.email && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.references[index]?.email?.message}
               </p>
             )}
@@ -220,7 +220,7 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
               placeholder="+1-234-567-8900"
             />
             {errors.references?.[index]?.phone && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.references[index]?.phone?.message}
               </p>
             )}

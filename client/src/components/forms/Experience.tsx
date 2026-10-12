@@ -171,7 +171,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               placeholder="Software Engineer"
             />
             {errors.experience?.[index]?.title && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.experience[index]?.title?.message}
               </p>
             )}
@@ -185,7 +185,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               placeholder="Company Name"
             />
             {errors.experience?.[index]?.company && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.experience[index]?.company?.message}
               </p>
             )}
@@ -210,7 +210,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               )}
             />
             {errors.experience?.[index]?.startDate && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.experience[index]?.startDate?.message}
               </p>
             )}

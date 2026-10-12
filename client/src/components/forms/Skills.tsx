@@ -165,7 +165,7 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
               placeholder="Programming Language"
             />
             {errors.skills?.[index]?.name && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.skills[index]?.name?.message}
               </p>
             )}
