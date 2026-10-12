@@ -80,7 +80,7 @@ const EditorComponent: React.FC<editorInterface> = ({ value, setValue }) => {
     },
     editorProps: {
       attributes: {
-        class: 'min-h-[150px] border rounded-b-md bg-slate-50 py-2 px-3 text-black dark:bg-gray-800 dark:text-white '
+        class: 'min-h-[150px] border rounded-b-md py-2 px-3 text-sm bg-white dark:bg-[#0b0b0c] text-[#111110] dark:text-[#f4f4f2] border-[#e5e3dc] dark:border-white/12 hover:border-[#cfcdc5] dark:hover:border-white/25 focus-visible:outline-none focus-visible:border-[#111110] dark:focus-visible:border-[#f4f4f2] focus-visible:ring-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff] transition-colors duration-150'
       }
     }
   });
@@ -190,7 +190,7 @@ const EditorComponent: React.FC<editorInterface> = ({ value, setValue }) => {
 
   return (
     <>
-      <div className="w-full border rounded-t-md p1 bg-slate-50 text-black dark:bg-gray-800 dark:text-white">
+      <div className="rte-toolbar flex flex-wrap items-center gap-0.5 w-full rounded-t-md border border-b-0 p-1 border-[#e5e3dc] dark:border-white/12 bg-[#f6f5f2] dark:bg-[#151517]">
         {options.map((option, i) => (
           <Tooltip key={i}>
             <TooltipTrigger asChild>

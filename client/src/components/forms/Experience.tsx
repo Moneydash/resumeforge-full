@@ -247,7 +247,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               />
             )}
           />
-          <p className="text-xs text-gray-500 mt-1 ml-1">
+          <p className="text-xs text-[#5c5b56] dark:text-[#a3a29c] mt-1 ml-1">
             Press Enter for new lines. These will be preserved when generating your resume.
           </p>
         </div>
