@@ -9,7 +9,8 @@ import {
   type UseFieldArrayAppend,
   type UseFieldArrayMove,
   type UseFormRegister,
-  type UseFormSetValue
+  type UseFormSetValue,
+  type UseFormTrigger
 } from "react-hook-form";
 import {
   DndContext,
@@ -29,6 +30,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import { validateEntry } from './entry-validation';
 import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface ReferencesFieldsComponentInterface {
@@ -46,6 +48,7 @@ interface ReferencesFieldsComponentInterface {
   inputClasses: string;
   watch: (name: string) => any;
   setValue: UseFormSetValue<ResumeFormData>;
+  trigger: UseFormTrigger<ResumeFormData>;
   control: Control<ResumeFormData>;
 }
 
@@ -62,7 +65,7 @@ interface SortableReferenceCardProps {
   isEditing: boolean;
   setIsEditing: (index: number, editing: boolean) => void;
   watch: (name: string) => any;
-  onSave: () => void;
+  onSave: (index: number) => Promise<boolean>;
   setValue: UseFormSetValue<ResumeFormData>;
   control: Control<ResumeFormData>;
 }
@@ -105,9 +108,9 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
     }
   };
 
-  const handleSave = () => {
-    setIsEditing(index, false);
-    onSave();
+  const handleSave = async () => {
+    // keep the card open, with its errors showing, until the entry is valid
+    if (await onSave(index)) setIsEditing(index, false);
   };
 
   const handleCancel = () => {
@@ -127,11 +130,11 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
   if (isEditing) {
     return (
       <div ref={setNodeRef} style={style} className={`${cardClasses} cursor-default`}>
-        <div className="flex justify-between items-start">
+        <div className="flex flex-wrap justify-between items-start gap-2">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Reference #{index + 1}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={handleSave}
@@ -155,7 +158,7 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
             </button>
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-2">
           <div>
             <Label className={labelClasses}>Full Name *</Label>
             <Input
@@ -196,7 +199,7 @@ const SortableReferenceCard: React.FC<SortableReferenceCardProps> = ({
             </p>
           )}
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-2">
           <div>
             <Label className={labelClasses}>Email *</Label>
             <Input
@@ -306,7 +309,8 @@ const ReferencesFieldsComponent: React.FC<ReferencesFieldsComponentInterface> = 
   inputClasses,
   watch,
   setValue,
-  control
+  control,
+  trigger
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [, forceUpdate] = useState(0);
@@ -333,6 +337,13 @@ const ReferencesFieldsComponent: React.FC<ReferencesFieldsComponentInterface> = 
     setEditingIndex(editing ? index : null);
   };
 
+  // Finish the open entry first: adding past an invalid one would leave a blank card behind, then open the new entry
+  const handleAdd = async () => {
+    if (editingIndex !== null && !(await validateEntry(trigger, 'references', editingIndex))) return;
+    appendReference({ name: '', title: '', company: '', email: '', phone: '' });
+    setEditingIndex(referenceFields.length);
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -342,7 +353,7 @@ const ReferencesFieldsComponent: React.FC<ReferencesFieldsComponentInterface> = 
           actions={
             <button
               type="button"
-              onClick={() => appendReference({ name: '', title: '', company: '', email: '', phone: '' })}
+              onClick={handleAdd}
               className={addButtonClasses}
             >
               <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Reference
@@ -375,7 +386,11 @@ const ReferencesFieldsComponent: React.FC<ReferencesFieldsComponentInterface> = 
                     isEditing={editingIndex === index}
                     setIsEditing={setIsEditing}
                     watch={watch}
-                    onSave={() => forceUpdate(n => n + 1)}
+                    onSave={async (i) => {
+                      const valid = await validateEntry(trigger, 'references', i);
+                      forceUpdate((n: number) => n + 1);
+                      return valid;
+                    }}
                     setValue={setValue}
                     control={control}
                   />

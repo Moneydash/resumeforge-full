@@ -58,7 +58,7 @@ const LIVE_EDIT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF re
 const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = false, liveEdit = false, sectionRefs }) => {
   const [loadingStep, setLoadingStep] = useState(0);
 
-  const { register, handleSubmit, control, reset, formState: { errors }, setValue, watch, getValues } = useForm<ResumeFormData>({
+  const { register, handleSubmit, control, reset, formState: { errors }, setValue, watch, getValues, trigger } = useForm<ResumeFormData>({
     resolver: yupResolver(schema as any),
     defaultValues: {
       personal: {
@@ -262,7 +262,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
   }, [liveEdit, watch, getValues]);
 
   return (
-    <form onSubmit={handleSubmit(handleSubmitForm, handleInvalid)} className="space-y-8">
+    <form onSubmit={handleSubmit(handleSubmitForm, handleInvalid)} className="@container space-y-8">
 
       {/* Personal Details */}
       <div ref={sectionRefs?.personalRef}>
@@ -322,6 +322,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
           control={control}
           watch={watch}
           setValue={setValue}
+          trigger={trigger}
         />
       </div>
 
@@ -343,6 +344,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
           control={control}
           watch={watch}
           setValue={setValue}
+          trigger={trigger}
         />
       </div>
 
@@ -363,6 +365,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
           inputClasses={inputClasses}
           watch={watch}
           setValue={setValue}
+          trigger={trigger}
           control={control}
         />
       </div>
@@ -424,6 +427,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
           moveProject={moveProject}
           watch={watch}
           setValue={setValue}
+          trigger={trigger}
           control={control}
         />
       </div>
@@ -446,6 +450,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
           moveAward={moveAward}
           watch={watch}
           setValue={setValue}
+          trigger={trigger}
         />
       </div>
 
@@ -465,6 +470,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
           inputClasses={inputClasses}
           watch={watch}
           setValue={setValue}
+          trigger={trigger}
           moveCertification={moveCertification}
           control={control}
         />
@@ -487,6 +493,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
           watch={watch}
           moveReference={moveReference}
           setValue={setValue}
+          trigger={trigger}
           control={control}
         />
       </div>

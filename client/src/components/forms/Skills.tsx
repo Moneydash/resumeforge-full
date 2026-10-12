@@ -11,6 +11,7 @@ import {
   type UseFieldArrayMove,
   type UseFormRegister,
   type UseFormSetValue,
+  type UseFormTrigger,
 } from "react-hook-form";
 import {
   DndContext,
@@ -32,6 +33,7 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import ChipInput from "./ChipInput";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { validateEntry } from './entry-validation';
 import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface SkillsFieldsComponentInterface {
@@ -49,6 +51,7 @@ interface SkillsFieldsComponentInterface {
   inputClasses: string;
   watch: (name: string) => any;
   setValue: UseFormSetValue<ResumeFormData>;
+  trigger: UseFormTrigger<ResumeFormData>;
   control: Control<ResumeFormData>;
 }
 
@@ -65,7 +68,7 @@ interface SortableSkillCardProps {
   isEditing: boolean;
   setIsEditing: (index: number, editing: boolean) => void;
   watch: (name: string) => any;
-  onSave: () => void;
+  onSave: (index: number) => Promise<boolean>;
   setValue: UseFormSetValue<ResumeFormData>;
   control: Control<ResumeFormData>;
 }
@@ -108,9 +111,9 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
     }
   };
 
-  const handleSave = () => {
-    setIsEditing(index, false);
-    onSave();
+  const handleSave = async () => {
+    // keep the card open, with its errors showing, until the entry is valid
+    if (await onSave(index)) setIsEditing(index, false);
   };
 
   const handleCancel = () => {
@@ -130,11 +133,11 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
   if (isEditing) {
     return (
       <div ref={setNodeRef} style={style} className={`${cardClasses} cursor-default`}>
-        <div className="flex justify-between items-start">
+        <div className="flex flex-wrap justify-between items-start gap-2">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Skill #{index + 1}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={handleSave}
@@ -283,7 +286,8 @@ const SkillsFieldsComponent: React.FC<SkillsFieldsComponentInterface> = ({
   inputClasses,
   watch,
   setValue,
-  control
+  control,
+  trigger
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [, forceUpdate] = useState(0);
@@ -310,6 +314,13 @@ const SkillsFieldsComponent: React.FC<SkillsFieldsComponentInterface> = ({
     setEditingIndex(editing ? index : null);
   };
 
+  // Finish the open entry first: adding past an invalid one would leave a blank card behind, then open the new entry
+  const handleAdd = async () => {
+    if (editingIndex !== null && !(await validateEntry(trigger, 'skills', editingIndex))) return;
+    appendSkill({ name: '', keywords: [] });
+    setEditingIndex(skillsFields.length);
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -319,7 +330,7 @@ const SkillsFieldsComponent: React.FC<SkillsFieldsComponentInterface> = ({
           actions={
             <button
               type="button"
-              onClick={() => appendSkill({ name: '', keywords: [] })}
+              onClick={handleAdd}
               className={addButtonClasses}
             >
               <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Skill
@@ -352,7 +363,11 @@ const SkillsFieldsComponent: React.FC<SkillsFieldsComponentInterface> = ({
                     isEditing={editingIndex === index}
                     setIsEditing={setIsEditing}
                     watch={watch}
-                    onSave={() => forceUpdate((n: number) => n + 1)}
+                    onSave={async (i) => {
+                      const valid = await validateEntry(trigger, 'skills', i);
+                      forceUpdate((n: number) => n + 1);
+                      return valid;
+                    }}
                     setValue={setValue}
                     control={control}
                   />

@@ -11,6 +11,7 @@ import {
   type UseFormRegister,
   useWatch,
   type UseFormSetValue,
+  type UseFormTrigger,
 } from "react-hook-form";
 import {
   DndContext,
@@ -32,6 +33,7 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import MonthPicker from "../MonthPicker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { validateEntry } from './entry-validation';
 import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface EducationFieldsComponentInterface {
@@ -50,6 +52,7 @@ interface EducationFieldsComponentInterface {
   control: Control<ResumeFormData>;
   watch: (name: string) => any;
   setValue: UseFormSetValue<ResumeFormData>;
+  trigger: UseFormTrigger<ResumeFormData>;
 }
 
 interface SortableEducationCardProps {
@@ -66,7 +69,7 @@ interface SortableEducationCardProps {
   isEditing: boolean;
   setIsEditing: (index: number, editing: boolean) => void;
   watch: (name: string) => any;
-  onSave: () => void;
+  onSave: (index: number) => Promise<boolean>;
   setValue: UseFormSetValue<ResumeFormData>;
 }
 
@@ -108,9 +111,9 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
     }
   };
 
-  const handleSave = () => {
-    setIsEditing(index, false);
-    onSave();
+  const handleSave = async () => {
+    // keep the card open, with its errors showing, until the entry is valid
+    if (await onSave(index)) setIsEditing(index, false);
   };
 
   const handleCancel = () => {
@@ -130,11 +133,11 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
   if (isEditing) {
     return (
       <div ref={setNodeRef} style={style} className={`${cardClasses} cursor-default`}>
-        <div className="flex justify-between items-start">
+        <div className="flex flex-wrap justify-between items-start gap-2">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Education #{index + 1}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={handleSave}
@@ -186,7 +189,7 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
             )}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
           <div>
             <Label className={labelClasses}>Start Date *</Label>
             <Controller
@@ -307,7 +310,8 @@ const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
   inputClasses,
   control,
   watch,
-  setValue
+  setValue,
+  trigger
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [, forceUpdate] = useState(0);
@@ -334,6 +338,13 @@ const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
     setEditingIndex(editing ? index : null);
   };
 
+  // Finish the open entry first: adding past an invalid one would leave a blank card behind, then open the new entry
+  const handleAdd = async () => {
+    if (editingIndex !== null && !(await validateEntry(trigger, 'education', editingIndex))) return;
+    appendEducation({ degree: '', institution: '', startDate: '', endDate: '', hidden: false });
+    setEditingIndex(educationFields.length);
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -343,7 +354,7 @@ const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
           actions={
             <button
               type="button"
-              onClick={() => appendEducation({ degree: '', institution: '', startDate: '', endDate: '', hidden: false })}
+              onClick={handleAdd}
               className={addButtonClasses}
             >
               <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Education
@@ -377,7 +388,11 @@ const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
                     isEditing={editingIndex === index}
                     setIsEditing={setIsEditing}
                     watch={watch}
-                    onSave={() => forceUpdate((n: number) => n + 1)}
+                    onSave={async (i) => {
+                      const valid = await validateEntry(trigger, 'education', i);
+                      forceUpdate((n: number) => n + 1);
+                      return valid;
+                    }}
                     setValue={setValue}
                   />
                 ))}
