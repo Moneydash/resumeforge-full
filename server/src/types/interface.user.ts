@@ -2,6 +2,7 @@ export interface User {
   id: string;
   google_id?: string;
   github_id?: string;
+  linkedin_id?: string;
   email: string;
   name: string;
   avatar?: string;
@@ -13,6 +14,7 @@ export interface CreateUserData {
   id: string;
   google_id?: string;
   github_id?: string;
+  linkedin_id?: string;
   email: string;
   name: string;
   avatar?: string;

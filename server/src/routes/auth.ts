@@ -4,6 +4,8 @@ import {
   googleCallback,
   githubLogin,
   githubCallback,
+  linkedinLogin,
+  linkedinCallback,
   logout
 } from '../controllers/auth';
 import { isAuthenticated, isGuest, validateSocialLogin, optionalAuth } from '../middlewares/auth';
@@ -24,10 +26,11 @@ authRouter.get('/', optionalAuth, (req, res) => {
 authRouter.get('/login', isGuest, (req, res) => {
   res.json({
     message: 'Login page',
-    providers: ['google', 'github'],
+    providers: ['google', 'github', 'linkedin'],
     loginUrls: {
       google: '/auth/google',
-      github: '/auth/github'
+      github: '/auth/github',
+      linkedin: '/auth/linkedin'
     }
   });
 });
@@ -69,6 +72,10 @@ authRouter.get('/auth/google/callback', googleCallback);
 authRouter.get('/auth/github', githubLogin);
 authRouter.get('/auth/github/callback', githubCallback);
 
+// LinkedIn OAuth routes
+authRouter.get('/auth/linkedin', linkedinLogin);
+authRouter.get('/auth/linkedin/callback', linkedinCallback);
+
 authRouter.get('/csrf-token', (req, res) => {
   const token = req.csrfToken();
   console.log('Generated CSRF Token for client: ', token);
@@ -79,7 +86,7 @@ authRouter.get('/csrf-token', (req, res) => {
 authRouter.post('/logout', logout);
 
 // Dashboard route (protected) - now accepts both Google and GitHub
-authRouter.get('/dashboard', isAuthenticated, validateSocialLogin(['google', 'github']), (req, res) => {
+authRouter.get('/dashboard', isAuthenticated, validateSocialLogin(['google', 'github', 'linkedin']), (req, res) => {
   res.json({
     message: 'Welcome to dashboard',
     user: req.user

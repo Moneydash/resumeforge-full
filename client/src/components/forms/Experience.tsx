@@ -10,6 +10,7 @@ import {
   type UseFieldArrayMove,
   type UseFormRegister,
   type UseFormSetValue,
+  type UseFormTrigger,
 } from "react-hook-form";
 import {
   DndContext,
@@ -35,6 +36,7 @@ import MonthPicker from "../MonthPicker";
 import EditorComponent from "../EditorComponent";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { useWatch } from "react-hook-form";
+import { validateEntry } from './entry-validation';
 import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface ExperienceFieldsComponentInterface {
@@ -53,6 +55,7 @@ interface ExperienceFieldsComponentInterface {
   control: Control<ResumeFormData>;
   watch: (name: string) => any;
   setValue: UseFormSetValue<ResumeFormData>;
+  trigger: UseFormTrigger<ResumeFormData>;
 }
 
 interface SortableExperienceCardProps {
@@ -68,7 +71,7 @@ interface SortableExperienceCardProps {
   control: Control<ResumeFormData>;
   isEditing: boolean;
   setIsEditing: (index: number, editing: boolean) => void;
-  onSave: () => void;
+  onSave: (index: number) => Promise<boolean>;
   watch: (name: string) => any;
   setValue: UseFormSetValue<ResumeFormData>;
 }
@@ -111,13 +114,18 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
     }
   };
 
-  const handleSave = () => {
-    setIsEditing(index, false);
-    onSave(); // onSave should trigger forceUpdate in the parent
+  // Edits are saved as you type, so closing only has to make sure the entry is valid: an invalid one stays open with its errors showing
+  const handleClose = async () => {
+    if (await onSave(index)) setIsEditing(index, false);
   };
 
-  const handleCancel = () => {
-    setIsEditing(index, false);
+  // An empty end date already reads as "Present" in every template, so the checkbox just clears and locks it
+  const endDate = useWatch({ control, name: `experience.${index}.endDate` });
+  const [stillHere, setStillHere] = useState(!endDate);
+  const isCurrent = stillHere && !endDate;
+  const handleStillHere = (checked: boolean) => {
+    setStillHere(checked);
+    if (checked) setValue(`experience.${index}.endDate`, '', { shouldDirty: true });
   };
 
   const isHidden = useWatch({
@@ -133,24 +141,17 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
   if (isEditing) {
     return (
       <div ref={setNodeRef} style={style} className={`${cardClasses} cursor-default`}>
-        <div className="flex justify-between items-start">
+        <div className="flex flex-wrap justify-between items-start gap-2">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Experience #{index + 1}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
-              onClick={handleSave}
-              className="px-3 py-1 text-sm text-white rounded bg-blue-500"
+              onClick={handleClose}
+              className="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-md min-h-9 pointer-coarse:min-h-11 border border-[#cfcdc5] dark:border-white/25 bg-white dark:bg-transparent text-[#111110] dark:text-[#f4f4f2] hover:bg-[#f6f5f2] dark:hover:bg-[#151517] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff] focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0b0b0c] transition-colors duration-150"
             >
-              Save
-            </button>
-            <button
-              type="button"
-              onClick={handleCancel}
-              className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
-            >
-              Cancel
+              Close
             </button>
             <button
               type="button"
@@ -162,7 +163,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
           <div>
             <Label className={labelClasses}>Job Title *</Label>
             <Input
@@ -171,7 +172,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               placeholder="Software Engineer"
             />
             {errors.experience?.[index]?.title && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.experience[index]?.title?.message}
               </p>
             )}
@@ -185,14 +186,14 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               placeholder="Company Name"
             />
             {errors.experience?.[index]?.company && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.experience[index]?.company?.message}
               </p>
             )}
           </div>
         </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-5">
           <div>
             <label className={labelClasses}>Start Date *</label>
             <Controller
@@ -210,10 +211,19 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               )}
             />
             {errors.experience?.[index]?.startDate && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.experience[index]?.startDate?.message}
               </p>
             )}
+            <label className="mt-2 flex items-center gap-2 text-sm text-[#5c5b56] dark:text-[#a3a29c] cursor-pointer">
+              <input
+                type="checkbox"
+                checked={isCurrent}
+                onChange={(e) => handleStillHere(e.target.checked)}
+                className="size-4 accent-[#111110] dark:accent-[#f4f4f2]"
+              />
+              I still work here
+            </label>
           </div>
 
           <div>
@@ -229,6 +239,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
                   yearPlaceholder="Select Year"
                   monthRequired={false}
                   yearRequired={false}
+                  disabled={isCurrent}
                 />
               )}
             />
@@ -247,7 +258,7 @@ const SortableExperienceCard: React.FC<SortableExperienceCardProps> = ({
               />
             )}
           />
-          <p className="text-xs text-gray-500 mt-1 ml-1">
+          <p className="text-xs text-[#5c5b56] dark:text-[#a3a29c] mt-1 ml-1">
             Press Enter for new lines. These will be preserved when generating your resume.
           </p>
         </div>
@@ -332,7 +343,8 @@ const ExperienceFieldsComponent: React.FC<ExperienceFieldsComponentInterface> = 
   errors,
   control,
   watch,
-  setValue
+  setValue,
+  trigger
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [, forceUpdate] = useState(0);
@@ -361,6 +373,13 @@ const ExperienceFieldsComponent: React.FC<ExperienceFieldsComponentInterface> = 
     setEditingIndex(editing ? index : null);
   };
 
+  // Finish the open entry first: adding past an invalid one would leave a blank card behind, then open the new entry
+  const handleAdd = async () => {
+    if (editingIndex !== null && !(await validateEntry(trigger, 'experience', editingIndex))) return;
+    appendExperience({ title: '', company: '', startDate: '', endDate: '', description: '', hidden: false });
+    setEditingIndex(experienceFields.length);
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -370,7 +389,7 @@ const ExperienceFieldsComponent: React.FC<ExperienceFieldsComponentInterface> = 
           actions={
             <button
               type="button"
-              onClick={() => appendExperience({ title: '', company: '', startDate: '', endDate: '', description: '', hidden: false })}
+              onClick={handleAdd}
               className={addButtonClasses}
             >
               <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Experience
@@ -403,7 +422,11 @@ const ExperienceFieldsComponent: React.FC<ExperienceFieldsComponentInterface> = 
                     control={control}
                     isEditing={editingIndex === index}
                     setIsEditing={setIsEditing}
-                    onSave={() => forceUpdate((n: number) => n + 1)}
+                    onSave={async (i) => {
+                      const valid = await validateEntry(trigger, 'experience', i);
+                      forceUpdate((n: number) => n + 1);
+                      return valid;
+                    }}
                     watch={watch}
                     setValue={setValue}
                   />

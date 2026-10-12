@@ -1,14 +1,14 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { FcGoogle } from 'react-icons/fc';
-import { FaGithub } from 'react-icons/fa';
+import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 import Cookies from 'js-cookie';
 import { Link, useNavigate } from 'react-router-dom';
 import ThemeToggle from '@/components/ThemeToggle';
 
-type Provider = 'google' | 'github';
+type Provider = 'google' | 'github' | 'linkedin';
 
-const PROVIDER_LABEL: Record<Provider, string> = { google: 'Google', github: 'GitHub' };
+const PROVIDER_LABEL: Record<Provider, string> = { google: 'Google', github: 'GitHub', linkedin: 'LinkedIn' };
 
 const focusRing =
   'focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring';
@@ -220,6 +220,7 @@ const Login: React.FC = () => {
             <div className="mt-8 space-y-3">
               {providerButton('google', <FcGoogle className="size-5" aria-hidden="true" />)}
               {providerButton('github', <FaGithub className="size-5" aria-hidden="true" />)}
+              {providerButton('linkedin', <FaLinkedin className="size-5 text-[#0A66C2]" aria-hidden="true" />)}
             </div>
 
             <div aria-live="polite" className="min-h-6">

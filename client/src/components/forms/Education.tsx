@@ -11,6 +11,7 @@ import {
   type UseFormRegister,
   useWatch,
   type UseFormSetValue,
+  type UseFormTrigger,
 } from "react-hook-form";
 import {
   DndContext,
@@ -32,6 +33,7 @@ import { Label } from "../ui/label";
 import { Input } from "../ui/input";
 import MonthPicker from "../MonthPicker";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
+import { validateEntry } from './entry-validation';
 import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
 interface EducationFieldsComponentInterface {
@@ -50,6 +52,7 @@ interface EducationFieldsComponentInterface {
   control: Control<ResumeFormData>;
   watch: (name: string) => any;
   setValue: UseFormSetValue<ResumeFormData>;
+  trigger: UseFormTrigger<ResumeFormData>;
 }
 
 interface SortableEducationCardProps {
@@ -66,7 +69,7 @@ interface SortableEducationCardProps {
   isEditing: boolean;
   setIsEditing: (index: number, editing: boolean) => void;
   watch: (name: string) => any;
-  onSave: () => void;
+  onSave: (index: number) => Promise<boolean>;
   setValue: UseFormSetValue<ResumeFormData>;
 }
 
@@ -108,9 +111,9 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
     }
   };
 
-  const handleSave = () => {
-    setIsEditing(index, false);
-    onSave();
+  const handleSave = async () => {
+    // keep the card open, with its errors showing, until the entry is valid
+    if (await onSave(index)) setIsEditing(index, false);
   };
 
   const handleCancel = () => {
@@ -130,22 +133,22 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
   if (isEditing) {
     return (
       <div ref={setNodeRef} style={style} className={`${cardClasses} cursor-default`}>
-        <div className="flex justify-between items-start">
+        <div className="flex flex-wrap justify-between items-start gap-2">
           <h3 className="text-lg font-medium text-gray-900 dark:text-white">
             Education #{index + 1}
           </h3>
-          <div className="flex gap-2">
+          <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={handleSave}
-              className="px-3 py-1 text-sm text-white rounded bg-blue-500"
+              className="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-md min-h-9 pointer-coarse:min-h-11 bg-[#111110] text-white hover:bg-[#2a2a28] dark:bg-[#f4f4f2] dark:text-[#111110] dark:hover:bg-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff] focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0b0b0c] transition-colors duration-150"
             >
               Save
             </button>
             <button
               type="button"
               onClick={handleCancel}
-              className="px-3 py-1 text-sm bg-gray-500 text-white rounded hover:bg-gray-600"
+              className="inline-flex items-center justify-center px-3 py-1 text-sm font-medium rounded-md min-h-9 pointer-coarse:min-h-11 border border-[#cfcdc5] dark:border-white/25 bg-white dark:bg-transparent text-[#111110] dark:text-[#f4f4f2] hover:bg-[#f6f5f2] dark:hover:bg-[#151517] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-offset-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff] focus-visible:ring-offset-white dark:focus-visible:ring-offset-[#0b0b0c] transition-colors duration-150"
             >
               Cancel
             </button>
@@ -167,7 +170,7 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
               placeholder="Bachelor of Science in Computer Science"
             />
             {errors.education?.[index]?.degree && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.education[index]?.degree?.message}
               </p>
             )}
@@ -180,13 +183,13 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
               placeholder="University Name"
             />
             {errors.education?.[index]?.institution && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.education[index]?.institution?.message}
               </p>
             )}
           </div>
         </div>
-        <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="grid grid-cols-1 @md:grid-cols-2 gap-4">
           <div>
             <Label className={labelClasses}>Start Date *</Label>
             <Controller
@@ -204,7 +207,7 @@ const SortableEducationCard: React.FC<SortableEducationCardProps> = ({
               )}
             />
             {errors.education?.[index]?.startDate && (
-              <p className="text-red-500 dark:text-red-400 text-sm mt-1">
+              <p className="text-[#b3261e] dark:text-[#ff8a80] text-sm mt-1 flex items-start gap-1.5 before:content-[''] before:mt-[0.45em] before:size-1.5 before:shrink-0 before:rounded-full before:bg-current">
                 {errors.education[index]?.startDate?.message}
               </p>
             )}
@@ -307,7 +310,8 @@ const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
   inputClasses,
   control,
   watch,
-  setValue
+  setValue,
+  trigger
 }) => {
   const [editingIndex, setEditingIndex] = useState<number | null>(null);
   const [, forceUpdate] = useState(0);
@@ -334,6 +338,13 @@ const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
     setEditingIndex(editing ? index : null);
   };
 
+  // Finish the open entry first: adding past an invalid one would leave a blank card behind, then open the new entry
+  const handleAdd = async () => {
+    if (editingIndex !== null && !(await validateEntry(trigger, 'education', editingIndex))) return;
+    appendEducation({ degree: '', institution: '', startDate: '', endDate: '', hidden: false });
+    setEditingIndex(educationFields.length);
+  };
+
   return (
     <>
       <div className="space-y-4">
@@ -343,7 +354,7 @@ const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
           actions={
             <button
               type="button"
-              onClick={() => appendEducation({ degree: '', institution: '', startDate: '', endDate: '', hidden: false })}
+              onClick={handleAdd}
               className={addButtonClasses}
             >
               <CirclePlusIcon size={15} style={{ marginRight: 5, marginBottom: 0.3 }} /> Add Education
@@ -377,7 +388,11 @@ const EducationFieldsComponent: React.FC<EducationFieldsComponentInterface> = ({
                     isEditing={editingIndex === index}
                     setIsEditing={setIsEditing}
                     watch={watch}
-                    onSave={() => forceUpdate((n: number) => n + 1)}
+                    onSave={async (i) => {
+                      const valid = await validateEntry(trigger, 'education', i);
+                      forceUpdate((n: number) => n + 1);
+                      return valid;
+                    }}
                     setValue={setValue}
                   />
                 ))}

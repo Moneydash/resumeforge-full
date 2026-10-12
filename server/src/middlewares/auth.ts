@@ -23,7 +23,7 @@ interface AuthMiddleware {
 }
 
 // Social login provider types
-type SocialProvider = 'google' | 'github' | 'facebook' | 'twitter';
+type SocialProvider = 'google' | 'github' | 'linkedin' | 'facebook' | 'twitter';
 
 // User session interface
 interface UserSession {
@@ -226,7 +226,7 @@ const authRateLimit = (maxAttempts: number = 5, windowMs: number = 15 * 60 * 100
  * Social login validation middleware
  * Validates that the user has completed social login process
  */
-const validateSocialLogin = (providers: SocialProvider[] = ['google', 'github']) => {
+const validateSocialLogin = (providers: SocialProvider[] = ['google', 'github', 'linkedin']) => {
   return (req: Request, res: Response, next: NextFunction) => {
     if (!req.isAuthenticated()) {
       res.status(401).json({
