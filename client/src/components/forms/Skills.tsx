@@ -2,6 +2,7 @@ import type { ResumeFormData } from "@/types/interface.resume-form-data";
 import { CirclePlusIcon, Trash2Icon, GripVerticalIcon, EyeOffIcon, EyeIcon } from "lucide-react";
 import React, { useState } from "react";
 import {
+  Controller,
   useWatch,
   type Control,
   type FieldArrayWithId,
@@ -29,6 +30,7 @@ import {
 import { CSS } from '@dnd-kit/utilities';
 import { Label } from "../ui/label";
 import { Input } from "../ui/input";
+import ChipInput from "./ChipInput";
 import { Tooltip, TooltipContent, TooltipTrigger } from "../ui/tooltip";
 import { SectionBody, SectionHeader, type SectionControls } from "./SectionHeader";
 
@@ -171,11 +173,18 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
             )}
           </div>
           <div>
-            <Label className={labelClasses}>Keywords</Label>
-            <Input
-              {...register(`skills.${index}.keywords`)}
-              className={inputClasses}
-              placeholder="PHP, Java, Javascript(separate with commas)"
+            <Label htmlFor={`skill-keywords-${index}`} className={labelClasses}>Keywords</Label>
+            <Controller
+              control={control}
+              name={`skills.${index}.keywords`}
+              render={({ field: keywordField }) => (
+                <ChipInput
+                  id={`skill-keywords-${index}`}
+                  value={keywordField.value}
+                  onChange={keywordField.onChange}
+                  placeholder="Type a keyword, then press Enter or comma  e.g. Java"
+                />
+              )}
             />
           </div>
         </div>
@@ -248,7 +257,7 @@ const SortableSkillCard: React.FC<SortableSkillCardProps> = ({
           return keywordArr.map((kw, i) => (
             <span
               key={i}
-              className="inline-block border border-[#e5e3dc] bg-[#f6f5f2] text-[#111110] text-xs font-semibold px-2.5 py-0.5 rounded dark:border-white/12 dark:bg-[#151517] dark:text-[#f4f4f2]"
+              className="inline-block border border-[#e5e3dc] bg-[#f6f5f2] text-[#111110] text-xs font-semibold px-2.5 py-0.5 rounded-md dark:border-white/12 dark:bg-[#151517] dark:text-[#f4f4f2]"
             >
               {kw}
             </span>

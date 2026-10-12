@@ -40,7 +40,7 @@ const ChipInput: React.FC<ChipInputProps> = ({ id, value, onChange, placeholder 
       {chips.map((chip, index) => (
         <span
           key={`${chip}-${index}`}
-          className="inline-flex items-center gap-1 rounded-full border border-[#e5e3dc] bg-[#f6f5f2] py-0.5 pl-3 pr-1 text-sm text-[#111110] dark:border-white/12 dark:bg-[#151517] dark:text-[#f4f4f2]"
+          className="inline-flex items-center gap-1 rounded-md border border-[#e5e3dc] bg-[#f6f5f2] py-0.5 pl-3 pr-1 text-sm text-[#111110] dark:border-white/12 dark:bg-[#151517] dark:text-[#f4f4f2]"
         >
           {chip}
           <button
@@ -48,7 +48,7 @@ const ChipInput: React.FC<ChipInputProps> = ({ id, value, onChange, placeholder 
             aria-label={`Remove ${chip}`}
             onMouseDown={(event) => event.preventDefault()} // keep focus so pending text is not committed mid-click
             onClick={() => onChange(removeChip(chips, index))}
-            className="rounded-full p-0.5 hover:bg-[#e5e3dc] dark:hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff]"
+            className="rounded p-0.5 hover:bg-[#e5e3dc] dark:hover:bg-white/12 focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1f3f8f] dark:focus-visible:ring-[#8fb0ff]"
           >
             <X size={12} />
           </button>
