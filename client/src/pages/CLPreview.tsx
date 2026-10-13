@@ -25,6 +25,7 @@ import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
 import DesignPanel, { DESIGN_PANEL_WIDTH, type DesignTab } from '@/components/DesignPanel';
 import EditorTopBar from '@/components/editor-chrome/EditorTopBar';
+import Loader from '@/components/SuspenseLoader';
 import SectionRail from '@/components/editor-chrome/SectionRail';
 import type { SavedFont } from '@/utils/fonts';
 
@@ -366,12 +367,7 @@ const CLPreview: React.FC = () => {
 
   return (
     clLoading ? (
-      <div className="h-screen w-full flex items-center justify-center bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800">
-        <div className="flex flex-col items-center">
-          <Loader2 className="w-10 h-10 animate-spin text-blue-600 dark:text-blue-400 mb-4" />
-          <span className="text-lg font-semibold text-gray-700 dark:text-gray-200">Loading your cover letter...</span>
-        </div>
-      </div>
+      <Loader label="Loading your cover letter..." />
     ) : (
       <div className="app-shell h-screen w-full font-app flex flex-col overflow-hidden">
         <EditorTopBar
