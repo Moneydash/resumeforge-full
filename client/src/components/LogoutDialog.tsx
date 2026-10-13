@@ -5,14 +5,15 @@ import { toast } from 'sonner';
 import client from '@/api/axiosInstance';
 import { getCsrfToken } from '@/utils/helper';
 import { Button } from '@/components/ui/button';
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { Dialog, DialogContent, DialogHeader, DialogEyebrow, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
+import { popupDangerClasses, popupGhostClasses } from '@/styles/popup-classes';
 
 interface LogoutDialogProps {
   open: boolean;
   onOpenChange: (open: boolean) => void;
 }
 
-// Confirmation dialog that ends the session; shared by the floating LogoutButton and the sidebar
+// Confirmation dialog that ends the session; opened from the sidebar
 const LogoutDialog: React.FC<LogoutDialogProps> = ({ open, onOpenChange }) => {
   const [loggingOut, setLoggingOut] = useState(false);
 
@@ -47,24 +48,24 @@ const LogoutDialog: React.FC<LogoutDialogProps> = ({ open, onOpenChange }) => {
     <Dialog open={open} onOpenChange={(next) => { if (!loggingOut) onOpenChange(next); }}>
       <DialogContent>
         <DialogHeader>
+          <DialogEyebrow>Account</DialogEyebrow>
           <DialogTitle>Log out?</DialogTitle>
+          <DialogDescription>
+            Are you sure you want to log out? You will need to sign in again to access your resumes.
+          </DialogDescription>
         </DialogHeader>
-        <DialogDescription>
-          Are you sure you want to log out? You will need to sign in again to access your resumes.
-        </DialogDescription>
         <DialogFooter>
           <Button
             onClick={() => onOpenChange(false)}
             disabled={loggingOut}
-            className="dark:text-white"
+            className={popupGhostClasses}
           >
             Stay signed in
           </Button>
           <Button
             onClick={handleLogout}
             disabled={loggingOut}
-            variant="destructive"
-            className="flex items-center gap-2"
+            className={popupDangerClasses}
           >
             {loggingOut ? <Loader2 className="w-4 h-4 animate-spin" /> : <LogOut className="w-4 h-4" />}
             {loggingOut ? 'Logging out...' : 'Log out'}
