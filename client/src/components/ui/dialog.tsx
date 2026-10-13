@@ -66,14 +66,16 @@ function DialogContent({
         <span aria-hidden="true" className="mx-auto h-1 w-9 rounded-full bg-[#cfcdc5] dark:bg-white/25 sm:hidden" />
         {children}
         {showCloseButton && (
-          <DialogPrimitive.Close
-            data-slot="dialog-close"
-            className="absolute top-3.5 right-3.5 inline-flex items-center justify-center rounded-[5px] border border-[#e5e3dc] px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-[#5c5b56] hover:bg-[#f6f5f2] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1f3f8f] dark:border-white/12 dark:text-[#a3a29c] dark:hover:bg-[#151517] dark:focus-visible:ring-[#8fb0ff] pointer-coarse:size-11 pointer-coarse:rounded-md pointer-coarse:border-0 sm:top-[18px] sm:right-[18px]"
-          >
-            <span aria-hidden="true" className="pointer-coarse:hidden">ESC</span>
-            <XIcon className="hidden size-4 pointer-coarse:block" />
-            <span className="sr-only">Close</span>
-          </DialogPrimitive.Close>
+          <div className="absolute top-2.5 right-2.5 flex items-center gap-1.5 sm:top-3.5 sm:right-3.5">
+            <span aria-hidden="true" className="pointer-coarse:hidden rounded-[5px] border border-[#e5e3dc] px-1.5 py-[3px] font-mono text-[10px] tracking-[0.08em] text-[#5c5b56] select-none dark:border-white/12 dark:text-[#a3a29c]">ESC</span>
+            <DialogPrimitive.Close
+              data-slot="dialog-close"
+              className="inline-flex size-7 items-center justify-center rounded-md text-[#5c5b56] hover:bg-[#f6f5f2] hover:text-[#111110] focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[#1f3f8f] dark:text-[#a3a29c] dark:hover:bg-[#151517] dark:hover:text-[#f4f4f2] dark:focus-visible:ring-[#8fb0ff] pointer-coarse:size-11"
+            >
+              <XIcon className="size-4" />
+              <span className="sr-only">Close</span>
+            </DialogPrimitive.Close>
+          </div>
         )}
       </DialogPrimitive.Content>
     </DialogPortal>
@@ -84,7 +86,7 @@ function DialogHeader({ className, ...props }: React.ComponentProps<"div">) {
   return (
     <div
       data-slot="dialog-header"
-      className={cn("flex flex-col gap-2 text-left pr-14", className)}
+      className={cn("flex flex-col gap-2 text-left pr-20", className)}
       {...props}
     />
   )
