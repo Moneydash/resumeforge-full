@@ -20,6 +20,7 @@ function App() {
               warning: 'bg-[#111110] text-[#f4f4f2] dark:bg-[#f4f4f2] dark:text-[#111110]',
               loading: 'bg-[#111110] text-[#f4f4f2] dark:bg-[#f4f4f2] dark:text-[#111110]',
               error: 'bg-[#b3261e] text-white dark:bg-[#ff8a80] dark:text-[#1a0a09]',
+              icon: 'relative flex size-4 shrink-0 items-center justify-center',
               title: 'font-medium',
               description: 'text-[13px] opacity-80',
             },
