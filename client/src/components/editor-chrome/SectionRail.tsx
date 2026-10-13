@@ -10,13 +10,15 @@ export interface RailItem {
 
 interface SectionRailProps {
   items: RailItem[];
+  /** Accessible name of the rail; the resume editor keeps the default. */
+  label?: string;
   onSelect: (ref: RefObject<HTMLDivElement>) => void;
 }
 
 // The page passes its own sidebarItems and scrollToSection, so the scrolling behavior is unchanged.
-export default function SectionRail({ items, onSelect }: SectionRailProps) {
+export default function SectionRail({ items, label = 'Resume sections', onSelect }: SectionRailProps) {
   return (
-    <nav className="ec-rail" aria-label="Resume sections">
+    <nav className="ec-rail" aria-label={label}>
       {items.map((item) => {
         const Icon = item.icon;
         return (
