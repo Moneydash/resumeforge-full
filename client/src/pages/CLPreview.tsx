@@ -3,8 +3,6 @@ import CLForm from '../components/CLForm';
 import { useTheme } from '../contexts/ThemeContext';
 import type { CLFormData } from '@/types/interface.cl-form-data';
 import { useNavigate } from 'react-router-dom';
-import ThemeToggle from '../components/ThemeToggle';
-import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import '@react-pdf-viewer/core/lib/styles/index.css';
 import '@react-pdf-viewer/default-layout/lib/styles/index.css';
@@ -13,11 +11,8 @@ import {
   Building2,
   MessageSquare,
   FileIcon,
-  Eye,
   Loader2,
-  LayoutDashboard,
-  GripVertical,
-  Palette
+  GripVertical
 } from 'lucide-react';
 import type { CLTemplateType } from '@/types';
 import { renderToString } from 'react-dom/server';
@@ -29,7 +24,7 @@ import client from '@/api/axiosInstance';
 import Cookies from 'js-cookie';
 import { useMainStore } from '@/store/useMainStore';
 import DesignPanel, { DESIGN_PANEL_WIDTH, type DesignTab } from '@/components/DesignPanel';
-import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from '@/components/ui/tooltip';
+import EditorTopBar from '@/components/editor-chrome/EditorTopBar';
 import type { SavedFont } from '@/utils/fonts';
 
 const CLPreview: React.FC = () => {
@@ -377,9 +372,20 @@ const CLPreview: React.FC = () => {
         </div>
       </div>
     ) : (
-      <div className="h-screen w-full bg-gradient-to-br from-slate-50 to-blue-50 dark:from-gray-900 dark:to-gray-800 font-app flex flex-col">
+      <div className="app-shell h-screen w-full font-app flex flex-col overflow-hidden">
+        <EditorTopBar
+          templateLabel={`Template: ${(template || 'aether').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`}
+          status={liveEdit ? liveStatus : 'idle'}
+          designOpen={designOpen}
+          canOpenDesign={!!pdfUrl}
+          onToggleDesign={() => setDesignOpen((open) => !open)}
+          onDashboard={redirectDashboard}
+          onExport={() => handleExportPDF({ ...clData, fontFamily: fontFamilyRef.current })}
+          exporting={loadingExport}
+          canExport={!!pdfUrl}
+        />
         {/* Fixed Navigation Sidebar */}
-        <div className="fixed left-0 top-0 h-full w-12 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg z-50 flex flex-col">
+        <div className="fixed left-0 top-14 bottom-0 w-12 bg-white dark:bg-gray-800 border-r border-gray-200 dark:border-gray-700 shadow-lg z-50 flex flex-col">
           <div className="flex-1 flex flex-col justify-center py-4">
             <div className="flex flex-col items-center space-y-2">
               {sidebarItems.map((item, index) => {
@@ -427,51 +433,6 @@ const CLPreview: React.FC = () => {
               transition: isResizing ? 'none' : 'width 0.15s cubic-bezier(.4,2,.6,1)',
             }}
           >
-            {/* Header - Fixed */}
-            <div className={`
-              flex-shrink-0 p-6 bg-inherit 
-              border-b border-gray-200/50 dark:border-gray-700/50
-              backdrop-blur-xl
-              z-10
-            `}>
-              <div className="flex items-center justify-between mb-2">
-                <div className="flex items-center space-x-3">
-                  <img src="/icon.png" alt="CoverCraft logo" className="h-8 w-8 flex-shrink-0 rounded-lg bg-white shadow-sm" />
-                  <h1 className={`
-                    text-2xl font-bold bg-gradient-to-r 
-                    ${isDarkMode
-                      ? 'from-white to-gray-300'
-                      : 'from-gray-900 to-gray-600'
-                    } 
-                    bg-clip-text text-transparent
-                  `}>
-                    CoverCraft
-                  </h1>
-                </div>
-
-                <div className={`
-                  px-3 py-1.5 rounded-full text-xs font-medium
-                  ${isDarkMode
-                    ? 'bg-gray-700/50 text-gray-300 border border-gray-600/50'
-                    : 'bg-gray-100/50 text-gray-600 border border-gray-200/50'
-                  }
-                  backdrop-blur-sm
-                `}>
-                  <ThemeToggle />
-                </div>
-              </div>
-
-              <div className={`
-                inline-flex items-center px-3 py-1 rounded-full text-xs font-medium
-                ${isDarkMode
-                  ? 'bg-blue-500/20 text-blue-300 border border-blue-500/30'
-                  : 'bg-blue-50 text-blue-600 border border-blue-200'
-                }
-              `}>
-                Template: {(template || 'aether').replace(/_/g, ' ').replace(/\b\w/g, c => c.toUpperCase())}
-              </div>
-            </div>
-
             {/* Form Content - Scrollable */}
             <div
               ref={formContainerRef}
@@ -516,111 +477,6 @@ const CLPreview: React.FC = () => {
               width: window.innerWidth >= 1024 ? `calc(100% - ${sidebarWidth}px - ${designOpen ? DESIGN_PANEL_WIDTH : 0}px)` : '100%',
             }}
           >
-            {/* Preview Header - Fixed */}
-            <div className={`
-              flex-shrink-0 p-6
-              ${isDarkMode
-                ? 'bg-gray-900/95 backdrop-blur-xl border-gray-700/50'
-                : 'bg-white/95 backdrop-blur-xl border-gray-200/50'
-              }
-              border-b shadow-lg
-              z-10
-            `}>
-              <div className="flex items-center justify-between">
-                <div className="flex items-center space-x-3">
-                  <Eye className={`w-5 h-5 ${isDarkMode ? 'text-gray-300' : 'text-gray-600'}`} />
-                  <h2 className={`
-                    text-xl font-semibold bg-gradient-to-r 
-                    ${isDarkMode
-                      ? 'from-white to-gray-300'
-                      : 'from-gray-900 to-gray-600'
-                    } 
-                    bg-clip-text text-transparent
-                  `}>
-                    Cover Letter Preview
-                  </h2>
-                </div>
-
-                <div className="flex items-center space-x-3">
-                  {liveEdit && liveStatus !== 'idle' && (
-                    <span className={`text-xs font-medium flex items-center ${liveStatus === 'error' ? 'text-red-500' : isDarkMode ? 'text-gray-400' : 'text-gray-500'}`}>
-                      {liveStatus === 'updating' && <><Loader2 className="w-3 h-3 mr-1 animate-spin" />Saving &amp; updating preview...</>}
-                      {liveStatus === 'saved' && 'All changes saved'}
-                      {liveStatus === 'error' && 'Update failed, will retry on next edit'}
-                    </span>
-                  )}
-                  <TooltipProvider>
-                    <Tooltip>
-                      <TooltipTrigger asChild>
-                        <Button
-                          variant="outline"
-                          size="icon"
-                          aria-label="Design"
-                          aria-pressed={designOpen}
-                          disabled={!pdfUrl}
-                          onClick={() => setDesignOpen((open) => !open)}
-                          className={`
-                            ${isDarkMode
-                              ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
-                              : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                            }
-                            ${designOpen ? 'ring-2 ring-indigo-500' : ''}
-                            transition-all duration-200 hover:scale-105
-                          `}
-                        >
-                          <Palette className="w-4 h-4" />
-                        </Button>
-                      </TooltipTrigger>
-                      <TooltipContent>Design</TooltipContent>
-                    </Tooltip>
-                  </TooltipProvider>
-
-                  <Button
-                    variant="outline"
-                    onClick={redirectDashboard}
-                    className={`
-                      ${isDarkMode
-                        ? 'border-gray-600 hover:bg-gray-700 text-gray-300 hover:text-white'
-                        : 'border-gray-300 hover:bg-gray-50 text-gray-700 hover:text-gray-900'
-                      }
-                      transition-all duration-200 hover:scale-105
-                    `}
-                  >
-                    <LayoutDashboard className="w-4 h-4 mr-2" />
-                    Dashboard
-                  </Button>
-
-                  <Button
-                    id="exportButton"
-                    onClick={() => handleExportPDF({ ...clData, fontFamily: fontFamilyRef.current })}
-                    disabled={loadingExport || !pdfUrl}
-                    className={`
-                      ${isDarkMode
-                        ? 'bg-gradient-to-r from-blue-600 to-purple-600 hover:from-blue-700 hover:to-purple-700'
-                        : 'bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700'
-                      }
-                      text-white font-medium
-                      transition-all duration-200 hover:scale-105
-                      disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:scale-100
-                      shadow-lg hover:shadow-xl
-                    `}
-                  >
-                    {loadingExport ? (
-                      <>
-                        <Loader2 className="w-4 h-4 mr-2 animate-spin" />
-                        Exporting...
-                      </>
-                    ) : (
-                      <>
-                        <FileIcon className="w-4 h-4 mr-2" />
-                        Export PDF
-                      </>
-                    )}
-                  </Button>
-                </div>
-              </div>
-            </div>
-
             {/* Preview Content - Scrollable */}
             <div className="flex-1 overflow-y-auto p-6 no-scrollbar">
               {loading && !liveEdit ? (
