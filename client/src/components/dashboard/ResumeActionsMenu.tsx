@@ -1,5 +1,5 @@
 import { Copy, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
-import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface ResumeActionsMenuProps {
   name: string;
@@ -19,6 +19,7 @@ export default function ResumeActionsMenu({ name, onClone, onRename, onDelete }:
         </button>
       </DropdownMenuTrigger>
       <DropdownMenuContent align="end">
+        <DropdownMenuLabel className="px-2.5 pt-1.5 pb-1 font-mono text-[9.5px] font-normal uppercase tracking-[0.14em] text-[#5c5b56] dark:text-[#a3a29c]">Actions</DropdownMenuLabel>
         <DropdownMenuItem onSelect={onClone}>
           <Copy aria-hidden="true" />
           Clone
