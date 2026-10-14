@@ -42,12 +42,14 @@ import type { SavedFont } from '@/utils/fonts';
 import { isColorTemplate, type ColorTheme } from '@/utils/color-theme';
 import { convertLayout, type SectionLayout } from '@/utils/section-layout';
 import type { SectionTitles } from '@/utils/section-titles';
-import type { LiveStatus } from '@/components/editor-chrome/status';
+import type { AxiosResponse } from 'axios';
+import { editorStatus, type LiveStatus } from '@/components/editor-chrome/status';
+import MaintenanceScreen from '@/components/maintenance/MaintenanceScreen';
 import MaintenanceBanner from '@/components/maintenance/MaintenanceBanner';
 import DraftRecoveryDialog from '@/components/maintenance/DraftRecoveryDialog';
 import { useMaintenance, useOnMaintenanceEnd } from '@/maintenance/hooks';
 import { isMaintenanceActive } from '@/maintenance/store';
-import { clearDraft, clearStorageKeepingDrafts, readDraft, saveDraft, shouldOfferDraft } from '@/maintenance/draft';
+import { chooseSaveSource, clearDraft, clearStorageKeepingDrafts, readDraft, saveDraft, shouldOfferDraft } from '@/maintenance/draft';
 import { claimSaveLock, TAB_ID } from '@/maintenance/lock';
 
 const Preview: React.FC = () => {
@@ -82,9 +84,12 @@ const Preview: React.FC = () => {
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const liveEdit = isUpdateMode && !!pdfUrl;
   const [liveStatus, setLiveStatus] = useState<LiveStatus>('idle');
-  const { status: maintenanceStatus } = useMaintenance();
+  const { status: maintenanceStatus } = useMaintenance(false);
   const maintenanceActive = maintenanceStatus === 'active';
   const maintenancePendingRef = useRef(false); // an edit is waiting to be saved once maintenance ends
+  const draftStoredRef = useRef(false); // the paused edit made it into the shared draft on this device
+  const loadRetryRef = useRef(false); // the resume could not be loaded because maintenance began first
+  const [loadBlocked, setLoadBlocked] = useState(false);
   // set when the opened resume has unsaved edits on this device that differ from the saved copy
   const [draftChoice, setDraftChoice] = useState<{ draft: string; server: string } | null>(null);
   const requestIdRef = useRef(0); // ignore out-of-order responses
@@ -198,17 +203,27 @@ const Preview: React.FC = () => {
     setResumeLoading(true);
     const resume_id = localStorage.getItem('id'); // resume id
     if (resume_id) {
-      const request = await client.get(`/resume/fetch-data/${resume_id}/${ownerId}`);
-      localStorage.setItem('resumeFormData', request.data?.resume_data);
-      if (request.data?.resume_data) {
-        // Edits kept on this device while maintenance blocked saving: ask before they get replaced by the saved copy.
-        const draft = readDraft(localStorage, 'resume', resume_id);
-        if (draft && shouldOfferDraft(draft.data, request.data.resume_data)) {
-          setDraftChoice({ draft: draft.data, server: request.data.resume_data });
-          return; // the page stays on the loader until the user chooses
+      let request: AxiosResponse;
+      try {
+        request = await client.get(`/resume/fetch-data/${resume_id}/${ownerId}`);
+      } catch (error) {
+        if (isMaintenanceActive()) { // maintenance started between status polls: wait it out, then load again
+          loadRetryRef.current = true;
+          setLoadBlocked(true);
+          return;
         }
-        applyResumeData(request.data.resume_data);
+        throw error;
       }
+      const serverJson: string | undefined = request.data?.resume_data;
+      localStorage.setItem('resumeFormData', request.data?.resume_data);
+      // Edits kept on this device while maintenance blocked saving: ask before they get replaced by the saved copy
+      // (also when the resume has no saved copy yet, e.g. a first version typed just as maintenance began).
+      const draft = readDraft(localStorage, 'resume', resume_id);
+      if (draft && (!serverJson || shouldOfferDraft(draft.data, serverJson))) {
+        setDraftChoice({ draft: draft.data, server: serverJson ?? '' });
+        return; // the page stays on the loader until the user chooses
+      }
+      if (serverJson) applyResumeData(serverJson);
     }
     setResumeLoading(false);
   };
@@ -216,10 +231,11 @@ const Preview: React.FC = () => {
   const resolveDraft = (keepLocal: boolean) => {
     if (!draftChoice) return;
     const chosen = keepLocal ? draftChoice.draft : draftChoice.server;
-    localStorage.setItem('resumeFormData', chosen); // the form reads its fields from here
-    clearDraft(localStorage, 'resume');
+    if (chosen) localStorage.setItem('resumeFormData', chosen); // the form reads its fields from here
+    const id = localStorage.getItem('id');
+    if (id) clearDraft(localStorage, 'resume', id);
     setDraftChoice(null);
-    applyResumeData(chosen); // keeping the draft also saves it to the server
+    if (chosen) applyResumeData(chosen); // keeping the draft also saves it to the server
     setResumeLoading(false);
   };
 
@@ -328,7 +344,7 @@ const Preview: React.FC = () => {
     resumeDataRef.current = data;
     maintenancePendingRef.current = true;
     const id = localStorage.getItem('id');
-    if (id) saveDraft(localStorage, 'resume', id, JSON.stringify(data));
+    draftStoredRef.current = id ? saveDraft(localStorage, 'resume', id, JSON.stringify(data)) : false;
     setLiveStatus('paused');
   };
 
@@ -346,7 +362,8 @@ const Preview: React.FC = () => {
       resumeDataRef.current = data;
       setResumeData(data);
       await saveResumeData(data);
-      clearDraft(localStorage, 'resume'); // saved: nothing is waiting on this device any more
+      const savedId = localStorage.getItem('id');
+      if (savedId) clearDraft(localStorage, 'resume', savedId); // saved: nothing is waiting on this device any more
       const htmlContent = renderToString(<ResumePreview data={data} template={template} />);
       const payload = pdfPayload(data, htmlContent, template || 'andromeda');
 
@@ -377,10 +394,33 @@ const Preview: React.FC = () => {
 
   // When maintenance ends, save the kept document once (several tabs on this resume: only one saves).
   useOnMaintenanceEnd(() => {
-    if (!maintenancePendingRef.current || !resumeDataRef.current) return;
-    if (!claimSaveLock(localStorage, `maintenance-save:resume:${localStorage.getItem('id')}`, TAB_ID, Date.now())) return;
+    if (loadRetryRef.current) { // the resume could not load because maintenance began first: load it now
+      loadRetryRef.current = false;
+      setLoadBlocked(false);
+      void fetchResumeData(Cookies.get('user.id') || '');
+      return;
+    }
+    if (!maintenancePendingRef.current) return;
     maintenancePendingRef.current = false;
-    void handleFormSubmitRef.current(resumeDataRef.current);
+    const id = localStorage.getItem('id');
+    if (!claimSaveLock(localStorage, `maintenance-save:resume:${id}`, TAB_ID, Date.now())) {
+      setLiveStatus('idle'); // another tab saves it
+      return;
+    }
+    // Save the newest edit from any tab (the shared draft), not necessarily this tab's own copy.
+    const source = chooseSaveSource(
+      id ? readDraft(localStorage, 'resume', id) : null,
+      draftStoredRef.current,
+      resumeDataRef.current ? JSON.stringify(resumeDataRef.current) : null,
+    );
+    if (source.kind === 'skip') {
+      setLiveStatus('idle');
+      return;
+    }
+    void (async () => {
+      await getCsrfToken().catch(() => { }); // the server may have restarted: get a fresh token before saving
+      await handleFormSubmitRef.current(JSON.parse(source.json));
+    })();
   });
 
   // each change is a server-side PDF render: wait for the user to stop before saving and regenerating
@@ -486,21 +526,25 @@ const Preview: React.FC = () => {
 
   return (
     resumeLoading ? (
-      <>
-        <Loader label="Loading your resume..." />
-        <DraftRecoveryDialog
-          open={draftChoice !== null}
-          noun="resume"
-          onKeepLocal={() => resolveDraft(true)}
-          onUseSaved={() => resolveDraft(false)}
-        />
-      </>
+      loadBlocked ? (
+        <MaintenanceScreen />
+      ) : (
+        <>
+          <Loader label="Loading your resume..." />
+          <DraftRecoveryDialog
+            open={draftChoice !== null}
+            noun="resume"
+            onKeepLocal={() => resolveDraft(true)}
+            onUseSaved={() => resolveDraft(false)}
+          />
+        </>
+      )
     ) : (
       <div className="app-shell h-screen w-full font-app flex flex-col overflow-hidden">
         <MaintenanceBanner variant="editor" />
         <EditorTopBar
           templateLabel={`Template: ${(template || 'andromeda').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`}
-          status={liveEdit ? liveStatus : 'idle'}
+          status={editorStatus(liveEdit, liveStatus)}
           designOpen={designOpen}
           canOpenDesign={!!pdfUrl}
           onToggleDesign={() => setDesignOpen((open) => !open)}

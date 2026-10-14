@@ -28,12 +28,13 @@ import EditorTopBar from '@/components/editor-chrome/EditorTopBar';
 import Loader from '@/components/SuspenseLoader';
 import SectionRail from '@/components/editor-chrome/SectionRail';
 import type { SavedFont } from '@/utils/fonts';
-import type { LiveStatus } from '@/components/editor-chrome/status';
+import { editorStatus, type LiveStatus } from '@/components/editor-chrome/status';
+import MaintenanceScreen from '@/components/maintenance/MaintenanceScreen';
 import MaintenanceBanner from '@/components/maintenance/MaintenanceBanner';
 import DraftRecoveryDialog from '@/components/maintenance/DraftRecoveryDialog';
 import { useMaintenance, useOnMaintenanceEnd } from '@/maintenance/hooks';
 import { isMaintenanceActive } from '@/maintenance/store';
-import { clearDraft, clearStorageKeepingDrafts, readDraft, saveDraft, shouldOfferDraft } from '@/maintenance/draft';
+import { chooseSaveSource, clearDraft, clearStorageKeepingDrafts, readDraft, saveDraft, shouldOfferDraft } from '@/maintenance/draft';
 import { claimSaveLock, TAB_ID } from '@/maintenance/lock';
 
 const CLPreview: React.FC = () => {
@@ -67,9 +68,12 @@ const CLPreview: React.FC = () => {
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const liveEdit = isUpdateMode && !!pdfUrl;
   const [liveStatus, setLiveStatus] = useState<LiveStatus>('idle');
-  const { status: maintenanceStatus } = useMaintenance();
+  const { status: maintenanceStatus } = useMaintenance(false);
   const maintenanceActive = maintenanceStatus === 'active';
   const maintenancePendingRef = useRef(false); // an edit is waiting to be saved once maintenance ends
+  const draftStoredRef = useRef(false); // the paused edit made it into the shared draft on this device
+  const loadRetryRef = useRef(false); // the cover letter could not be loaded because maintenance began first
+  const [loadBlocked, setLoadBlocked] = useState(false);
   // set when the opened cover letter has unsaved edits on this device that differ from the saved copy
   const [draftChoice, setDraftChoice] = useState<{ draft: string; server: string } | null>(null);
   const requestIdRef = useRef(0); // ignore out-of-order responses
@@ -148,35 +152,42 @@ const CLPreview: React.FC = () => {
   const fetchCLData = async () => {
     setCLLoading(true);
     const coverLetterId = localStorage.getItem('cl-id');
-    let awaitingChoice = false;
+    let keepLoading = false;
     try {
       const request = await client.get(`/cover-letter/fetch-data/${coverLetterId}/${userId}`)
+      const serverJson: string | undefined = request.data?.cover_letter_data;
       localStorage.setItem('clFormData', request.data?.cover_letter_data);
-      if (request.data?.cover_letter_data) {
-        // Edits kept on this device while maintenance blocked saving: ask before they get replaced by the saved copy.
-        const draft = coverLetterId ? readDraft(localStorage, 'cover-letter', coverLetterId) : null;
-        if (draft && shouldOfferDraft(draft.data, request.data.cover_letter_data)) {
-          setDraftChoice({ draft: draft.data, server: request.data.cover_letter_data });
-          awaitingChoice = true; // the page stays on the loader until the user chooses
-        } else {
-          applyCLData(request.data.cover_letter_data);
-        }
+      // Edits kept on this device while maintenance blocked saving: ask before they get replaced by the saved copy
+      // (also when the cover letter has no saved copy yet).
+      const draft = coverLetterId ? readDraft(localStorage, 'cover-letter', coverLetterId) : null;
+      if (draft && (!serverJson || shouldOfferDraft(draft.data, serverJson))) {
+        setDraftChoice({ draft: draft.data, server: serverJson ?? '' });
+        keepLoading = true; // the page stays on the loader until the user chooses
+      } else if (serverJson) {
+        applyCLData(serverJson);
       }
     } catch (error) {
-      console.error('Error fetching cover letter data:', error);
-      toast.error('Failed to load cover letter data');
+      if (isMaintenanceActive()) { // maintenance started between status polls: wait it out, then load again
+        loadRetryRef.current = true;
+        setLoadBlocked(true);
+        keepLoading = true;
+      } else {
+        console.error('Error fetching cover letter data:', error);
+        toast.error('Failed to load cover letter data');
+      }
     } finally {
-      if (!awaitingChoice) setCLLoading(false);
+      if (!keepLoading) setCLLoading(false);
     }
   };
 
   const resolveDraft = (keepLocal: boolean) => {
     if (!draftChoice) return;
     const chosen = keepLocal ? draftChoice.draft : draftChoice.server;
-    localStorage.setItem('clFormData', chosen); // the form reads its fields from here
-    clearDraft(localStorage, 'cover-letter');
+    if (chosen) localStorage.setItem('clFormData', chosen); // the form reads its fields from here
+    const id = localStorage.getItem('cl-id');
+    if (id) clearDraft(localStorage, 'cover-letter', id);
     setDraftChoice(null);
-    applyCLData(chosen); // keeping the draft also saves it to the server
+    if (chosen) applyCLData(chosen); // keeping the draft also saves it to the server
     setCLLoading(false);
   };
 
@@ -265,7 +276,8 @@ const CLPreview: React.FC = () => {
         template: template,
       });
       localStorage.setItem('clFormData', JSON.stringify(data));
-      clearDraft(localStorage, 'cover-letter'); // saved: nothing is waiting on this device any more
+      const savedId = localStorage.getItem('cl-id');
+      if (savedId) clearDraft(localStorage, 'cover-letter', savedId); // saved: nothing is waiting on this device any more
       setCLData(data);
       return true;
     } catch (error) {
@@ -293,7 +305,7 @@ const CLPreview: React.FC = () => {
     clDataRef.current = data;
     maintenancePendingRef.current = true;
     const id = localStorage.getItem('cl-id');
-    if (id) saveDraft(localStorage, 'cover-letter', id, JSON.stringify(data));
+    draftStoredRef.current = id ? saveDraft(localStorage, 'cover-letter', id, JSON.stringify(data)) : false;
     setLiveStatus('paused');
   };
 
@@ -347,10 +359,33 @@ const CLPreview: React.FC = () => {
 
   // When maintenance ends, save the kept document once (several tabs on this cover letter: only one saves).
   useOnMaintenanceEnd(() => {
-    if (!maintenancePendingRef.current || !clDataRef.current) return;
-    if (!claimSaveLock(localStorage, `maintenance-save:cover-letter:${localStorage.getItem('cl-id')}`, TAB_ID, Date.now())) return;
+    if (loadRetryRef.current) { // the cover letter could not load because maintenance began first: load it now
+      loadRetryRef.current = false;
+      setLoadBlocked(false);
+      void fetchCLData();
+      return;
+    }
+    if (!maintenancePendingRef.current) return;
     maintenancePendingRef.current = false;
-    void handleFormSubmitRef.current(clDataRef.current);
+    const id = localStorage.getItem('cl-id');
+    if (!claimSaveLock(localStorage, `maintenance-save:cover-letter:${id}`, TAB_ID, Date.now())) {
+      setLiveStatus('idle'); // another tab saves it
+      return;
+    }
+    // Save the newest edit from any tab (the shared draft), not necessarily this tab's own copy.
+    const source = chooseSaveSource(
+      id ? readDraft(localStorage, 'cover-letter', id) : null,
+      draftStoredRef.current,
+      clDataRef.current ? JSON.stringify(clDataRef.current) : null,
+    );
+    if (source.kind === 'skip') {
+      setLiveStatus('idle');
+      return;
+    }
+    void (async () => {
+      await getCsrfToken().catch(() => { }); // the server may have restarted: get a fresh token before saving
+      await handleFormSubmitRef.current(JSON.parse(source.json));
+    })();
   });
 
   const handleFontChange = (next: SavedFont | undefined) => {
@@ -428,21 +463,25 @@ const CLPreview: React.FC = () => {
 
   return (
     clLoading ? (
-      <>
-        <Loader label="Loading your cover letter..." />
-        <DraftRecoveryDialog
-          open={draftChoice !== null}
-          noun="cover letter"
-          onKeepLocal={() => resolveDraft(true)}
-          onUseSaved={() => resolveDraft(false)}
-        />
-      </>
+      loadBlocked ? (
+        <MaintenanceScreen />
+      ) : (
+        <>
+          <Loader label="Loading your cover letter..." />
+          <DraftRecoveryDialog
+            open={draftChoice !== null}
+            noun="cover letter"
+            onKeepLocal={() => resolveDraft(true)}
+            onUseSaved={() => resolveDraft(false)}
+          />
+        </>
+      )
     ) : (
       <div className="app-shell h-screen w-full font-app flex flex-col overflow-hidden">
         <MaintenanceBanner variant="editor" />
         <EditorTopBar
           templateLabel={`Template: ${(template || 'aether').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`}
-          status={liveEdit ? liveStatus : 'idle'}
+          status={editorStatus(liveEdit, liveStatus)}
           designOpen={designOpen}
           canOpenDesign={!!pdfUrl}
           onToggleDesign={() => setDesignOpen((open) => !open)}

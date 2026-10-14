@@ -60,22 +60,26 @@ export function useMaintenancePolling(): void {
   }, [forced]);
 }
 
-/** The current state plus a clock that ticks once a second while maintenance is scheduled or active. */
-export function useMaintenance() {
+/**
+ * The current state plus a clock that ticks once a second while maintenance is scheduled or active.
+ * Pass `tick = false` when only the status is needed (the editors): the component then re-renders on
+ * each poll, not every second, so unrelated effects and toasts on the page are left alone.
+ */
+export function useMaintenance(tick = true) {
   const snapshot = useMaintenanceStore((s) => s.snapshot);
   const offsetMs = useMaintenanceStore((s) => s.offsetMs);
   const forced = useMaintenanceStore((s) => s.forcedActive);
-  const [now, setNow] = useState(() => Date.now());
+  const [tickedNow, setTickedNow] = useState(() => Date.now());
 
-  const live = forced || (snapshot !== null && snapshot.status !== 'off');
+  const live = tick && (forced || (snapshot !== null && snapshot.status !== 'off'));
   useEffect(() => {
     if (!live) return;
-    setNow(Date.now());
-    const id = setInterval(() => setNow(Date.now()), 1000);
+    setTickedNow(Date.now());
+    const id = setInterval(() => setTickedNow(Date.now()), 1000);
     return () => clearInterval(id);
   }, [live]);
 
-  const serverNow = now + offsetMs;
+  const serverNow = (tick ? tickedNow : Date.now()) + offsetMs;
   return {
     status: effectiveStatus(snapshot, forced, serverNow),
     startsAt: snapshot?.startsAt ?? null,
@@ -87,7 +91,7 @@ export function useMaintenance() {
 
 /** Calls `onEnd` once when maintenance stops being active. */
 export function useOnMaintenanceEnd(onEnd: () => void): void {
-  const { status } = useMaintenance();
+  const { status } = useMaintenance(false);
   const onEndRef = useRef(onEnd);
   onEndRef.current = onEnd;
   const previous = useRef(status);

@@ -10,6 +10,10 @@ export const liveStatusLabel = (status: LiveStatus): string => {
   return '';
 };
 
+/** The live status only shows once live edit is on, except "paused": a first-time creation must see it too. */
+export const editorStatus = (liveEdit: boolean, status: LiveStatus): LiveStatus =>
+  liveEdit || status === 'paused' ? status : 'idle';
+
 export const statusTone = (status: LiveStatus): StatusTone => {
   if (status === 'updating') return 'working';
   if (status === 'saved') return 'ok';

@@ -215,3 +215,5 @@ bash scripts/maintenance.sh status
 While maintenance is active every request except `GET /maintenance/status` and `PUT /maintenance` gets `503`. `endsAt` is an estimate only; clients leave the maintenance screen when the status becomes `off`.
 
 The state lives in memory. With `REDIS_URL` set it is also mirrored to Redis, so it survives a restart and is shared between instances. Without Redis, a restart resets maintenance to off.
+
+Sessions are kept in memory, so restarting the server signs everyone out. People who were editing keep their unsaved changes on their device and are offered them again after they sign in and reopen the document.

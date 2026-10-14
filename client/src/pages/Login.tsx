@@ -3,6 +3,7 @@ import { FcGoogle } from 'react-icons/fc';
 import { FaGithub, FaLinkedin } from 'react-icons/fa';
 import { ArrowLeft, Check, Loader2 } from 'lucide-react';
 import Cookies from 'js-cookie';
+import { clearStorageKeepingDrafts } from '@/maintenance/draft';
 import { Link, useNavigate } from 'react-router-dom';
 import ThemeToggle from '@/components/ThemeToggle';
 
@@ -66,7 +67,7 @@ const Login: React.FC = () => {
   // Clear stale data once on arrival (not on every render, which would also
   // wipe the theme preference the toggle on this page just saved).
   useEffect(() => {
-    localStorage.clear();
+    clearStorageKeepingDrafts(localStorage); // unsaved edits kept during maintenance must survive signing in again
   }, []);
 
   // Cleanup function to clear polling interval
