@@ -36,15 +36,6 @@ authRouter.get('/login', isGuest, (req, res) => {
   });
 });
 
-// Test route to check authentication status
-authRouter.get('/auth-status', optionalAuth, (req, res) => {
-  res.json({
-    isAuthenticated: req.isAuthenticated(),
-    user: req.user,
-    session: req.session
-  });
-});
-
 // Database test route
 authRouter.get('/db-test', async (req, res) => {
   try {

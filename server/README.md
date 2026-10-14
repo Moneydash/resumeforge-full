@@ -110,7 +110,6 @@ The server will start on `http://localhost:8080`
 - `GET /auth/github` - Initiate GitHub OAuth login
 - `GET /auth/github/callback` - GitHub OAuth callback
 - `POST /logout` - Logout user
-- `GET /auth-status` - Check authentication status
 - `GET /dashboard` - Protected dashboard route
 - `GET /profile` - Get user profile (requires authentication)
 - `GET /csrf-token` - Get CSRF token for secure requests
