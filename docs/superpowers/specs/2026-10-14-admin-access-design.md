@@ -59,7 +59,7 @@ The user row loaded for the session already carries `role`, so no extra query is
   - the optional `x-admin-token` header, exactly as today (no CSRF, no cookie involved);
   - an admin session, which must pass the CSRF check like every other state-changing call.
   Without a token header and without an admin session the route answers 404, so its existence is not revealed. A wrong token answers 401, and the route stays disabled (404) when `MAINTENANCE_ADMIN_TOKEN` is unset and the caller is not an admin.
-- `GET /admin/me` returns `{ role }` for admins and 404 for everyone else.
+- `GET /admin/me` returns `{ id, role }` for admins (the page needs `id` to mark your own row) and 404 for everyone else.
 - `GET /admin/admins` lists admins and super admins as `{ id, email, name, role }`.
 - `POST /admin/admins` `{ email }`: make admin. `DELETE /admin/admins/:id`: remove admin.
 - `POST /admin/super-admins` `{ email }`: make super admin. `DELETE /admin/super-admins/:id`: demote to admin.
