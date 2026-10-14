@@ -9,6 +9,7 @@ import { CreateUserData, User } from '@/types/interface.user';
 import { Strategy as OAuth2Strategy } from 'passport-oauth2';
 import jwt from 'jsonwebtoken';
 import { fetchLinkedinUserInfo, resolveLinkedinUser } from '../utils/linkedin';
+import { isExplicitlyUnverified } from '../utils/emailVerification';
 
 const JWT_SECRET = process.env.JWT_SECRET || 'your-secret-key';
 
@@ -39,6 +40,10 @@ passport.use(new GoogleStrategy({
   passReqToCallback: true
 }, async (req, accessToken, refreshToken, profile, done) => {
   try {
+    // An email Google marks as unverified must not be linked to an existing account or create one.
+    if (isExplicitlyUnverified(profile?.emails?.[0])) {
+      return done(new Error('Google email is not verified'), false);
+    }
     // Check if user already exists by email
     let user = await userModel.findByEmail(profile?.emails ? profile?.emails[0]?.value : '');
 

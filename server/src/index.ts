@@ -1,4 +1,4 @@
-import express, { Request, Response, NextFunction } from "express";
+import express, { Request, Response, NextFunction, RequestHandler } from "express";
 import cors from "cors";
 import pdfRouter from "./routes/resume";
 import authRouter from "./routes/auth";
@@ -11,14 +11,19 @@ import { testConnection } from './db/db';
 import cookieParser from 'cookie-parser';
 import { csrfProtection } from './middlewares/auth';
 import { createMaintenanceStore } from './utils/maintenanceStore';
-import { createMaintenanceRouter } from './routes/maintenance';
+import { createMaintenanceControlRouter, createMaintenanceStatusRouter } from './routes/maintenance';
 import { maintenanceGate } from './middlewares/maintenance';
+import { createAdminRouter } from './routes/admin';
+import { AdminService } from './services/adminService';
+import { KnexAdminStore } from './models/KnexAdminStore';
+import { isAdminRequest, lenientSession } from './middlewares/adminAuth';
 
 configDotenv();
 
 const app = express();
 const port = process.env.PORT || 8080;
 const maintenanceStore = createMaintenanceStore();
+const adminService = new AdminService(new KnexAdminStore());
 
 interface ErrorWithCode extends Error {
   code?: string;
@@ -30,10 +35,8 @@ app.use(cors({
   exposedHeaders: ['X-Maintenance', 'Retry-After'], // so the client can recognise the maintenance 503
 }));
 app.use(express.json());
-// Maintenance: the router stays reachable, then the gate answers 503 to everything else while active.
-// Both must come before the session and CSRF middleware below.
-app.use('/maintenance', createMaintenanceRouter(maintenanceStore));
-app.use(maintenanceGate(maintenanceStore));
+// Public maintenance status first: it stays ahead of the session so polling never touches the database.
+app.use('/maintenance', createMaintenanceStatusRouter(maintenanceStore));
 app.use(cookieParser(process.env.SESSION_SECRET || 'your-secret-key'));
 // app.use(cookieParser());
 
@@ -57,7 +60,15 @@ app.set('trust proxy', 1); // Trust first proxy for secure cookies in production
 
 // Passport middleware
 app.use(passport.initialize());
-app.use(passport.session());
+// A failed user lookup (database down) counts as "not signed in", so the gate below can still answer 503.
+app.use(lenientSession(passport.session() as RequestHandler));
+
+// Maintenance gate: admins pass, everyone else gets 503. It sits after the session (to see who is asking)
+// and before the CSRF check (so clients see the 503, not a CSRF 403).
+app.use(maintenanceGate(maintenanceStore, { isAdmin: isAdminRequest }));
+// PUT /maintenance checks its own credentials (emergency token, or admin session + CSRF), so it sits
+// before the global CSRF check.
+app.use('/maintenance', createMaintenanceControlRouter(maintenanceStore, { isAdmin: isAdminRequest, csrf: csrfProtection }));
 
 app.use(csrfProtection);
 
@@ -76,6 +87,7 @@ app.use('/', authRouter);
 app.use('/resume', pdfRouter);
 app.use('/cover-letter', clRouter);
 app.use('/ats', atsRouter);
+app.use('/admin', createAdminRouter(adminService));
 
 app.use((err: unknown, req: Request, res: Response, next: NextFunction) => {
   const error = err as ErrorWithCode;
