@@ -14,6 +14,7 @@ const ATSScanner = lazy(() => import('./pages/ATSScanner'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const ToS = lazy(() => import('./pages/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const Admin = lazy(() => import('./pages/Admin'));
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Loader from './components/SuspenseLoader';
 import MaintenanceGate from '@/components/maintenance/MaintenanceGate';
@@ -93,6 +94,14 @@ const RouteComponent = () => {
                   <ATSScanner />
                 </ProtectedRoute>
               </MaintenanceGate>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
+              <ProtectedRoute>
+                <Admin />
+              </ProtectedRoute>
             }
           />
           <Route path="*" element={<NotFound />} />
