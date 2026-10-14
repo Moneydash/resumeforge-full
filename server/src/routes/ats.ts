@@ -1,5 +1,6 @@
 import express from "express";
 import scan_resume from "../controllers/ats";
+import { get_keywords, save_keywords } from "../controllers/atsKeywords";
 import { isAuthenticated, validateSocialLogin } from '../middlewares/auth';
 import { atsRateLimit, uploadResume } from '../middlewares/ats';
 
@@ -13,6 +14,18 @@ atsRouter.post('/scan',
   atsRateLimit,
   uploadResume,
   scan_resume
+);
+
+// Saved keyword lists (only the keywords are stored, never the resume). Not rate limited like scans.
+atsRouter.get('/keywords',
+  isAuthenticated,
+  validateSocialLogin(['google', 'github', 'linkedin']),
+  get_keywords
+);
+atsRouter.put('/keywords',
+  isAuthenticated,
+  validateSocialLogin(['google', 'github', 'linkedin']),
+  save_keywords
 );
 
 export default atsRouter;
