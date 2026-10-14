@@ -1,3 +1,4 @@
+import { Link } from 'react-router-dom';
 import { useMaintenance } from '@/maintenance/hooks';
 import { formatClock, inCountdown } from '@/maintenance/timing';
 import '@/styles/maintenance.css';
@@ -10,7 +11,18 @@ interface MaintenanceBannerProps {
 }
 
 export default function MaintenanceBanner({ variant, showActive = false }: MaintenanceBannerProps) {
-  const { status, startsAt, endsAt, serverNow } = useMaintenance();
+  const { status, adminBypass, startsAt, endsAt, serverNow } = useMaintenance();
+
+  if (adminBypass) {
+    return (
+      <div className="mt-bar mt-bar--dark" role="status">
+        <span>
+          <b>Maintenance is on.</b> Only admins can use the app right now.
+        </span>
+        <Link to="/admin" className="mt-bar__link">Open admin page</Link>
+      </div>
+    );
+  }
 
   if (status === 'scheduled' && startsAt !== null) {
     return (

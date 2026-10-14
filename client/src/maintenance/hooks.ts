@@ -1,7 +1,8 @@
 import { useEffect, useRef, useState } from 'react';
-import { fetchMaintenanceStatus } from './api';
+import { fetchMaintenanceStatus, probeAdmin } from './api';
 import { useMaintenanceStore } from './store';
-import { effectiveStatus, pollIntervalMs } from './timing';
+import { effectiveStatus, pollIntervalMs, rawStatus } from './timing';
+import { isSignedIn } from '@/components/not-found/actions';
 
 /**
  * Polls the status endpoint. Mount it once, at the app root.
@@ -69,6 +70,7 @@ export function useMaintenance(tick = true) {
   const snapshot = useMaintenanceStore((s) => s.snapshot);
   const offsetMs = useMaintenanceStore((s) => s.offsetMs);
   const forced = useMaintenanceStore((s) => s.forcedActive);
+  const viewerIsAdmin = useMaintenanceStore((s) => s.viewerIsAdmin);
   const [tickedNow, setTickedNow] = useState(() => Date.now());
 
   const live = tick && (forced || (snapshot !== null && snapshot.status !== 'off'));
@@ -80,8 +82,12 @@ export function useMaintenance(tick = true) {
   }, [live]);
 
   const serverNow = (tick ? tickedNow : Date.now()) + offsetMs;
+  const raw = rawStatus(snapshot, forced, serverNow);
+  const adminBypass = raw === 'active' && viewerIsAdmin;
   return {
-    status: effectiveStatus(snapshot, forced, serverNow),
+    status: adminBypass ? ('off' as const) : raw,
+    rawStatus: raw,
+    adminBypass,
     startsAt: snapshot?.startsAt ?? null,
     endsAt: snapshot?.endsAt ?? null,
     message: snapshot?.message ?? '',
@@ -100,4 +106,24 @@ export function useOnMaintenanceEnd(onEnd: () => void): void {
     if (previous.current === 'active' && status !== 'active') onEndRef.current();
     previous.current = status;
   }, [status]);
+}
+
+/**
+ * While maintenance is active and the viewer is signed in, ask once whether they are an admin. An admin is
+ * then not blocked (their effective status becomes "off"); anyone else keeps the maintenance screen.
+ */
+export function useAdminProbe(): void {
+  const { rawStatus: raw } = useMaintenance(false);
+  const adminChecked = useMaintenanceStore((s) => s.adminChecked);
+
+  useEffect(() => {
+    if (raw !== 'active' || adminChecked || !isSignedIn()) return;
+    let cancelled = false;
+    void probeAdmin().then((isAdmin) => {
+      if (!cancelled) useMaintenanceStore.getState().setViewerAdmin(isAdmin);
+    });
+    return () => {
+      cancelled = true;
+    };
+  }, [raw, adminChecked]);
 }

@@ -5,10 +5,10 @@ export const POLL_FAST_MS = 10_000;
 export const FAST_WINDOW_MS = 2 * 60_000;
 
 /**
- * What the UI should treat the state as right now. `forcedActive` is set when a request got the
+ * What the server says right now, ignoring who is asking. `forcedActive` is set when a request got the
  * maintenance 503 before the next poll. A scheduled start that passes between polls flips on time.
  */
-export const effectiveStatus = (
+export const rawStatus = (
   snapshot: MaintenanceSnapshot | null,
   forcedActive: boolean,
   serverNow: number,
@@ -17,6 +17,17 @@ export const effectiveStatus = (
   if (!snapshot || snapshot.status === 'off') return 'off';
   if (snapshot.status === 'active') return 'active';
   return snapshot.startsAt !== null && serverNow >= snapshot.startsAt ? 'active' : 'scheduled';
+};
+
+/** What this viewer should treat the state as: an admin is not blocked, so for them "active" means "off". */
+export const effectiveStatus = (
+  snapshot: MaintenanceSnapshot | null,
+  forcedActive: boolean,
+  serverNow: number,
+  viewerIsAdmin = false,
+): MaintenanceStatus => {
+  const status = rawStatus(snapshot, forcedActive, serverNow);
+  return status === 'active' && viewerIsAdmin ? 'off' : status;
 };
 
 export const pollIntervalMs = (

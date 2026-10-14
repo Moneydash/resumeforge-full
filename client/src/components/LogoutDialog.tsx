@@ -4,6 +4,7 @@ import Cookies from 'js-cookie';
 import { toast } from 'sonner';
 import client from '@/api/axiosInstance';
 import { getCsrfToken } from '@/utils/helper';
+import { useMaintenanceStore } from '@/maintenance/store';
 import { Button } from '@/components/ui/button';
 import { Dialog, DialogContent, DialogHeader, DialogEyebrow, DialogTitle, DialogDescription, DialogFooter } from '@/components/ui/dialog';
 import { popupDangerClasses, popupGhostClasses } from '@/styles/popup-classes';
@@ -20,6 +21,7 @@ const LogoutDialog: React.FC<LogoutDialogProps> = ({ open, onOpenChange }) => {
   const clearClientSession = () => {
     // Only cookies readable from JS can be removed here; HttpOnly ones (session, CSRF) are cleared by the server
     Object.keys(Cookies.get()).forEach((name) => Cookies.remove(name));
+    useMaintenanceStore.getState().resetAdmin();
     localStorage.clear();
     sessionStorage.clear();
   };
