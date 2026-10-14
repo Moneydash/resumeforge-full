@@ -14,8 +14,10 @@ const ATSScanner = lazy(() => import('./pages/ATSScanner'));
 const NotFound = lazy(() => import('./pages/NotFound'));
 const ToS = lazy(() => import('./pages/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
+const Admin = lazy(() => import('./pages/Admin'));
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Loader from './components/SuspenseLoader';
+import MaintenanceGate from '@/components/maintenance/MaintenanceGate';
 
 const RouteComponent = () => {
   return (
@@ -27,56 +29,78 @@ const RouteComponent = () => {
           <Route
             path="/dashboard"
             element={
-              <ProtectedRoute>
-                <Dashboard />
-              </ProtectedRoute>
+              <MaintenanceGate>
+                <ProtectedRoute>
+                  <Dashboard />
+                </ProtectedRoute>
+              </MaintenanceGate>
             }
           />
           <Route
             path="/templates"
             element={
-              <ProtectedRoute>
-                <Templates />
-              </ProtectedRoute>
+              <MaintenanceGate>
+                <ProtectedRoute>
+                  <Templates />
+                </ProtectedRoute>
+              </MaintenanceGate>
             }
           />
           <Route
             path="/preview"
             element={
-              <ProtectedRoute>
-                <Preview />
-              </ProtectedRoute>
+              <MaintenanceGate softLock>
+                <ProtectedRoute>
+                  <Preview />
+                </ProtectedRoute>
+              </MaintenanceGate>
             }
           />
           <Route
             path="/cl-preview"
             element={
-              <ProtectedRoute>
-                <CLPreview />
-              </ProtectedRoute>
+              <MaintenanceGate softLock>
+                <ProtectedRoute>
+                  <CLPreview />
+                </ProtectedRoute>
+              </MaintenanceGate>
             }
           />
           <Route
             path="/cl-templates"
             element={
-              <ProtectedRoute>
-                <CLTemplates />
-              </ProtectedRoute>
+              <MaintenanceGate>
+                <ProtectedRoute>
+                  <CLTemplates />
+                </ProtectedRoute>
+              </MaintenanceGate>
             }
           />
           <Route
             path="/cl-dashboard"
             element={
-              <ProtectedRoute>
-                <CLDashboard />
-              </ProtectedRoute>
+              <MaintenanceGate>
+                <ProtectedRoute>
+                  <CLDashboard />
+                </ProtectedRoute>
+              </MaintenanceGate>
             }
           />
           <Route
             path="/ats-scanner"
             element={
+              <MaintenanceGate>
+                <ProtectedRoute>
+                  <ATSScanner />
+                </ProtectedRoute>
+              </MaintenanceGate>
+            }
+          />
+          <Route
+            path="/admin"
+            element={
               <ProtectedRoute>
-                <ATSScanner />
+                <Admin />
               </ProtectedRoute>
             }
           />

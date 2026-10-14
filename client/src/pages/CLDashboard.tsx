@@ -12,6 +12,7 @@ import { usePendingNavigation } from '@/hooks/usePendingNavigation';
 import type { CoverLetterSummary, ResumeSummary } from '@/types';
 import { useMainStore } from '@/store/useMainStore';
 import { getCsrfToken, slugify } from '@/utils/helper';
+import { clearStorageKeepingDrafts } from '@/maintenance/draft';
 
 const STORAGE_KEY = 'cover-letters';
 
@@ -174,7 +175,7 @@ const CLDashboard: React.FC = () => {
   useEffect(() => {
     toast.dismiss(); // dismiss all toast upon render
     setUserId(Cookies.get('user.id') || '');
-    localStorage.clear();
+    clearStorageKeepingDrafts(localStorage);
   }, []);
 
   useEffect(() => {

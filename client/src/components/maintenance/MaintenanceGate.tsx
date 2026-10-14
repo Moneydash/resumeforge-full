@@ -1,0 +1,40 @@
+import { useRef, type ReactNode } from 'react';
+import Loader from '@/components/SuspenseLoader';
+import { isSignedIn } from '@/components/not-found/actions';
+import { useMaintenance } from '@/maintenance/hooks';
+import { useMaintenanceStore } from '@/maintenance/store';
+import MaintenanceScreen from './MaintenanceScreen';
+
+interface MaintenanceGateProps {
+  children: ReactNode;
+  /**
+   * Editor routes: only block if maintenance was already active when the route mounted, so someone who
+   * is already editing keeps their editor (the soft lock) when maintenance starts.
+   */
+  softLock?: boolean;
+}
+
+export default function MaintenanceGate({ children, softLock = false }: MaintenanceGateProps) {
+  const checked = useMaintenanceStore((s) => s.checked);
+  const adminChecked = useMaintenanceStore((s) => s.adminChecked);
+  const { status, rawStatus } = useMaintenance();
+  const activeAtMount = useRef<boolean | null>(null);
+
+  // Wait for the first status check, otherwise a page could mount and fetch just as maintenance is on.
+  if (!checked) return <Loader label="Loading" />;
+
+  // While maintenance is on and the viewer is signed in, wait for the admin check so an admin never sees a
+  // flash of the maintenance screen. An editor that is already open (soft lock) is never unmounted for this.
+  const waitingForAdminCheck = rawStatus === 'active' && !adminChecked && isSignedIn();
+  if (softLock) {
+    if (activeAtMount.current === null) {
+      if (waitingForAdminCheck) return <Loader label="Loading" />;
+      activeAtMount.current = status === 'active';
+    }
+  } else if (waitingForAdminCheck) {
+    return <Loader label="Loading" />;
+  }
+
+  const block = softLock ? activeAtMount.current && status === 'active' : status === 'active';
+  return block ? <MaintenanceScreen /> : <>{children}</>;
+}

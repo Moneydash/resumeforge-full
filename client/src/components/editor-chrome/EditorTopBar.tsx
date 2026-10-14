@@ -16,6 +16,7 @@ export interface EditorTopBarProps {
   onExport: () => void;
   exporting: boolean;
   canExport: boolean;
+  exportHint?: string;
 }
 
 export default function EditorTopBar({
@@ -28,6 +29,7 @@ export default function EditorTopBar({
   onExport,
   exporting,
   canExport,
+  exportHint,
 }: EditorTopBarProps) {
   const label = liveStatusLabel(status);
   const tone = statusTone(status);
@@ -85,6 +87,7 @@ export default function EditorTopBar({
           className="l-btn l-btn--primary"
           aria-label={exporting ? 'Exporting' : 'Export PDF'}
           disabled={exporting || !canExport}
+          title={exportHint}
           onClick={onExport}
         >
           {exporting ? (

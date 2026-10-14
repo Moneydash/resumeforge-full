@@ -29,8 +29,9 @@ export async function fetchLinkedinUserInfo(accessToken: string): Promise<Linked
 
 /**
  * Find, link or create the local user for a LinkedIn profile.
- * An existing account is only linked by email when LinkedIn reports the email as verified,
- * otherwise anyone could take over an account by registering its address on LinkedIn.
+ * A new account is only created, and an existing one only linked by email, when LinkedIn reports the
+ * email as verified; otherwise anyone could take over an account (or claim a role granted to an address)
+ * by registering that address on LinkedIn.
  */
 export async function resolveLinkedinUser(profile: LinkedinUserInfo): Promise<User> {
   if (!profile?.sub) {
@@ -46,12 +47,12 @@ export async function resolveLinkedinUser(profile: LinkedinUserInfo): Promise<Us
     throw new Error('Email is required for registration');
   }
 
+  if (!profile.email_verified) {
+    throw new Error('LinkedIn email is not verified');
+  }
+
   const byEmail = await userModel.findByEmail(profile.email);
   if (byEmail) {
-    if (!profile.email_verified) {
-      throw new Error('LinkedIn email is not verified');
-    }
-
     const linked = await userModel.update(byEmail.id, { linkedin_id: profile.sub });
     if (!linked) {
       throw new Error('Failed to link LinkedIn account');

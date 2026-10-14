@@ -1,0 +1,53 @@
+/* Admin page. Variables come from the .app-shell scope in landing.css. */
+
+.ad-status {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.75rem 1rem;
+  padding: 0.875rem 1rem;
+}
+.ad-status__title { margin: 0.125rem 0 0; font-size: 1.125rem; font-weight: 600; letter-spacing: -0.01em; }
+
+.ad-tabs { display: flex; gap: 1.25rem; border-bottom: 1px solid var(--l-hair); }
+.ad-tab {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  min-height: 2.75rem;
+  padding: 0.25rem 0;
+  border: 0;
+  border-bottom: 2px solid transparent;
+  background: transparent;
+  color: var(--l-muted);
+  font: inherit;
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+.ad-tab:hover { color: var(--l-ink); }
+.ad-tab[aria-selected='true'] { border-bottom-color: var(--l-ink); color: var(--l-ink); font-weight: 600; }
+.ad-count {
+  padding: 0 0.4375rem;
+  border: 1px solid var(--l-hair-strong);
+  border-radius: 999px;
+  font-size: 0.6875rem;
+  line-height: 1.25rem;
+}
+
+.ad-badge {
+  display: inline-block;
+  padding: 0.0625rem 0.5rem;
+  border: 1px solid var(--l-hair-strong);
+  border-radius: 6px;
+  color: var(--l-muted);
+  font-size: 0.75rem;
+  white-space: nowrap;
+}
+.ad-badge--super { border-color: var(--l-ink); color: var(--l-ink); font-weight: 600; }
+
+.ad-error { margin: 0.25rem 0 0; color: #b3261e; font-size: 0.8125rem; }
+.dark .ad-error { color: #ff8a80; }
+.ad-hint { margin: 0.25rem 0 0; color: var(--l-muted); font-size: 0.8125rem; }
+.ad-field { margin-bottom: 1rem; }
+.ad-rowactions { display: flex; flex-wrap: wrap; justify-content: flex-end; gap: 0.375rem; }

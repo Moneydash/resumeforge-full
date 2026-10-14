@@ -7,7 +7,8 @@ import '@/styles/dashboard.css';
 import ThemeToggle from '@/components/ThemeToggle';
 import LogoutDialog from '@/components/LogoutDialog';
 import { usePendingNavigation } from '@/hooks/usePendingNavigation';
-import { NAV_ITEMS, isActive } from './nav-items';
+import { useIsAdmin } from '@/admin/useIsAdmin';
+import { ADMIN_NAV_ITEM, NAV_ITEMS, isActive } from './nav-items';
 
 const BRAND = 'ResumeForge';
 const MENU_ID = 'app-mobile-menu';
@@ -22,9 +23,11 @@ interface NavListProps {
 }
 
 function NavList({ pathname, pendingKey, go }: NavListProps) {
+  const isAdmin = useIsAdmin();
+  const items = isAdmin ? [...NAV_ITEMS, ADMIN_NAV_ITEM] : NAV_ITEMS;
   return (
     <nav aria-label="Primary" className="flex flex-col gap-1">
-      {NAV_ITEMS.map((item) => {
+      {items.map((item) => {
         const active = isActive(pathname, item.to, item.activeFor);
         const pending = pendingKey === `nav:${item.key}`;
         const Icon = item.icon;

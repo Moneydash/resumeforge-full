@@ -6,6 +6,8 @@ export interface User {
   email: string;
   name: string;
   avatar?: string;
+  role?: 'user' | 'admin' | 'super_admin';
+  super_admin_slot?: number | null;
   created_at?: Date;
   updated_at?: Date;
 };

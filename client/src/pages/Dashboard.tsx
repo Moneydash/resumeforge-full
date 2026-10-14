@@ -12,6 +12,7 @@ import type { ResumeSummary } from '@/types';
 import { useDashboardStore } from '@/store/useDashboardStore';
 import { useMainStore } from '@/store/useMainStore';
 import { getCsrfToken, slugify } from '@/utils/helper';
+import { clearStorageKeepingDrafts } from '@/maintenance/draft';
 
 const STORAGE_KEY = 'resumes';
 
@@ -80,7 +81,7 @@ const Dashboard: React.FC = () => {
   useEffect(() => {
     toast.dismiss(); // dismiss all toast upon loading
     setUserId(Cookies.get('user.id') || '');
-    localStorage.clear();
+    clearStorageKeepingDrafts(localStorage);
   }, []);
 
   // Load resumes from the API

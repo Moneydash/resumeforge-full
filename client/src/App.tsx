@@ -2,6 +2,7 @@ import { BrowserRouter as Router } from "react-router-dom"
 import RouteComponent from "./routes"
 import { ThemeProvider } from "./contexts/ThemeContext"
 import { Toaster } from "sonner";
+import MaintenanceLayer from "./components/maintenance/MaintenanceLayer"
 
 function App() {
   return (
@@ -26,6 +27,7 @@ function App() {
             },
           }}
         />
+        <MaintenanceLayer />
         <RouteComponent />
       </Router>
     </ThemeProvider>

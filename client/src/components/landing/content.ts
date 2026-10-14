@@ -53,7 +53,7 @@ export const HERO_COPY = {
   sub: 'Pick a template, shape every section, preview it live and export a clean PDF.',
   primary: 'Build your resume',
   secondary: 'Browse templates',
-  note: 'No credit card required · PDF export · Sign in with Google or GitHub',
+  note: 'No credit card required · PDF export · Sign in with Google, GitHub or LinkedIn',
 } as const;
 
 export const TRUST_ITEMS = [
@@ -108,7 +108,7 @@ export const templateStripCopy = (resumeCount: number, letterCount: number) => (
 
 export const CTA_COPY = {
   heading: 'Start your resume today.',
-  sub: 'Sign in with Google or GitHub to begin.',
+  sub: 'Sign in with Google, GitHub or LinkedIn to begin.',
   button: 'Get started',
 } as const;
 

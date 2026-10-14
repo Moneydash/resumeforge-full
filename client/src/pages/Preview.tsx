@@ -42,6 +42,15 @@ import type { SavedFont } from '@/utils/fonts';
 import { isColorTemplate, type ColorTheme } from '@/utils/color-theme';
 import { convertLayout, type SectionLayout } from '@/utils/section-layout';
 import type { SectionTitles } from '@/utils/section-titles';
+import type { AxiosResponse } from 'axios';
+import { editorStatus, type LiveStatus } from '@/components/editor-chrome/status';
+import MaintenanceScreen from '@/components/maintenance/MaintenanceScreen';
+import MaintenanceBanner from '@/components/maintenance/MaintenanceBanner';
+import DraftRecoveryDialog from '@/components/maintenance/DraftRecoveryDialog';
+import { useMaintenance, useOnMaintenanceEnd } from '@/maintenance/hooks';
+import { isMaintenanceActive } from '@/maintenance/store';
+import { chooseSaveSource, clearDraft, clearStorageKeepingDrafts, readDraft, saveDraft, shouldOfferDraft } from '@/maintenance/draft';
+import { claimSaveLock, TAB_ID } from '@/maintenance/lock';
 
 const Preview: React.FC = () => {
   const [loading, setLoading] = useState(false);
@@ -74,7 +83,15 @@ const Preview: React.FC = () => {
   // Update mode = the resume already had saved data when the page opened (not a first-time creation)
   const [isUpdateMode, setIsUpdateMode] = useState(false);
   const liveEdit = isUpdateMode && !!pdfUrl;
-  const [liveStatus, setLiveStatus] = useState<'idle' | 'updating' | 'saved' | 'error'>('idle');
+  const [liveStatus, setLiveStatus] = useState<LiveStatus>('idle');
+  const { status: maintenanceStatus } = useMaintenance(false);
+  const maintenanceActive = maintenanceStatus === 'active';
+  const maintenancePendingRef = useRef(false); // an edit is waiting to be saved once maintenance ends
+  const draftStoredRef = useRef(false); // the paused edit made it into the shared draft on this device
+  const loadRetryRef = useRef(false); // the resume could not be loaded because maintenance began first
+  const [loadBlocked, setLoadBlocked] = useState(false);
+  // set when the opened resume has unsaved edits on this device that differ from the saved copy
+  const [draftChoice, setDraftChoice] = useState<{ draft: string; server: string } | null>(null);
   const requestIdRef = useRef(0); // ignore out-of-order responses
   const LAYOUT_DEBOUNCE_MS = 2500; // each regeneration is a server-side PDF render, wait for the user to stop dragging
   const activeTemplate: TemplateType = template ?? 'andromeda';
@@ -156,38 +173,69 @@ const Preview: React.FC = () => {
     document.body.style.userSelect = 'none'; // Prevent text selection during resize
   };
 
+  const applyResumeData = (resumeJson: string) => {
+    try {
+      setIsUpdateMode(true);
+      const parsedData: ResumeFormData = JSON.parse(resumeJson);
+      // the layout was arranged for another template: carry it over (column <-> single-column rules)
+      const initialLayout = parsedData.sectionLayout && parsedData.sectionLayout.template !== activeTemplate
+        ? convertLayout(parsedData.sectionLayout, activeTemplate, parsedData)
+        : parsedData.sectionLayout;
+      sectionLayoutRef.current = initialLayout;
+      setSectionLayout(initialLayout);
+      fontFamilyRef.current = parsedData.fontFamily;
+      setFontFamily(parsedData.fontFamily);
+      colorThemeRef.current = parsedData.colorTheme;
+      setColorTheme(parsedData.colorTheme);
+      sectionTitlesRef.current = parsedData.sectionTitles;
+      setSectionTitles(parsedData.sectionTitles);
+      setResumeData(parsedData);
+      handleFormSubmit(parsedData); // Use parsedData directly!
+    } catch (e) {
+      // fallback if not JSON
+      setIsUpdateMode(true);
+      setResumeData(resumeJson as unknown as ResumeFormData);
+      handleFormSubmit(resumeJson as unknown as ResumeFormData); // Use the fallback data directly!
+    }
+  };
+
   const fetchResumeData = async (ownerId: string) => {
     setResumeLoading(true);
     const resume_id = localStorage.getItem('id'); // resume id
     if (resume_id) {
-      const request = await client.get(`/resume/fetch-data/${resume_id}/${ownerId}`);
-      localStorage.setItem('resumeFormData', request.data?.resume_data);
-      if (request.data?.resume_data) {
-        try {
-          setIsUpdateMode(true);
-          const parsedData: ResumeFormData = JSON.parse(request.data.resume_data);
-          // the layout was arranged for another template: carry it over (column <-> single-column rules)
-          const initialLayout = parsedData.sectionLayout && parsedData.sectionLayout.template !== activeTemplate
-            ? convertLayout(parsedData.sectionLayout, activeTemplate, parsedData)
-            : parsedData.sectionLayout;
-          sectionLayoutRef.current = initialLayout;
-          setSectionLayout(initialLayout);
-          fontFamilyRef.current = parsedData.fontFamily;
-          setFontFamily(parsedData.fontFamily);
-          colorThemeRef.current = parsedData.colorTheme;
-          setColorTheme(parsedData.colorTheme);
-          sectionTitlesRef.current = parsedData.sectionTitles;
-          setSectionTitles(parsedData.sectionTitles);
-          setResumeData(parsedData);
-          handleFormSubmit(parsedData); // Use parsedData directly!
-        } catch (e) {
-          // fallback if not JSON
-          setIsUpdateMode(true);
-          setResumeData(request.data.resume_data);
-          handleFormSubmit(request.data.resume_data); // Use the fallback data directly!
+      let request: AxiosResponse;
+      try {
+        request = await client.get(`/resume/fetch-data/${resume_id}/${ownerId}`);
+      } catch (error) {
+        if (isMaintenanceActive()) { // maintenance started between status polls: wait it out, then load again
+          loadRetryRef.current = true;
+          setLoadBlocked(true);
+          return;
         }
+        throw error;
       }
+      const serverJson: string | undefined = request.data?.resume_data;
+      localStorage.setItem('resumeFormData', request.data?.resume_data);
+      // Edits kept on this device while maintenance blocked saving: ask before they get replaced by the saved copy
+      // (also when the resume has no saved copy yet, e.g. a first version typed just as maintenance began).
+      const draft = readDraft(localStorage, 'resume', resume_id);
+      if (draft && (!serverJson || shouldOfferDraft(draft.data, serverJson))) {
+        setDraftChoice({ draft: draft.data, server: serverJson ?? '' });
+        return; // the page stays on the loader until the user chooses
+      }
+      if (serverJson) applyResumeData(serverJson);
     }
+    setResumeLoading(false);
+  };
+
+  const resolveDraft = (keepLocal: boolean) => {
+    if (!draftChoice) return;
+    const chosen = keepLocal ? draftChoice.draft : draftChoice.server;
+    if (chosen) localStorage.setItem('resumeFormData', chosen); // the form reads its fields from here
+    const id = localStorage.getItem('id');
+    if (id) clearDraft(localStorage, 'resume', id);
+    setDraftChoice(null);
+    if (chosen) applyResumeData(chosen); // keeping the draft also saves it to the server
     setResumeLoading(false);
   };
 
@@ -291,16 +339,31 @@ const Preview: React.FC = () => {
     }
   }
 
+  // Maintenance: keep the latest document in memory and on the device, and save it when maintenance ends.
+  const pauseForMaintenance = (data: ResumeFormData) => {
+    resumeDataRef.current = data;
+    maintenancePendingRef.current = true;
+    const id = localStorage.getItem('id');
+    draftStoredRef.current = id ? saveDraft(localStorage, 'resume', id, JSON.stringify(data)) : false;
+    setLiveStatus('paused');
+  };
+
   const handleFormSubmit = async (formData: ResumeFormData) => {
+    // the layout, section names, font and color theme live outside the form; always attach the current ones (undefined is dropped from the JSON)
+    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current, sectionTitles: sectionTitlesRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current };
+    if (isMaintenanceActive()) {
+      pauseForMaintenance(data);
+      return;
+    }
     const requestId = ++requestIdRef.current;
     setLoading(true);
     if (liveEdit) setLiveStatus('updating');
-    // the layout, section names, font and color theme live outside the form; always attach the current ones (undefined is dropped from the JSON)
-    const data: ResumeFormData = { ...formData, sectionLayout: sectionLayoutRef.current, sectionTitles: sectionTitlesRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current };
     try {
       resumeDataRef.current = data;
       setResumeData(data);
       await saveResumeData(data);
+      const savedId = localStorage.getItem('id');
+      if (savedId) clearDraft(localStorage, 'resume', savedId); // saved: nothing is waiting on this device any more
       const htmlContent = renderToString(<ResumePreview data={data} template={template} />);
       const payload = pdfPayload(data, htmlContent, template || 'andromeda');
 
@@ -317,6 +380,10 @@ const Preview: React.FC = () => {
       });
       if (liveEdit) setLiveStatus('saved');
     } catch (error) {
+      if (isMaintenanceActive()) { // the 503 arrived before the next status poll: not an error, keep the edit
+        pauseForMaintenance(data);
+        return;
+      }
       console.error("Error: ", error);
       if (liveEdit) setLiveStatus('error');
     } finally {
@@ -324,6 +391,37 @@ const Preview: React.FC = () => {
     }
   }
   handleFormSubmitRef.current = handleFormSubmit; // always-fresh handle for the debounced layout callback
+
+  // When maintenance ends, save the kept document once (several tabs on this resume: only one saves).
+  useOnMaintenanceEnd(() => {
+    if (loadRetryRef.current) { // the resume could not load because maintenance began first: load it now
+      loadRetryRef.current = false;
+      setLoadBlocked(false);
+      void fetchResumeData(Cookies.get('user.id') || '');
+      return;
+    }
+    if (!maintenancePendingRef.current) return;
+    maintenancePendingRef.current = false;
+    const id = localStorage.getItem('id');
+    if (!claimSaveLock(localStorage, `maintenance-save:resume:${id}`, TAB_ID, Date.now())) {
+      setLiveStatus('idle'); // another tab saves it
+      return;
+    }
+    // Save the newest edit from any tab (the shared draft), not necessarily this tab's own copy.
+    const source = chooseSaveSource(
+      id ? readDraft(localStorage, 'resume', id) : null,
+      draftStoredRef.current,
+      resumeDataRef.current ? JSON.stringify(resumeDataRef.current) : null,
+    );
+    if (source.kind === 'skip') {
+      setLiveStatus('idle');
+      return;
+    }
+    void (async () => {
+      await getCsrfToken().catch(() => { }); // the server may have restarted: get a fresh token before saving
+      await handleFormSubmitRef.current(JSON.parse(source.json));
+    })();
+  });
 
   // each change is a server-side PDF render: wait for the user to stop before saving and regenerating
   const queueRegenerate = () => {
@@ -421,32 +519,45 @@ const Preview: React.FC = () => {
     const toastId = toast.loading("Redirecting to Resume Dashboards...");
     setTimeout(() => {
       toast.dismiss(toastId);
-      localStorage.clear();
+      clearStorageKeepingDrafts(localStorage);
       navigate("/dashboard");
     }, 1600);
   }
 
   return (
     resumeLoading ? (
-      <Loader label="Loading your resume..." />
+      loadBlocked ? (
+        <MaintenanceScreen />
+      ) : (
+        <>
+          <Loader label="Loading your resume..." />
+          <DraftRecoveryDialog
+            open={draftChoice !== null}
+            noun="resume"
+            onKeepLocal={() => resolveDraft(true)}
+            onUseSaved={() => resolveDraft(false)}
+          />
+        </>
+      )
     ) : (
       <div className="app-shell h-screen w-full font-app flex flex-col overflow-hidden">
+        <MaintenanceBanner variant="editor" />
         <EditorTopBar
           templateLabel={`Template: ${(template || 'andromeda').replace(/_/g, ' ').replace(/\b\w/g, (c) => c.toUpperCase())}`}
-          status={liveEdit ? liveStatus : 'idle'}
+          status={editorStatus(liveEdit, liveStatus)}
           designOpen={designOpen}
           canOpenDesign={!!pdfUrl}
           onToggleDesign={() => setDesignOpen((open) => !open)}
           onDashboard={redirectResumes}
           onExport={() => handleExportPDF({ ...resumeData, sectionLayout: sectionLayoutRef.current, sectionTitles: sectionTitlesRef.current, fontFamily: fontFamilyRef.current, colorTheme: colorThemeRef.current })}
           exporting={loadingExport}
-          canExport={!!pdfUrl}
+          canExport={!!pdfUrl && !maintenanceActive}
+          exportHint={maintenanceActive ? 'Export is paused during maintenance' : undefined}
         />
-        {/* Fixed Navigation Sidebar */}
-        <SectionRail items={sidebarItems} onSelect={scrollToSection} />
+        {/* Main Content Area - leaves room (pl-12) for the section rail, which sits inside it */}
+        <div className="relative flex-1 pl-12 flex flex-col lg:flex-row overflow-hidden">
+          <SectionRail items={sidebarItems} onSelect={scrollToSection} />
 
-        {/* Main Content Area - Adjusted for fixed sidebar */}
-        <div className="flex-1 pl-12 flex flex-col lg:flex-row overflow-hidden">
           {/* Form Sidebar */}
           <div
             className="ec-formcol h-1/2 lg:h-full flex flex-col overflow-hidden relative"
