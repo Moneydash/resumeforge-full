@@ -28,10 +28,10 @@ export default function MaintenanceTab({ form, errors, locked, onChange }: Maint
       )}
 
       <div className="app-seg mb-5" role="group" aria-label="When to start">
-        <button type="button" aria-pressed={form.mode === 'now'} disabled={locked} onClick={() => onChange({ mode: 'now' })}>
+        <button type="button" className="px-4 text-sm" aria-pressed={form.mode === 'now'} disabled={locked} onClick={() => onChange({ mode: 'now' })}>
           Start now
         </button>
-        <button type="button" aria-pressed={form.mode === 'schedule'} disabled={locked} onClick={() => onChange({ mode: 'schedule' })}>
+        <button type="button" className="px-4 text-sm" aria-pressed={form.mode === 'schedule'} disabled={locked} onClick={() => onChange({ mode: 'schedule' })}>
           Schedule
         </button>
       </div>
