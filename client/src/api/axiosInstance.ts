@@ -1,5 +1,6 @@
 import axios from 'axios';
 import Cookies from 'js-cookie';
+import { useMaintenanceStore } from '@/maintenance/store';
 
 const API_URL = import.meta.env.VITE_API_URL || 'http://localhost:5000';
 
@@ -29,6 +30,13 @@ client.interceptors.response.use(
     return response;
   },
   (error) => {
+    // The server answers every request with 503 + X-Maintenance while maintenance is active. The header
+    // (not the body) is checked because PDF requests use responseType 'blob'. This flips the UI without
+    // waiting for the next status poll.
+    if (error.response?.status === 503 && error.response.headers?.['x-maintenance'] === '1') {
+      useMaintenanceStore.getState().markActive();
+    }
+
     if (error.code === 'ECONNABORTED') {
       console.error('Request timeout:', error);
       return Promise.reject(new Error('Request timeout. Please check your internet connection.'));
