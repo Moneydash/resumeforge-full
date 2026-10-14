@@ -51,11 +51,13 @@
 .ec-iconbtn[aria-pressed='true'] { border-color: var(--l-ink); box-shadow: inset 0 0 0 1px var(--l-ink); }
 .ec-iconbtn:disabled { opacity: 0.55; cursor: not-allowed; }
 
-/* Section rail: exactly 48px wide, because the resize math subtracts 48 */
+/* Section rail: exactly 48px wide, because the resize math subtracts 48.
+   Positioned inside the editor's content area (which is `relative`), so it always starts below the top bar
+   and anything above it, such as the maintenance banner. */
 .ec-rail {
-  position: fixed;
+  position: absolute;
   left: 0;
-  top: 3.5rem;
+  top: 0;
   bottom: 0;
   z-index: 40;
   display: flex;

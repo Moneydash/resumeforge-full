@@ -491,11 +491,10 @@ const CLPreview: React.FC = () => {
           canExport={!!pdfUrl && !maintenanceActive}
           exportHint={maintenanceActive ? 'Export is paused during maintenance' : undefined}
         />
-        {/* Fixed Navigation Sidebar */}
-        <SectionRail items={sidebarItems} label="Cover letter sections" onSelect={scrollToSection} />
+        {/* Main Content Area - leaves room (pl-12) for the section rail, which sits inside it */}
+        <div className="relative flex-1 pl-12 flex flex-col lg:flex-row overflow-hidden">
+          <SectionRail items={sidebarItems} label="Cover letter sections" onSelect={scrollToSection} />
 
-        {/* Main Content Area - Adjusted for fixed sidebar */}
-        <div className="flex-1 pl-12 flex flex-col lg:flex-row overflow-hidden">
           {/* Form Sidebar */}
           <div
             className="ec-formcol h-1/2 lg:h-full flex flex-col overflow-hidden relative"
