@@ -2,17 +2,20 @@ import { useEffect, useRef } from 'react';
 import { RotateCcw } from 'lucide-react';
 import ExtractedTextPanel from './ExtractedTextPanel';
 import FindingsList from './FindingsList';
+import KeywordMatch from './KeywordMatch';
 import VerdictCard from './VerdictCard';
 import { VERDICT_META } from './verdict-meta';
 import type { ScanResult } from './types';
+import type { KeywordPreferences } from './useKeywordPreferences';
 
 interface ScanResultsProps {
   result: ScanResult;
   fileName: string;
+  keywords: KeywordPreferences;
   onReset: () => void;
 }
 
-export default function ScanResults({ result, fileName, onReset }: ScanResultsProps) {
+export default function ScanResults({ result, fileName, keywords, onReset }: ScanResultsProps) {
   const headingRef = useRef<HTMLHeadingElement>(null);
 
   // Move focus to the results when they open, so keyboard and screen reader users land on them.
@@ -43,6 +46,7 @@ export default function ScanResults({ result, fileName, onReset }: ScanResultsPr
         <div className="flex flex-col gap-4">
           <VerdictCard result={result} />
           <FindingsList checks={result.checks} />
+          <KeywordMatch text={result.extractedText} prefs={keywords} />
         </div>
         <ExtractedTextPanel text={result.extractedText} />
       </div>
