@@ -25,7 +25,7 @@ const RouteComponent = () => {
       <Suspense fallback={<Loader />}>
         <Routes>
           <Route path="/" element={<Home />} />
-          <Route path="/login" element={<MaintenanceGate><Login /></MaintenanceGate>} />
+          <Route path="/login" element={<Login />} />
           <Route
             path="/dashboard"
             element={

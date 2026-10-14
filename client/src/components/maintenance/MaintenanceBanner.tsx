@@ -51,7 +51,7 @@ export default function MaintenanceBanner({ variant, showActive = false }: Maint
   return (
     <div className="mt-bar mt-bar--dark" role="status">
       <span>
-        <b>Maintenance in progress.</b> Sign-in and the editor are unavailable{endsAt !== null ? ` until about ${formatClock(endsAt)}` : ' for now'}.
+        <b>Maintenance in progress.</b> The app is unavailable{endsAt !== null ? ` until about ${formatClock(endsAt)}` : ' for now'}. Admins can still sign in.
       </span>
     </div>
   );

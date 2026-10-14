@@ -198,9 +198,9 @@ Polyform Noncommercial License
 
 ## Maintenance mode
 
-Take the app down for maintenance without a deploy.
+Take the app down for maintenance without a deploy. Admins do it from the `/admin` page (see "Admin access" below). The command line below is the optional emergency path.
 
-1. Set `MAINTENANCE_ADMIN_TOKEN` on the server to a long random value (for example `openssl rand -hex 32`). Without it the control endpoint is disabled.
+1. Set `MAINTENANCE_ADMIN_TOKEN` on the server to a long random value (for example `openssl rand -hex 32`). Without it the token path is disabled; admin sessions still work.
 2. Run the commands from `server/`:
 
 ```bash
@@ -212,7 +212,7 @@ bash scripts/maintenance.sh off                # end it
 bash scripts/maintenance.sh status
 ```
 
-While maintenance is active every request except `GET /maintenance/status` and `PUT /maintenance` gets `503`. `endsAt` is an estimate only; clients leave the maintenance screen when the status becomes `off`.
+While maintenance is active every request gets `503`, except `GET /maintenance/status`, `PUT /maintenance`, the OAuth sign-in routes (so an admin can sign back in), and any request from a signed-in admin. `endsAt` is an estimate only; clients leave the maintenance screen when the status becomes `off`.
 
 The state lives in memory. With `REDIS_URL` set it is also mirrored to Redis, so it survives a restart and is shared between instances. Without Redis, a restart resets maintenance to off.
 

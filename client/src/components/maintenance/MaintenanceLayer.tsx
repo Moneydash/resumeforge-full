@@ -6,8 +6,8 @@ import MaintenanceBanner from './MaintenanceBanner';
 const EDITOR_PATHS = ['/preview', '/cl-preview'];
 // The admin page shows the maintenance state itself.
 const ADMIN_PATH = '/admin';
-// Pages that stay up during maintenance: the "in progress" bar explains why sign-in does not work.
-const PUBLIC_PATHS = ['/', '/terms-of-service', '/privacy-policy'];
+// Pages that stay up during maintenance (sign-in too, so admins can get back in): the "in progress" bar explains why.
+const PUBLIC_PATHS = ['/', '/login', '/terms-of-service', '/privacy-policy'];
 
 /** Mount once inside the router: runs the status polling and the admin probe, and shows the root banner. */
 export default function MaintenanceLayer() {

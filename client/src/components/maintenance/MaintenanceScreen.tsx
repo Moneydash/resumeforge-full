@@ -1,6 +1,7 @@
 import { Check } from 'lucide-react';
 import { Link } from 'react-router-dom';
 import ThemeToggle from '@/components/ThemeToggle';
+import { isSignedIn } from '@/components/not-found/actions';
 import { useMaintenance } from '@/maintenance/hooks';
 import { formatClock, progressPercent, timeLeftLabel } from '@/maintenance/timing';
 import '@/styles/landing.css';
@@ -57,6 +58,7 @@ export default function MaintenanceScreen() {
 
         <p className="mt-screen__foot">
           This page updates on its own. The <Link to="/">landing page</Link>, privacy policy and terms are still available.
+          {!isSignedIn() && <> Admins can <Link to="/login">sign in</Link>.</>}
         </p>
       </main>
     </div>
