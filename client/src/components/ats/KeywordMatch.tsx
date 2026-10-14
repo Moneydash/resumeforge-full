@@ -10,6 +10,7 @@ export default function KeywordMatch({ text, prefs }: { text: string; prefs: Key
     [text, prefs.lists.active],
   );
   const total = matched.length + missing.length;
+  const unreadable = text.trim() === '';
 
   return (
     <section aria-labelledby="kw-match-title" className="app-card flex flex-col gap-4 p-5">
@@ -20,7 +21,11 @@ export default function KeywordMatch({ text, prefs }: { text: string; prefs: Key
         <p className="l-muted m-0 mt-1 text-xs">Based on exact wording. Edit the list to re-check instantly.</p>
       </div>
 
-      {total === 0 ? (
+      {unreadable ? (
+        <p className="l-muted m-0 text-sm">
+          Text couldn't be read from this PDF, so keywords can't be checked. See the findings above.
+        </p>
+      ) : total === 0 ? (
         <p className="l-muted m-0 text-sm">Add the keywords you want to check and the match appears here.</p>
       ) : (
         <>

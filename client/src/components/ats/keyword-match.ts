@@ -26,9 +26,9 @@ const ALIASES: string[][] = [
   ['sop', 'standard operating procedure'],
 ];
 
-// Words with letters, digits and inner . or & (node.js, p&l), plus a trailing ++ / # / + (c++, c#) or a leading dot
+// Words (any language) with letters, digits and inner . or & (node.js, p&l), plus a trailing ++ / # / + (c++, c#) or a leading dot
 // (.net). Hyphens and slashes split words, so "full-stack" equals "full stack" and "ci/cd" is "ci cd".
-const TOKEN = /\.?[a-z0-9]+(?:[.&][a-z0-9]+)*(?:\+\+|#|\+)?/g;
+const TOKEN = /\.?[\p{L}\p{N}]+(?:[.&][\p{L}\p{N}]+)*(?:\+\+|#|\+)?/gu;
 
 /** Crude stemming so manage / managed / managing and deal / deals line up. Only plain alphabetic words. */
 const stem = (word: string): string => {

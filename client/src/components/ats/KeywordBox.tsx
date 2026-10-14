@@ -94,6 +94,13 @@ export default function KeywordBox({ prefs }: { prefs: KeywordPreferences }) {
               handleRemove(lists.active[lists.active.length - 1]);
             }
           }}
+          onPaste={(e) => {
+            // Single-line inputs flatten line breaks, so read the raw clipboard text to split one-per-line lists.
+            const pasted = e.clipboardData.getData('text');
+            if (!/[\n\r]/.test(pasted)) return;
+            e.preventDefault();
+            commit(`${draft},${pasted}`);
+          }}
           onBlur={() => commit(draft)}
         />
       </div>

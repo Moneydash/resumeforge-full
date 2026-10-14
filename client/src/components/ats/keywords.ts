@@ -18,7 +18,11 @@ export const EMPTY_LISTS: KeywordLists = { active: [], suggested: [] };
 const same = (a: string, b: string) => a.toLowerCase() === b.toLowerCase();
 const without = (list: string[], term: string) => list.filter((t) => !same(t, term));
 
-export const normalizeTerm = (raw: string): string => raw.trim().replace(/\s+/g, ' ');
+// Text copied from PDFs can carry control characters, which the server rejects.
+// eslint-disable-next-line no-control-regex
+const CONTROL_CHARS = /[\u0000-\u001f\u007f]/g;
+
+export const normalizeTerm = (raw: string): string => raw.replace(CONTROL_CHARS, ' ').trim().replace(/\s+/g, ' ');
 
 /** Splits pasted text on commas, semicolons and line breaks. */
 export const splitInput = (raw: string): string[] =>
