@@ -195,3 +195,23 @@ src/
 ## License
 
 Polyform Noncommercial License
+
+## Maintenance mode
+
+Take the app down for maintenance without a deploy.
+
+1. Set `MAINTENANCE_ADMIN_TOKEN` on the server to a long random value (for example `openssl rand -hex 32`). Without it the control endpoint is disabled.
+2. Run the commands from `server/`:
+
+```bash
+export MAINTENANCE_ADMIN_TOKEN=...            # same value as on the server
+export MAINTENANCE_URL=https://api.example.com # default http://localhost:8080
+bash scripts/maintenance.sh schedule "2026-10-20T15:00:00Z" --ends "2026-10-20T16:00:00Z" --message "Database upgrade"
+bash scripts/maintenance.sh on                 # start immediately
+bash scripts/maintenance.sh off                # end it
+bash scripts/maintenance.sh status
+```
+
+While maintenance is active every request except `GET /maintenance/status` and `PUT /maintenance` gets `503`. `endsAt` is an estimate only; clients leave the maintenance screen when the status becomes `off`.
+
+The state lives in memory. With `REDIS_URL` set it is also mirrored to Redis, so it survives a restart and is shared between instances. Without Redis, a restart resets maintenance to off.

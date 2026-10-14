@@ -10,11 +10,15 @@ import passport from 'passport';
 import { testConnection } from './db/db';
 import cookieParser from 'cookie-parser';
 import { csrfProtection } from './middlewares/auth';
+import { createMaintenanceStore } from './utils/maintenanceStore';
+import { createMaintenanceRouter } from './routes/maintenance';
+import { maintenanceGate } from './middlewares/maintenance';
 
 configDotenv();
 
 const app = express();
 const port = process.env.PORT || 8080;
+const maintenanceStore = createMaintenanceStore();
 
 interface ErrorWithCode extends Error {
   code?: string;
@@ -23,8 +27,13 @@ interface ErrorWithCode extends Error {
 app.use(cors({
   origin: process.env.FRONTEND_URL || "http://localhost:3000",
   credentials: true,
+  exposedHeaders: ['X-Maintenance', 'Retry-After'], // so the client can recognise the maintenance 503
 }));
 app.use(express.json());
+// Maintenance: the router stays reachable, then the gate answers 503 to everything else while active.
+// Both must come before the session and CSRF middleware below.
+app.use('/maintenance', createMaintenanceRouter(maintenanceStore));
+app.use(maintenanceGate(maintenanceStore));
 app.use(cookieParser(process.env.SESSION_SECRET || 'your-secret-key'));
 // app.use(cookieParser());
 
@@ -83,6 +92,7 @@ const startServer = async () => {
   try {
     await testConnection();
 
+    maintenanceStore.start();
     app.listen(port, () => {
       console.log(`Server is running and listening to port: ${port}`);
     });
