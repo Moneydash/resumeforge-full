@@ -6,6 +6,8 @@ import client from '@/api/axiosInstance';
 import { getCsrfToken } from '@/utils/helper';
 import AppShell from '@/components/app-shell/AppShell';
 import IdleSteps from '@/components/ats/IdleSteps';
+import KeywordBox from '@/components/ats/KeywordBox';
+import { useKeywordPreferences } from '@/components/ats/useKeywordPreferences';
 import PrivacyNote from '@/components/ats/PrivacyNote';
 import ScanDropzone from '@/components/ats/ScanDropzone';
 import ScanFileCard from '@/components/ats/ScanFileCard';
@@ -41,6 +43,7 @@ const ATSScanner: React.FC = () => {
   const [pacing, setPacing] = useState<PacingState>(INITIAL_PACING);
   const [pendingResult, setPendingResult] = useState<ScanResult | null>(null); // the response, held until the steps finish
   const [result, setResult] = useState<ScanResult | null>(null); // revealed results
+  const keywords = useKeywordPreferences();
 
   const pacingRef = useRef<PacingState>(INITIAL_PACING);
   const pendingRef = useRef<ScanResult | null>(null);
@@ -139,7 +142,7 @@ const ATSScanner: React.FC = () => {
         {phase === 'results' && result ? (
           <>
             <h1 className="sr-only">ATS scanner</h1>
-            <ScanResults result={result} fileName={file?.name ?? 'Your resume'} onReset={handleReset} />
+            <ScanResults result={result} fileName={file?.name ?? 'Your resume'} keywords={keywords} onReset={handleReset} />
           </>
         ) : (
           <>
@@ -153,6 +156,9 @@ const ATSScanner: React.FC = () => {
                 <>
                   <ScanDropzone maxSizeMb={MAX_FILE_SIZE_MB} onFile={handleFileSelected} />
                   <IdleSteps />
+                  <div className="app-card p-5">
+                    <KeywordBox prefs={keywords} />
+                  </div>
                   <PrivacyNote />
                 </>
               )}
@@ -187,7 +193,14 @@ const ATSScanner: React.FC = () => {
                 </button>
               )}
 
-              {phase === 'selected' && <PrivacyNote />}
+              {phase === 'selected' && (
+                <>
+                  <div className="app-card p-5">
+                    <KeywordBox prefs={keywords} />
+                  </div>
+                  <PrivacyNote />
+                </>
+              )}
             </div>
           </>
         )}
