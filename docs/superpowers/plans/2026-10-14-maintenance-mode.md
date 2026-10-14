@@ -1,6 +1,6 @@
 # Maintenance Mode Implementation Plan
 
-> **For agentic workers:** REQUIRED SUB-SKILL: Use superpowers:subagent-driven-development (recommended) or superpowers:executing-plans to implement this plan task-by-task. Steps use checkbox (`- [ ]`) syntax for tracking.
+> **For agentic workers:** This plan is executed inline with superpowers:executing-plans (the user's standing choice), task by task. Steps use checkbox (`- [ ]`) syntax for tracking.
 
 **Goal:** Let an admin schedule or start maintenance with one command and no deploy, while people who are mid-edit keep their work and everyone else sees a clear maintenance screen.
 
