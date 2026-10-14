@@ -36,3 +36,15 @@ export const lenientSession = (sessionMiddleware: RequestHandler): RequestHandle
     next();
   });
 };
+
+/**
+ * Tells a signed-in user their own role, so the UI can show admin-only links. This only drives what is
+ * shown: the server still enforces every admin route.
+ */
+export const sendRole: RequestHandler = (req, res) => {
+  if (req.isAuthenticated?.() !== true) {
+    res.status(401).json({ error: 'Authentication required' });
+    return;
+  }
+  res.json({ role: roleOf(req.user as { role?: unknown } | undefined) });
+};

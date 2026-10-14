@@ -229,6 +229,6 @@ Admins sign in the normal way (Google, GitHub or LinkedIn); admin status lives o
 UPDATE users SET role = 'super_admin', super_admin_slot = 1 WHERE email = 'owner@example.com';
 ```
 
-3. Open `/admin` on the site. From there super admins and admins manage maintenance, and admins are added and removed. There can be at most two super admins (a database rule): to hand over ownership, make the new owner a super admin, then have them demote you. The same SQL statement repairs the system if the database ever has no super admin.
+3. Open the **Admin** link in the sidebar (it is shown to admins only) or go to `/admin`. From there super admins and admins manage maintenance, and admins are added and removed. There can be at most two super admins (a database rule): to hand over ownership, make the new owner a super admin, then have them demote you. The same SQL statement repairs the system if the database ever has no super admin.
 
 While maintenance is on, admins can use the whole app and everyone else is blocked. `PUT /maintenance` also still accepts the optional emergency `MAINTENANCE_ADMIN_TOKEN` (see above), which is the way back in if the database is down and nobody can sign in.

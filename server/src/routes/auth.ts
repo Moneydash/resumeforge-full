@@ -10,6 +10,7 @@ import {
 } from '../controllers/auth';
 import { isAuthenticated, isGuest, validateSocialLogin, optionalAuth } from '../middlewares/auth';
 import { userModel } from '../models/User';
+import { sendRole } from '../middlewares/adminAuth';
 
 const authRouter = express.Router();
 
@@ -75,6 +76,9 @@ authRouter.get('/auth/github/callback', githubCallback);
 // LinkedIn OAuth routes
 authRouter.get('/auth/linkedin', linkedinLogin);
 authRouter.get('/auth/linkedin/callback', linkedinCallback);
+
+// The signed-in user's own role, for showing admin-only links in the UI
+authRouter.get('/auth/role', sendRole);
 
 authRouter.get('/csrf-token', (req, res) => {
   const token = req.csrfToken();
