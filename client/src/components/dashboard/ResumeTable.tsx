@@ -12,7 +12,7 @@ interface ResumeTableProps extends ResumeHandlers {
   labels?: DocLabels;
 }
 
-export default function ResumeTable({ resumes, pendingEditId, onEdit, onClone, onRename, onDelete, labels = RESUME_LABELS }: ResumeTableProps) {
+export default function ResumeTable({ resumes, pendingEditId, onEdit, onClone, onRename, onShare, onDelete, labels = RESUME_LABELS }: ResumeTableProps) {
   return (
     <table className="app-table">
       <caption className="sr-only">{labels.tableCaption}</caption>
@@ -76,6 +76,7 @@ export default function ResumeTable({ resumes, pendingEditId, onEdit, onClone, o
                     name={name}
                     onClone={() => onClone(resume.id)}
                     onRename={() => onRename(resume)}
+                    onShare={onShare ? () => onShare(resume) : undefined}
                     onDelete={() => onDelete(resume.id)}
                   />
                 </div>

@@ -6,6 +6,7 @@ import AppShell from '@/components/app-shell/AppShell';
 import DashboardView from '@/components/dashboard/DashboardView';
 import ResumeFormDialog from '@/components/dashboard/ResumeFormDialog';
 import DeleteResumeDialog from '@/components/dashboard/DeleteResumeDialog';
+import ShareResumeDialog from '@/components/dashboard/ShareResumeDialog';
 import type { DashboardStatus, ViewMode } from '@/components/dashboard/types';
 import { usePendingNavigation } from '@/hooks/usePendingNavigation';
 import type { ResumeSummary } from '@/types';
@@ -21,6 +22,8 @@ const Dashboard: React.FC = () => {
   const [viewMode, setViewMode] = useState<ViewMode>('grid');
   const [deleteDialogOpen, setDeleteDialogOpen] = useState(false);
   const [resumeToDelete, setResumeToDelete] = useState<string | null>(null);
+  const [shareResumeId, setShareResumeId] = useState<string | null>(null);
+  const [shareBusy, setShareBusy] = useState(false);
   const [status, setStatus] = useState<DashboardStatus>('loading');
   const { pendingKey, go } = usePendingNavigation();
 
@@ -165,6 +168,25 @@ const Dashboard: React.FC = () => {
       })
   };
 
+  const handleShare = (resume: ResumeSummary) => setShareResumeId(resume.id);
+
+  const handleToggleShare = async (enabled: boolean) => {
+    if (!shareResumeId) return;
+    setShareBusy(true);
+    try {
+      await client.post(`/resume/share/${shareResumeId}/${userId}`, { enabled });
+      await fetchResumes();
+      toast.success(enabled ? 'Sharing is on' : 'Sharing is off');
+    } catch (error) {
+      console.error('Failed to update sharing: ', error);
+      toast.error('Could not update sharing. Please try again.');
+    } finally {
+      setShareBusy(false);
+    }
+  };
+
+  const shareResume = resumes.find((r) => r.id === shareResumeId);
+
   const handleSlugChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const value = e.target.value;
     const slug = slugify(value);
@@ -186,6 +208,7 @@ const Dashboard: React.FC = () => {
         onEdit={handleEditResume}
         onClone={handleClone}
         onRename={handleRename}
+        onShare={handleShare}
         onDelete={openDeleteDialog}
       />
 
@@ -197,6 +220,18 @@ const Dashboard: React.FC = () => {
         }}
         onCancel={closeDeleteDialog}
         onConfirm={confirmDeleteResume}
+      />
+
+      <ShareResumeDialog
+        open={!!shareResume}
+        onOpenChange={(open) => {
+          if (!open) setShareResumeId(null);
+        }}
+        resumeName={shareResume?.resume_name || 'Untitled'}
+        enabled={!!shareResume?.share_enabled}
+        token={shareResume?.share_token ?? null}
+        busy={shareBusy}
+        onToggle={handleToggleShare}
       />
 
       <ResumeFormDialog

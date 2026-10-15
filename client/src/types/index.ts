@@ -54,6 +54,8 @@ export interface ResumeSummary {
   resume_slug_name: string;
   template: string;
   updated_at: string;
+  share_enabled?: boolean | number; // MySQL sends 0 / 1
+  share_token?: string | null;
 };
 
 export interface CoverLetterSummary {

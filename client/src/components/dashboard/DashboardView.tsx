@@ -29,10 +29,11 @@ export default function DashboardView({
   onEdit,
   onClone,
   onRename,
+  onShare,
   onDelete,
   labels = RESUME_LABELS,
 }: DashboardViewProps) {
-  const handlers = { onEdit, onClone, onRename, onDelete };
+  const handlers = { onEdit, onClone, onRename, onShare, onDelete };
 
   return (
     <div className="w-full px-4 py-8 sm:px-8 lg:px-10 lg:py-12">

@@ -1,4 +1,4 @@
-import { Copy, MoreHorizontal, Pencil, Trash2 } from 'lucide-react';
+import { Copy, MoreHorizontal, Pencil, Share2, Trash2 } from 'lucide-react';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuLabel, DropdownMenuSeparator, DropdownMenuTrigger } from '@/components/ui/dropdown-menu';
 
 interface ResumeActionsMenuProps {
@@ -6,11 +6,12 @@ interface ResumeActionsMenuProps {
   onClone: () => void;
   onRename: () => void;
   onDelete: () => void;
+  onShare?: () => void;
 }
 
 // modal={false}: Rename and Delete open a Dialog from a menu item; a modal menu would leave the page
 // with `pointer-events: none` after the dialog closes.
-export default function ResumeActionsMenu({ name, onClone, onRename, onDelete }: ResumeActionsMenuProps) {
+export default function ResumeActionsMenu({ name, onClone, onRename, onShare, onDelete }: ResumeActionsMenuProps) {
   return (
     <DropdownMenu modal={false}>
       <DropdownMenuTrigger asChild>
@@ -28,6 +29,12 @@ export default function ResumeActionsMenu({ name, onClone, onRename, onDelete }:
           <Pencil aria-hidden="true" />
           Rename
         </DropdownMenuItem>
+        {onShare && (
+          <DropdownMenuItem onSelect={onShare}>
+            <Share2 aria-hidden="true" />
+            Share
+          </DropdownMenuItem>
+        )}
         <DropdownMenuSeparator />
         <DropdownMenuItem variant="destructive" onSelect={onDelete}>
           <Trash2 aria-hidden="true" />
