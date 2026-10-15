@@ -102,7 +102,10 @@ const ViewMode: React.FC<{ token: string }> = ({ token }) => {
   return (
     <main className="flex min-h-screen flex-col bg-[#f2f1ec] dark:bg-[#1a1a17]">
       <header className="flex items-center justify-between gap-3 px-4 py-3">
-        <span className="text-sm font-semibold">ResumeForge</span>
+        <span className="flex items-center gap-2.5 text-sm font-semibold">
+          <img src="/icon.png" alt="" width={28} height={28} className="size-7 rounded-md" />
+          ResumeForge
+        </span>
         <a className="l-btn l-btn--primary" href={`${apiUrl}/public/resume/${token}/pdf?download=1`}>
           Download PDF
         </a>
