@@ -138,6 +138,12 @@ const shareResume: Controller = async (req, res) => {
   const { id, userId } = req.params;
   const { enabled } = req.body;
 
+  // isAuthenticated only proves someone is signed in: the resume must belong to the signed-in user, not
+  // merely to whichever userId the URL names.
+  if ((req.user as { id?: string } | undefined)?.id !== userId) {
+    return res.status(404).json({ message: 'Resume not found' });
+  }
+
   if (typeof enabled !== 'boolean') {
     return res.status(400).json({ message: 'enabled must be true or false' });
   }

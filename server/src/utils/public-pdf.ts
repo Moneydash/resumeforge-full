@@ -1,8 +1,14 @@
 import { formatDescription } from "./helper";
 import { launchBrowser, renderPdf } from "./pdf-render";
+import { createLimiter } from "./limiter";
+
+// Each render starts a full Chrome: never more than two at once, however many links are requested.
+const limitRenders = createLimiter(2);
 
 // The token is validated by the caller (22 url-safe characters), so the URL cannot be steered elsewhere.
-export async function renderPublicPdf(token: string) {
+export const renderPublicPdf = (token: string) => limitRenders(() => renderPublicPdfNow(token));
+
+async function renderPublicPdfNow(token: string) {
   const base = (process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '');
   const browser = await launchBrowser();
   try {

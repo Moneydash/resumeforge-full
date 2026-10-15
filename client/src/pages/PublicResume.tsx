@@ -98,6 +98,7 @@ const ViewMode: React.FC<{ token: string }> = ({ token }) => {
   }
 
   const apiUrl = import.meta.env.VITE_API_URL || 'http://localhost:5000';
+  const canInlinePdf = typeof navigator.pdfViewerEnabled === 'boolean' ? navigator.pdfViewerEnabled : true;
   return (
     <main className="flex min-h-screen flex-col bg-[#f2f1ec] dark:bg-[#1a1a17]">
       <header className="flex items-center justify-between gap-3 px-4 py-3">
@@ -106,7 +107,22 @@ const ViewMode: React.FC<{ token: string }> = ({ token }) => {
           Download PDF
         </a>
       </header>
-      <iframe title="Resume" src={`${pdfUrl}#toolbar=0&zoom=100`} className="w-full flex-1 border-0" style={{ minHeight: '85vh' }} />
+      {canInlinePdf ? (
+        <iframe title="Resume" src={`${pdfUrl}#toolbar=0&zoom=100`} className="w-full flex-1 border-0" style={{ minHeight: '85vh' }} />
+      ) : (
+        // some mobile browsers (Android Chrome) cannot draw a PDF inside a page: offer it as a file instead
+        <div className="flex flex-1 flex-col items-center justify-center gap-4 p-6 text-center">
+          <p className="max-w-sm text-sm opacity-80">This browser can't show the resume inside the page. Open or download the PDF instead.</p>
+          <div className="flex flex-wrap justify-center gap-3">
+            <a className="l-btn l-btn--primary" href={pdfUrl} target="_blank" rel="noopener noreferrer">
+              Open PDF
+            </a>
+            <a className="l-btn l-btn--ghost" href={`${apiUrl}/public/resume/${token}/pdf?download=1`}>
+              Download PDF
+            </a>
+          </div>
+        </div>
+      )}
     </main>
   );
 };

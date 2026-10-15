@@ -4,6 +4,7 @@ import { resumeModel } from "../models/Resume";
 import { isValidShareToken } from "../utils/shareToken";
 import { PublicPdfCache } from "../utils/publicPdfCache";
 import { renderPublicPdf } from "../utils/public-pdf";
+import { stripHiddenContent } from "../utils/publicResumeData";
 
 const pdfCache = new PublicPdfCache(50);
 
@@ -15,13 +16,13 @@ const getPublicResume: Controller = async (req, res) => {
   if (!isValidShareToken(token)) return notFound(res);
 
   const resume = await resumeModel.findPublicByToken(token);
-  if (!resume) return notFound(res);
+  if (!resume || resume.share_token !== token) return notFound(res);
 
   res.set('Cache-Control', 'no-store');
   return res.json({
     resume_name: resume.resume_name,
     template: resume.template,
-    resume_data: resume.resume_data,
+    resume_data: stripHiddenContent(resume.resume_data),
     updated_at: resume.updated_at,
   });
 };
@@ -30,9 +31,10 @@ const getPublicResumePdf: Controller = async (req, res) => {
   const { token } = req.params;
   if (!isValidShareToken(token)) return notFound(res);
 
-  // The enabled / deleted check runs on every request, before the cache is consulted.
+  // MySQL's default collation matches tokens case-insensitively; only the exact stored token is valid, which
+  // also keeps the cache key unique per resume. The enabled / deleted check runs on every request, before the cache is consulted.
   const resume = await resumeModel.findPublicByToken(token);
-  if (!resume) return notFound(res);
+  if (!resume || resume.share_token !== token) return notFound(res);
 
   try {
     const version = new Date(resume.updated_at as Date | string).getTime();
