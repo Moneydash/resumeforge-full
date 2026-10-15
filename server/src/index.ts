@@ -4,6 +4,7 @@ import pdfRouter from "./routes/resume";
 import authRouter from "./routes/auth";
 import clRouter from "./routes/cover-letter";
 import atsRouter from "./routes/ats";
+import publicResumeRouter from './routes/public-resume';
 import { config as configDotenv } from "dotenv";
 import session from 'express-session';
 import passport from 'passport';
@@ -69,6 +70,10 @@ app.use(maintenanceGate(maintenanceStore, { isAdmin: isAdminRequest }));
 // PUT /maintenance checks its own credentials (emergency token, or admin session + CSRF), so it sits
 // before the global CSRF check.
 app.use('/maintenance', createMaintenanceControlRouter(maintenanceStore, { isAdmin: isAdminRequest, csrf: csrfProtection }));
+
+// Public share links: GET only, no sign-in. After the maintenance gate (they pause with the rest of the site)
+// and before the CSRF check (nothing here changes state).
+app.use('/public/resume', publicResumeRouter);
 
 app.use(csrfProtection);
 
