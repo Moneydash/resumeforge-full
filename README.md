@@ -57,6 +57,23 @@ A passed check earns its full weight and a warning earns half. A resume with no 
 - One PDF per request, up to 5 MB, at most 10 pages scanned, 30-second timeout per scan.
 - The score is a heuristic. Real ATS products differ from each other, so treat it as guidance rather than a guarantee. OCR is not performed, so image-only PDFs are reported as not readable.
 
+## CI/CD
+
+GitHub Actions runs two workflows (see `.github/workflows/`):
+
+| Workflow | When | What it does |
+|---|---|---|
+| `CI` | Every pull request and push to `master` | **client:** install, lint (advisory for now), build. **server:** install, type-check, build, tests. **docker:** builds the server image and checks that Chrome can render a PDF inside it. |
+| `Publish server image` | After a merge to `master` that changes `server/` (or manually) | Pushes the server image to GitHub Container Registry as `latest` and `sha-<commit>`. |
+
+Pull the published image with:
+
+```bash
+docker pull ghcr.io/moneydash/resumeforge-server:latest
+```
+
+The image needs a MySQL database and the variables from `server/.env` to run (see the Docker setup above). Nothing is deployed automatically. Dependabot opens weekly update PRs for npm, the Dockerfile and the workflows.
+
 ## Folder Structure
 
 ```
