@@ -15,6 +15,7 @@ const NotFound = lazy(() => import('./pages/NotFound'));
 const ToS = lazy(() => import('./pages/TermsOfService'));
 const PrivacyPolicy = lazy(() => import('./pages/PrivacyPolicy'));
 const Admin = lazy(() => import('./pages/Admin'));
+const PublicResume = lazy(() => import('./pages/PublicResume'));
 import ProtectedRoute from '@/components/ProtectedRoute';
 import Loader from './components/SuspenseLoader';
 import MaintenanceGate from '@/components/maintenance/MaintenanceGate';
@@ -104,6 +105,7 @@ const RouteComponent = () => {
               </ProtectedRoute>
             }
           />
+          <Route path="/r/:token" element={<PublicResume />} />
           <Route path="*" element={<NotFound />} />
           <Route path="/terms-of-service" element={<ToS />} />
           <Route path="/privacy-policy" element={<PrivacyPolicy />} />
