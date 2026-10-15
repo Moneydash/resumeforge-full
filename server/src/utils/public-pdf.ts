@@ -9,7 +9,9 @@ const limitRenders = createLimiter(2);
 export const renderPublicPdf = (token: string) => limitRenders(() => renderPublicPdfNow(token));
 
 async function renderPublicPdfNow(token: string) {
-  const base = (process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '');
+  // PRINT_BASE_URL: where Chrome reaches the frontend when that differs from the public FRONTEND_URL
+  // (e.g. a container that must use host.docker.internal instead of localhost).
+  const base = (process.env.PRINT_BASE_URL || process.env.FRONTEND_URL || 'http://localhost:3000').replace(/\/+$/, '');
   const browser = await launchBrowser();
   try {
     const page = await browser.newPage();

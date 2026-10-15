@@ -17,6 +17,10 @@ export default defineConfig({
       "@": path.resolve(__dirname, "./src")
     }
   },
+  server: {
+    // the dockerized backend's Chrome loads /r/:token?print=1 from here via host.docker.internal
+    allowedHosts: ['host.docker.internal']
+  },
   test: {
     environment: 'node'
   }
