@@ -51,3 +51,23 @@ jobs:
       - run: npm run build
       # No tests are committed yet; do not fail on that.
       - run: npx vitest run --passWithNoTests
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build server image (not pushed)
+        uses: docker/build-push-action@v6
+        with:
+          context: server
+          load: true
+          push: false
+          provenance: false
+          tags: resumeforge-server:ci
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,scope=server,mode=max
+      # Chrome is the part of the image that breaks silently: render a PDF as the image's non-root user.
+      - name: Smoke test (Chrome renders a PDF as non-root)
+        run: |
+          docker run --rm --entrypoint node resumeforge-server:ci -e "const p=require('puppeteer');(async()=>{const b=await p.launch({headless:true,args:['--no-sandbox']});const pg=await b.newPage();await pg.setContent('<h1>hi</h1>');const pdf=await pg.pdf();if(process.getuid()===0||pdf.length<1000){throw new Error('uid='+process.getuid()+' pdf='+pdf.length)}console.log('pdf bytes',pdf.length,'uid',process.getuid());await b.close()})().catch(e=>{console.error(e.message);process.exit(1)})"
