@@ -1,0 +1,62 @@
+# Local stack: API + MySQL + Redis. Secrets come from server/.env (never baked into the image).
+#   docker compose up -d --build
+#   docker compose run --rm migrate
+services:
+  server:
+    build: .
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+      REDIS_URL: redis://redis:6379
+      # Chrome inside the container can't reach the host's Vite via localhost (FRONTEND_URL)
+      PRINT_BASE_URL: ${PRINT_BASE_URL:-http://host.docker.internal:5173}
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    ports:
+      - "8080:8080"
+    depends_on:
+      db:
+        condition: service_healthy
+      redis:
+        condition: service_started
+    restart: unless-stopped
+    init: true           # reap Chrome zombie processes
+    shm_size: 1gb        # Chrome needs more than Docker's 64MB default /dev/shm
+
+  migrate:
+    build: .
+    profiles: ["tools"]
+    env_file: .env
+    environment:
+      DB_HOST: db
+      DB_PORT: "3306"
+    command: ["npx", "knex", "migrate:latest"]
+    depends_on:
+      db:
+        condition: service_healthy
+
+  db:
+    image: mysql:8.4
+    environment:
+      MYSQL_ROOT_PASSWORD: ${DB_PASSWORD:?set DB_PASSWORD in .env}
+      MYSQL_DATABASE: ${DB_NAME:-resumeforge}
+    ports:
+      - "127.0.0.1:3307:3306"   # for Workbench; 3306 is taken by a local MySQL
+    volumes:
+      - mysql_data:/var/lib/mysql
+    healthcheck:
+      test: ["CMD-SHELL", "mysqladmin ping -h 127.0.0.1 -p$$MYSQL_ROOT_PASSWORD --silent"]
+      interval: 10s
+      timeout: 5s
+      retries: 10
+      start_period: 30s
+
+  redis:
+    image: redis:7-alpine
+    volumes:
+      - redis_data:/data
+
+volumes:
+  mysql_data:
+  redis_data:

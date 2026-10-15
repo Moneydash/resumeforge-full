@@ -30,8 +30,10 @@ interface ErrorWithCode extends Error {
   code?: string;
 }
 
+// The print page Chrome opens for share-link PDFs may live at PRINT_BASE_URL; its API calls need CORS too.
+const printOrigin = process.env.PRINT_BASE_URL ? new URL(process.env.PRINT_BASE_URL).origin : undefined;
 app.use(cors({
-  origin: process.env.FRONTEND_URL || "http://localhost:3000",
+  origin: [process.env.FRONTEND_URL || "http://localhost:3000", ...(printOrigin ? [printOrigin] : [])],
   credentials: true,
   exposedHeaders: ['X-Maintenance', 'Retry-After'], // so the client can recognise the maintenance 503
 }));

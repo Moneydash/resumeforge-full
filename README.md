@@ -164,6 +164,9 @@ server/
 │   │   ├── helper.ts
 │   │   └── pdfGenerator.ts
 │   └── index.ts                    # App setup: CORS, sessions, Passport, CSRF, routes
+├── .dockerignore
+├── docker-compose.yml              # API + MySQL + Redis for local development
+├── Dockerfile                      # Multi-stage production image (Chrome included)
 ├── knexfile.js
 ├── nodemon.json
 ├── package.json
@@ -185,13 +188,16 @@ Logout ends the session on the server and clears the session and CSRF cookies. T
 
 ## Getting Started
 
-### Prerequisites
-- Node.js 20 or later
-- MySQL
-- A Google and/or GitHub OAuth app
-- Redis (optional): only needed to share rate-limit counters across several server instances
+You can run the backend either **manually** with Node.js (Option A) or **with Docker** (Option B). The client always runs with Node.js. Both options use the same `server/.env` file (see [Environment variables](#environment-variables)).
 
-### Setup
+### Prerequisites
+- Node.js 20 or later (both options, for the client)
+- A Google and/or GitHub OAuth app
+- **Option A only:** MySQL, and optionally Redis
+- **Option B only:** Docker with Docker Compose (Docker Desktop on Windows and macOS)
+- Redis is optional: it is only needed to share rate-limit counters across several server instances
+
+### Option A: Manual setup (Node.js)
 1. Clone the repository
 2. Install dependencies in both `client` and `server` (the server's install also downloads Chrome for Puppeteer)
    ```bash
@@ -208,6 +214,50 @@ Logout ends the session on the server and clears the session and CSRF cookies. T
    cd server && npm run dev     # http://localhost:8080
    cd client && npm run dev     # http://localhost:5173
    ```
+
+### Option B: Docker setup (backend)
+
+Docker runs the API, MySQL 8.4 and Redis 7 together, so you don't need MySQL or Chrome installed on your machine. The client still runs on your machine.
+
+1. Clone the repository and install the client dependencies
+   ```bash
+   cd client && npm install
+   ```
+2. Create `client/.env` and `server/.env` (see below). In `server/.env`, `DB_PASSWORD` is required: it becomes the MySQL root password. `DB_HOST`, `DB_PORT` and `REDIS_URL` are set for you by Compose, so the values in the file don't matter for Docker.
+3. Build and start the stack
+   ```bash
+   cd server
+   docker compose up -d --build
+   ```
+4. Run the database migrations (first run, and after pulling new migrations)
+   ```bash
+   docker compose run --rm migrate
+   ```
+5. Start the client. Use `--host` so the container's Chrome can reach it (see the note below)
+   ```bash
+   cd client && npm run dev -- --host     # http://localhost:5173
+   ```
+
+The API is at `http://localhost:8080`. Check it with `curl http://localhost:8080/maintenance/status`, or `docker compose ps` (the server should show as healthy).
+
+**Everyday commands** (run in `server/`)
+
+| Command | What it does |
+|---|---|
+| `docker compose up -d` | Start the stack (add `--build` after code changes) |
+| `docker compose logs -f server` | Follow the API logs |
+| `docker compose stop` | Stop the containers and keep everything |
+| `docker compose down` | Remove the containers and keep your database |
+| `docker compose down -v` | Remove the containers **and delete the database and Redis data** (the next start needs migrations again) |
+
+**Connect a database client (MySQL Workbench and others):** host `127.0.0.1`, port `3307`, user `root`, password = your `DB_PASSWORD`. It is port 3307 so it doesn't clash with a MySQL you may already run locally on 3306. Use Standard TCP/IP, not a socket or named pipe.
+
+**Why the client needs `--host`:** share-link PDFs (`/r/:token`) are rendered by Chrome inside the container, which opens the client's print page. Inside the container `localhost` is the container itself, so Compose points it at `http://host.docker.internal:5173` (the `PRINT_BASE_URL` variable). Vite only accepts that connection when it listens on all interfaces, which `--host` does. Without it, share links fail with "We couldn't load this resume". This only matters for local Docker; with a real `FRONTEND_URL` it isn't needed. `--host` also makes the dev server reachable from your local network.
+
+**Notes**
+- Secrets are read from `server/.env` at runtime and never baked into the image (`.env` is in `.dockerignore`).
+- The image is about 1.6 GB because it bundles Chrome for PDF generation.
+- To use the server image elsewhere, build it with `docker build -t resumeforge-server server`. It listens on port 8080, runs as a non-root user and has a health check.
 
 ### Environment variables
 
@@ -229,6 +279,7 @@ Logout ends the session on the server and clears the session and CSRF cookies. T
 | `GOOGLE_CLIENT_ID`, `GOOGLE_CLIENT_SECRET` | Google OAuth |
 | `GITHUB_CLIENT_ID`, `GITHUB_CLIENT_SECRET` | GitHub OAuth |
 | `REDIS_URL` | Optional. Stores ATS rate-limit counters in Redis instead of memory |
+| `PRINT_BASE_URL` | Optional. Where the server's Chrome reaches the client to render share-link PDFs, when that differs from `FRONTEND_URL`. Docker Compose sets it to `http://host.docker.internal:5173` |
 
 ### Useful scripts
 
@@ -238,6 +289,8 @@ Logout ends the session on the server and clears the session and CSRF cookies. T
 | server | `npm run dev` | Start with nodemon and ts-node |
 | server | `npm run build` / `start` | Compile to `dist/` and run it |
 | server | `npm run migrate` / `migrate:rollback` | Apply or roll back database migrations |
+| server | `docker compose up -d --build` | Start the API, MySQL and Redis in Docker |
+| server | `docker compose run --rm migrate` | Apply migrations inside Docker |
 
 For more detail, see the READMEs in the `client` and `server` directories.
 
