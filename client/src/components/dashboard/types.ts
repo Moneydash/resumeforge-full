@@ -9,6 +9,7 @@ export interface ResumeHandlers {
   onClone: (id: string) => void;
   onRename: (resume: ResumeSummary) => void;
   onDelete: (id: string) => void;
+  onShare?: (resume: ResumeSummary) => void; // resumes only; the menu item is hidden when absent
 }
 
 // Every user-visible noun on the dashboard, so one set of components serves resumes and cover letters.

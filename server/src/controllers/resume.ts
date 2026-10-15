@@ -3,6 +3,7 @@ import { generateId } from "../utils/helper";
 import { resumeModel } from "../models/Resume";
 import { ResumeData } from "@/types/interface.resume";
 import { escape, trim } from 'validator';
+import { generateShareToken } from "../utils/shareToken";
 
 const save_userData: Controller = async (req, res) => {
   const { resumeData, userId, template, id } = req.body;
@@ -133,6 +134,31 @@ const saveExportedResume: Controller = async (req, res) => {
   return res.json({ 'message': 'Resume successfully exported!' });
 };
 
+const shareResume: Controller = async (req, res) => {
+  const { id, userId } = req.params;
+  const { enabled } = req.body;
+
+  // isAuthenticated only proves someone is signed in: the resume must belong to the signed-in user, not
+  // merely to whichever userId the URL names.
+  if ((req.user as { id?: string } | undefined)?.id !== userId) {
+    return res.status(404).json({ message: 'Resume not found' });
+  }
+
+  if (typeof enabled !== 'boolean') {
+    return res.status(400).json({ message: 'enabled must be true or false' });
+  }
+
+  const resume = await resumeModel.findByIdAndUserId(id, userId);
+
+  if (!resume) {
+    return res.status(404).json({ message: 'Resume not found' });
+  }
+
+  const token = resume.share_token || generateShareToken();
+  await resumeModel.setShare(id, userId, enabled, token);
+  return res.json({ enabled, token });
+};
+
 export {
   save_userData,
   fetchResumeData,
@@ -141,5 +167,6 @@ export {
   createInitResume,
   renameResume,
   cloneResume,
-  saveExportedResume
+  saveExportedResume,
+  shareResume
 };

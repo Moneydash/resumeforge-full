@@ -93,6 +93,37 @@ export class ResumeModel {
     }
   }
 
+  // Only a resume that is shared and not deleted is publicly readable.
+  async findPublicByToken(token: string): Promise<ResumeData | null> {
+    try {
+      const resume = await knex(this.tableName)
+        .where('share_token', token)
+        .andWhere('share_enabled', true)
+        .whereNull('deleted_at')
+        .first();
+
+      return resume || null;
+    } catch (error) {
+      console.error('Error finding shared resume: ', error);
+      throw error;
+    }
+  }
+
+  // updated_at is left alone on purpose: sharing is not an edit.
+  async setShare(id: string, userId: string, enabled: boolean, token: string): Promise<ResumeData | null> {
+    try {
+      await knex(this.tableName)
+        .where('id', id)
+        .andWhere('user_id', userId)
+        .update({ share_enabled: enabled, share_token: token });
+
+      return await this.findByIdAndUserId(id, userId);
+    } catch (error) {
+      console.error('Error updating resume sharing: ', error);
+      throw error;
+    }
+  }
+
   async delete(id: string, user_id: string): Promise<void> {
     try {
       await knex(this.tableName)

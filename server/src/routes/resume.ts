@@ -7,7 +7,8 @@ import {
   createInitResume,
   renameResume,
   cloneResume,
-  saveExportedResume
+  saveExportedResume,
+  shareResume
 } from '../controllers/resume';
 import generate_pdf from "../controllers/pdf";
 import { isAuthenticated, validateSocialLogin, authRateLimit } from '../middlewares/auth';
@@ -65,6 +66,13 @@ pdfRouter.post('/clone/:id/:userId',
   isAuthenticated,
   validateSocialLogin(['google', 'github', 'linkedin']),
   cloneResume
+);
+
+pdfRouter.post('/share/:id/:userId',
+  authRateLimit(100, 30 * 60 * 1000),
+  isAuthenticated,
+  validateSocialLogin(['google', 'github', 'linkedin']),
+  shareResume
 );
 
 pdfRouter.post('/save-exports/:id/:userId',

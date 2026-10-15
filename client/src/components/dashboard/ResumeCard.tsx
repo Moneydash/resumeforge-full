@@ -10,7 +10,7 @@ interface ResumeCardProps extends ResumeHandlers {
   pending: boolean;
 }
 
-export default function ResumeCard({ resume, pending, onEdit, onClone, onRename, onDelete }: ResumeCardProps) {
+export default function ResumeCard({ resume, pending, onEdit, onClone, onRename, onShare, onDelete }: ResumeCardProps) {
   const name = resume.resume_name || 'Untitled';
   const thumb = resume.template ? TEMPLATE_THUMBS[resume.template] : undefined;
 
@@ -47,6 +47,7 @@ export default function ResumeCard({ resume, pending, onEdit, onClone, onRename,
             name={name}
             onClone={() => onClone(resume.id)}
             onRename={() => onRename(resume)}
+            onShare={onShare ? () => onShare(resume) : undefined}
             onDelete={() => onDelete(resume.id)}
           />
         </div>
