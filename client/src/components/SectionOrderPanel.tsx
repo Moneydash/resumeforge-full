@@ -24,8 +24,8 @@ import SectionTitleField from '@/components/SectionTitleField';
 import type { TemplateType } from '@/types';
 import type { ResumeFormData } from '@/types/interface.resume-form-data';
 import {
-  SECTION_LABELS,
   getColumnLabels,
+  getSectionLabel,
   getPinned,
   hasContent,
   isSectionHidden,
@@ -34,6 +34,7 @@ import {
   type SectionId,
   type SectionLayout,
 } from '@/utils/section-layout';
+import { isCustomId } from '@/utils/custom-sections';
 import { hasCustomTitles, hasTitle, type SectionTitles } from '@/utils/section-titles';
 
 interface SectionOrderPanelProps {
@@ -49,6 +50,7 @@ const columnDroppableId = (index: number) => `column-${index}`;
 
 interface RowProps {
   id: SectionId;
+  label: string;
   pinned: boolean;
   empty: boolean;
   hidden: boolean;
@@ -57,12 +59,12 @@ interface RowProps {
   onTitlesChange: (titles: SectionTitles | undefined) => void;
 }
 
-const SortableRow: React.FC<RowProps> = ({ id, pinned, empty, hidden, template, titles, onTitlesChange }) => {
+const SortableRow: React.FC<RowProps> = ({ id, label, pinned, empty, hidden, template, titles, onTitlesChange }) => {
   const { attributes, listeners, setNodeRef, transform, transition, isDragging } = useSortable({ id, disabled: pinned });
   const [renaming, setRenaming] = useState(false);
   // a section with nothing in it cannot be renamed; one that is only switched off still can
   const noContent = empty && !hidden;
-  const renamable = hasTitle(template, id);
+  const renamable = !isCustomId(id) && hasTitle(template, id);
   const renamed = !!titles?.[id];
   return (
     <div
@@ -74,17 +76,17 @@ const SortableRow: React.FC<RowProps> = ({ id, pinned, empty, hidden, template, 
         {pinned ? (
           <Lock size={14} className="text-gray-400" aria-label="Fixed section" />
         ) : (
-          <button type="button" className="cursor-grab touch-none text-gray-500" aria-label={`Move ${SECTION_LABELS[id]}`} {...attributes} {...listeners}>
+          <button type="button" className="cursor-grab touch-none text-gray-500" aria-label={`Move ${label}`} {...attributes} {...listeners}>
             <GripVertical size={16} />
           </button>
         )}
-        <span className="flex-1">{SECTION_LABELS[id]}</span>
+        <span className="flex-1">{label}</span>
         {hidden && <span className="text-xs text-gray-400">hidden</span>}
         {renamable && (
           <button
             type="button"
             disabled={noContent}
-            aria-label={`Rename ${SECTION_LABELS[id]} heading`}
+            aria-label={`Rename ${label} heading`}
             aria-expanded={renaming && !noContent}
             title={noContent ? 'Add content to this section to rename its heading' : 'Rename this heading on the resume'}
             onClick={() => setRenaming((open) => !open)}
@@ -119,6 +121,7 @@ const Column: React.FC<{
             <SortableRow
               key={id}
               id={id}
+              label={getSectionLabel(id, data)}
               pinned={pinned.includes(id)}
               empty={!hasContent(id, data)}
               hidden={isSectionHidden(id, data)}
