@@ -1,0 +1,73 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [master]
+
+permissions:
+  contents: read
+
+# A new push to a PR cancels the older run; a master run is never cancelled.
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  client:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: client
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: client/package-lock.json
+      - run: npm ci
+      # Advisory: the client has existing ESLint errors. Remove continue-on-error once they are fixed.
+      - name: Lint (advisory)
+        run: npm run lint
+        continue-on-error: true
+      - run: npm run build
+
+  server:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: server
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: server/package-lock.json
+      # --ignore-scripts skips the Puppeteer postinstall (Chrome is not needed to compile)
+      - run: npm ci --ignore-scripts
+      - run: npx tsc --noEmit
+      - run: npm run build
+      # No tests are committed yet; do not fail on that.
+      - run: npx vitest run --passWithNoTests
+
+  docker:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: docker/setup-buildx-action@v3
+      - name: Build server image (not pushed)
+        uses: docker/build-push-action@v6
+        with:
+          context: server
+          load: true
+          push: false
+          provenance: false
+          tags: resumeforge-server:ci
+          cache-from: type=gha,scope=server
+          cache-to: type=gha,scope=server,mode=max
+      # Chrome is the part of the image that breaks silently: render a PDF as the image's non-root user.
+      - name: Smoke test (Chrome renders a PDF as non-root)
+        run: |
+          docker run --rm --entrypoint node resumeforge-server:ci -e "const p=require('puppeteer');(async()=>{const b=await p.launch({headless:true,args:['--no-sandbox']});const pg=await b.newPage();await pg.setContent('<h1>hi</h1>');const pdf=await pg.pdf();if(process.getuid()===0||pdf.length<1000){throw new Error('uid='+process.getuid()+' pdf='+pdf.length)}console.log('pdf bytes',pdf.length,'uid',process.getuid());await b.close()})().catch(e=>{console.error(e.message);process.exit(1)})"
