@@ -5,6 +5,7 @@ import HermesCss from "@/styles/templates/greek/hermes.css?inline";
 import { getRenderColumns, getVisibleSocials, getVisibleSummary } from "@/utils/section-layout";
 import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { renderCustomSections } from "@/components/templates/custom-section";
 
 const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
   const t = titlesFor('hermes', data);
@@ -259,6 +260,7 @@ const HermesTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const columns = getRenderColumns('hermes', data);
   const sections: SectionMap = {
+    ...renderCustomSections(data, t, { sectionTag: 'div', section: 'resume-section', title: 'section-title', icon: 'fas fa-star', content: 'section-content', item: 'award-item', itemHeader: 'award-header', itemTitle: 'award-title', itemDate: 'award-date', itemDescription: 'award-description' }),
     experience: workExperienceSection,
     projects: projectsSection,
     references: referencesSection,

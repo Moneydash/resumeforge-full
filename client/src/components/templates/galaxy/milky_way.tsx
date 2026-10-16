@@ -5,6 +5,7 @@ import milkyWayCss from "@/styles/templates/galaxy/milky_way.css?inline";
 import { getRenderColumns } from "@/utils/section-layout";
 import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { renderCustomSections } from "@/components/templates/custom-section";
 
 const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
   const t = titlesFor('milky_way', data);
@@ -162,6 +163,7 @@ const MilkyWayTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const columns = getRenderColumns('milky_way', data);
   const sections: SectionMap = {
+    ...renderCustomSections(data, t, { section: 'mw-section', title: 'mw-section-title', item: 'mw-item', itemExtra: 'mw-card', itemHeader: 'mw-item-header', itemTitle: 'mw-item-title', itemDate: 'mw-item-date', itemDescription: 'mw-item-description' }),
     summary: aboutSection,
     experience: expSection,
     education: educSection,
