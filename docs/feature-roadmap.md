@@ -36,7 +36,7 @@ Resume and cover letter builders, 10 resume + 5 cover letter templates, PDF expo
    Autosave snapshots with restore. Needed because live autosave makes accidental overwrites a real risk.
 
 9. **Custom sections**
-   Let users add their own sections (Volunteering, Publications, Awards) using the existing section reordering.
+   Let users add their own sections (Volunteering, Publications, Awards) using the existing section reordering. Built: user-named sections with dated entries (optional end date, "still ongoing"), shown in all templates and the public share view.
 
 ## Tier 3: Growth and polish
 
