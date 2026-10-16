@@ -1,6 +1,6 @@
 import type { TemplateType } from "@/types";
 import type { ResumeFormData } from "@/types/interface.resume-form-data";
-import { findCustomSection, isCustomId } from "@/utils/custom-sections";
+import { customSectionId, findCustomSection, isCustomId } from "@/utils/custom-sections";
 
 export type BuiltInSectionId =
   | 'summary'
@@ -124,8 +124,12 @@ const LAYOUTS: Record<TemplateType, TemplateLayoutConfig> = {
 const countVisible = (items: Array<{ hidden?: boolean }> | undefined): number =>
   (items ?? []).filter((item) => !item.hidden).length;
 
-export const getDefaultColumns = (template: TemplateType, data: ResumeFormData): SectionId[][] =>
-  LAYOUTS[template].defaultColumns(countVisible(data.experience)).map((column) => [...column]);
+export const getDefaultColumns = (template: TemplateType, data: ResumeFormData): SectionId[][] => {
+  const columns = LAYOUTS[template].defaultColumns(countVisible(data.experience)).map((column) => [...column]);
+  // custom sections have no home of their own: they go at the end of the last column until the user moves them
+  columns[columns.length - 1].push(...(data.customSections ?? []).map((section) => customSectionId(section.id)));
+  return columns;
+};
 
 export const getPinned = (template: TemplateType): SectionId[] => LAYOUTS[template].pinned;
 
@@ -155,7 +159,7 @@ export const getSectionLabel = (id: SectionId, data: Pick<ResumeFormData, 'custo
 
 export const hasContent = (id: SectionId, data: ResumeFormData): boolean => {
   if (isSectionHidden(id, data)) return false;
-  if (isCustomId(id)) return false; // custom sections are counted in the next change
+  if (isCustomId(id)) return countVisible(findCustomSection(data, id)?.entries) >= 1;
   switch (id) {
     case 'summary':
       return !!data.summary;
@@ -176,7 +180,7 @@ export const hasContent = (id: SectionId, data: ResumeFormData): boolean => {
 };
 
 const isSectionId = (value: unknown): value is SectionId =>
-  typeof value === 'string' && (ALL_SECTION_IDS as string[]).includes(value);
+  isCustomId(value) || (typeof value === 'string' && (ALL_SECTION_IDS as string[]).includes(value));
 
 /** Spread free sections (in `ordered` order) over the template's columns. */
 const distributeFree = (
