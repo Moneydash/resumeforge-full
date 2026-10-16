@@ -40,7 +40,7 @@
     "@tiptap/extension-document": "^2.14.0",
     "@tiptap/extension-heading": "^2.14.0",
     "@tiptap/extension-highlight": "^2.14.0",
-    "@tiptap/extension-italic": "^2.14.0",
+    "@tiptap/extension-italic": "^3.31.4",
     "@tiptap/extension-list-item": "^2.14.0",
     "@tiptap/extension-ordered-list": "^2.14.0",
     "@tiptap/extension-paragraph": "^2.14.0",
