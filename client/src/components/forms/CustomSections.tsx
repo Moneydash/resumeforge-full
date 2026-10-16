@@ -128,6 +128,8 @@ const EntryCard: React.FC<EntryCardProps> = ({
           {entryErrors?.title && <p className={errorClasses}>{entryErrors.title.message}</p>}
         </div>
 
+        <Toggle checked={!!entry?.hasEndDate} onChange={setHasEndDate} label="Has an end date" />
+
         <div className="grid grid-cols-1 @md:grid-cols-2 gap-5">
           <div>
             <label className={labelClasses}>Start Date *</label>
@@ -159,8 +161,7 @@ const EntryCard: React.FC<EntryCardProps> = ({
             )}
           </div>
 
-          <div className="space-y-2">
-            <Toggle checked={!!entry?.hasEndDate} onChange={setHasEndDate} label="Has an end date" />
+          <div>
             {entry?.hasEndDate && (
               <>
                 {!entry?.stillOngoing && (
