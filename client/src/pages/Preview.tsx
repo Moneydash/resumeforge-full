@@ -26,6 +26,7 @@ import {
   Trophy,
   Award,
   Users,
+  ListPlus,
   FileIcon,
   Loader2,
   GripVertical
@@ -142,6 +143,7 @@ const Preview: React.FC = () => {
   const awardsRef = useRef<HTMLDivElement>(null!);
   const certificationsRef = useRef<HTMLDivElement>(null!);
   const referencesRef = useRef<HTMLDivElement>(null!);
+  const customSectionsRef = useRef<HTMLDivElement>(null!);
 
   // Create a ref for the form container
   const formContainerRef = useRef<HTMLDivElement>(null);
@@ -164,6 +166,7 @@ const Preview: React.FC = () => {
       { icon: Trophy, label: 'Awards', ref: awardsRef },
       { icon: Award, label: 'Certifications', ref: certificationsRef },
       { icon: Users, label: 'References', ref: referencesRef },
+      { icon: ListPlus, label: 'Custom Sections', ref: customSectionsRef },
     ];
 
   const startResize = (e: React.MouseEvent | React.TouchEvent) => {
@@ -597,6 +600,7 @@ const Preview: React.FC = () => {
                   awardsRef,
                   certificationsRef,
                   referencesRef,
+                  customSectionsRef,
                 }}
               />
             </div>

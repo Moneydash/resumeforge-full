@@ -51,6 +51,7 @@ interface ResumeFormProps {
     awardsRef: React.RefObject<HTMLDivElement>;
     certificationsRef: React.RefObject<HTMLDivElement>;
     referencesRef: React.RefObject<HTMLDivElement>;
+    customSectionsRef: React.RefObject<HTMLDivElement>;
   };
 }
 
@@ -519,22 +520,24 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
       </div>
 
       {/* Custom sections */}
-      <CustomSectionsComponent
-        sections={customSectionFields}
-        controlsFor={controlsFor}
-        appendSection={appendCustomSection}
-        removeSection={handleRemoveCustomSection}
-        control={control}
-        register={register}
-        errors={errors}
-        setValue={setValue}
-        trigger={trigger}
-        cardClasses={cardClasses}
-        inputClasses={inputClasses}
-        labelClasses={labelClasses}
-        addButtonClasses={addButtonClasses}
-        removeButtonClasses={removeButtonClasses}
-      />
+      <div ref={sectionRefs?.customSectionsRef}>
+        <CustomSectionsComponent
+          sections={customSectionFields}
+          controlsFor={controlsFor}
+          appendSection={appendCustomSection}
+          removeSection={handleRemoveCustomSection}
+          control={control}
+          register={register}
+          errors={errors}
+          setValue={setValue}
+          trigger={trigger}
+          cardClasses={cardClasses}
+          inputClasses={inputClasses}
+          labelClasses={labelClasses}
+          addButtonClasses={addButtonClasses}
+          removeButtonClasses={removeButtonClasses}
+        />
+      </div>
 
       {/* Submit Button (hidden in live edit mode) */}
       {!liveEdit && <div className="pt-6">
