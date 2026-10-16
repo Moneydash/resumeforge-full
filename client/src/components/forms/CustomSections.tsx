@@ -146,21 +146,23 @@ const EntryCard: React.FC<EntryCardProps> = ({
               )}
             />
             {entryErrors?.startDate && <p className={errorClasses}>{entryErrors.startDate.message}</p>}
+            {entry?.hasEndDate && (
+              <label className="mt-2 flex items-center gap-2 text-sm text-[#5c5b56] dark:text-[#a3a29c] cursor-pointer">
+                <input
+                  type="checkbox"
+                  checked={!!entry?.stillOngoing}
+                  onChange={(e) => setStillOngoing(e.target.checked)}
+                  className="size-4 accent-[#111110] dark:accent-[#f4f4f2]"
+                />
+                Still ongoing
+              </label>
+            )}
           </div>
 
           <div className="space-y-2">
             <Toggle checked={!!entry?.hasEndDate} onChange={setHasEndDate} label="Has an end date" />
             {entry?.hasEndDate && (
               <>
-                <label className="flex items-center gap-2 text-sm text-[#5c5b56] dark:text-[#a3a29c] cursor-pointer">
-                  <input
-                    type="checkbox"
-                    checked={!!entry?.stillOngoing}
-                    onChange={(e) => setStillOngoing(e.target.checked)}
-                    className="size-4 accent-[#111110] dark:accent-[#f4f4f2]"
-                  />
-                  Still ongoing
-                </label>
                 {!entry?.stillOngoing && (
                   <div>
                     <label className={labelClasses}>End Date *</label>
