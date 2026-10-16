@@ -1,12 +1,13 @@
 import type { TemplateType } from "@/types";
 import type { ResumeFormData } from "@/types/interface.resume-form-data";
 import type { SectionId } from "@/utils/section-layout";
+import { findCustomSection, isCustomId } from "@/utils/custom-sections";
 
 export type SectionTitles = Partial<Record<SectionId, string>>;
 
 export const MAX_TITLE_LENGTH = 40;
 
-type TitleSource = Pick<ResumeFormData, 'sectionTitles'>;
+type TitleSource = Pick<ResumeFormData, 'sectionTitles' | 'customSections'>;
 
 const classic: SectionTitles = {
   summary: 'Summary',
@@ -92,7 +93,8 @@ export const CUSTOM_TITLE_CLASS = 'custom-title';
 export const CUSTOM_TITLE_CSS = `.${CUSTOM_TITLE_CLASS}.${CUSTOM_TITLE_CLASS}{text-transform:none !important;}`;
 
 /** Empty string when the saved name is missing or blank, so callers can fall back to the default. */
-const customTitle = (id: SectionId, data: TitleSource): string => data.sectionTitles?.[id]?.trim() ?? '';
+const customTitle = (id: SectionId, data: TitleSource): string =>
+  (isCustomId(id) ? findCustomSection(data, id)?.title : data.sectionTitles?.[id])?.trim() ?? '';
 
 export const getDefaultTitle = (template: TemplateType, id: SectionId): string | undefined =>
   TEMPLATE_TITLES[template][id];
@@ -103,7 +105,8 @@ export const hasTitle = (template: TemplateType, id: SectionId): boolean =>
 export const isCustomTitle = (id: SectionId, data: TitleSource): boolean => customTitle(id, data) !== '';
 
 export const hasCustomTitles = (data: TitleSource): boolean =>
-  (Object.keys(data.sectionTitles ?? {}) as SectionId[]).some((id) => isCustomTitle(id, data));
+  (Object.keys(data.sectionTitles ?? {}) as SectionId[]).some((id) => isCustomTitle(id, data))
+  || (data.customSections ?? []).some((section) => section.title.trim() !== '');
 
 /** The user's name for the section if they set one (it follows them across templates), else the template's own. */
 export const getSectionTitle = (template: TemplateType, id: SectionId, data: TitleSource): string =>

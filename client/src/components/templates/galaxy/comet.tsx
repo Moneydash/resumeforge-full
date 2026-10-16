@@ -4,6 +4,7 @@ import CometCss from "@/styles/templates/galaxy/comet.css?inline";
 import { getRenderColumns } from "@/utils/section-layout";
 import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { renderCustomSections } from "@/components/templates/custom-section";
 
 const CometTemplate: React.FC<TemplateProps> = ({ data }) => {
   const t = titlesFor('comet', data);
@@ -54,6 +55,7 @@ const CometTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const columns = getRenderColumns('comet', data);
   const sections: SectionMap = {
+    ...renderCustomSections(data, t, { section: 'comet-section', title: 'comet-section-title', item: 'comet-item', itemHeader: 'comet-item-header', itemTitle: 'comet-item-title', itemDate: 'comet-item-tech', itemDescription: 'comet-item-description' }),
     summary: aboutSection,
     skills: skillSection,
     projects: projSection,

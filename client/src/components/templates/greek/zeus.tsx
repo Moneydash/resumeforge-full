@@ -5,6 +5,7 @@ import ZeusCss from "@/styles/templates/greek/zeus.css?inline";
 import { getRenderColumns, getVisibleSocials } from "@/utils/section-layout";
 import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { renderCustomSections } from "@/components/templates/custom-section";
 
 const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
   const t = titlesFor('zeus', data);
@@ -165,6 +166,7 @@ const ZeusTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const columns = getRenderColumns('zeus', data);
   const sections: SectionMap = {
+    ...renderCustomSections(data, t, { section: 'greek-section', title: 'greek-section-title', item: 'greek-item', itemHeader: 'greek-item-header', itemTitle: 'greek-item-title', itemDate: 'greek-item-date', itemDescription: 'greek-item-description' }),
     summary: aboutSection,
     experience: expSection,
     education: educSection,

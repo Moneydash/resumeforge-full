@@ -1,6 +1,7 @@
 import type { SectionId, SectionLayout } from "@/utils/section-layout";
 import type { SavedFont } from "@/utils/fonts";
 import type { ColorTheme } from "@/utils/color-theme";
+import type { CustomSection } from "@/utils/custom-sections";
 
 export interface ResumeFormData {
   personal: {
@@ -69,6 +70,8 @@ export interface ResumeFormData {
     phone: string;
     hidden?: boolean;
   }>;
+  /** User-named sections; each is laid out and hidden by its `custom:<id>` section id. */
+  customSections?: CustomSection[];
   /** Sections switched off at the parent level; their items keep their own `hidden` state. */
   hiddenSections?: SectionId[];
   /** Section names the user typed; a section not listed shows its template's default heading. */

@@ -5,6 +5,7 @@ import andromedaCSS from "@/styles/templates/galaxy/andromeda.css?inline";
 import { getRenderColumns, getVisibleSocials } from "@/utils/section-layout";
 import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { renderCustomSections } from "@/components/templates/custom-section";
 
 const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
   const t = titlesFor('andromeda', data);
@@ -188,6 +189,7 @@ const AndromedaTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const columns = getRenderColumns('andromeda', data);
   const sections: SectionMap = {
+    ...renderCustomSections(data, t, { section: 'section', title: 'section-title', content: 'section-content', item: 'item', itemHeader: 'item-header', itemTitle: 'item-title', itemDate: 'item-date', itemDescription: 'item-description' }),
     summary: (
       <section className="section">
         <h3 className={t.cls("section-title", "summary")}>{t.text("summary")}</h3>

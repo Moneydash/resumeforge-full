@@ -5,6 +5,7 @@ import cigarCss from "@/styles/templates/greek/hera.css?inline";
 import { getRenderColumns, getVisibleSocials } from "@/utils/section-layout";
 import { titlesFor } from "@/utils/section-titles";
 import { renderSections, type SectionMap } from "@/components/templates/render-sections";
+import { renderCustomSections } from "@/components/templates/custom-section";
 
 const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
   const t = titlesFor('hera', data);
@@ -157,6 +158,7 @@ const HeraTemplate: React.FC<TemplateProps> = ({ data }) => {
 
   const columns = getRenderColumns('hera', data);
   const sections: SectionMap = {
+    ...renderCustomSections(data, t, { section: 'classic-section', title: 'classic-section-title', item: 'classic-item', itemHeader: 'classic-item-header', itemTitle: 'classic-item-title', itemDate: 'classic-item-date', itemDescription: 'classic-item-description' }),
     summary: aboutSection,
     experience: expSection,
     education: educSection,

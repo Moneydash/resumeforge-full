@@ -1,4 +1,5 @@
 import { useSyncExternalStore } from "react";
+import { isCustomId } from "@/utils/custom-sections";
 import { SECTION_LABELS, type SectionId } from "@/utils/section-layout";
 
 const STORAGE_KEY = 'resumeCollapsedSections';
@@ -10,7 +11,7 @@ const read = (storage: StorageLike | undefined): SectionId[] => {
   try {
     const parsed: unknown = JSON.parse(storage?.getItem(STORAGE_KEY) ?? '[]');
     if (!Array.isArray(parsed)) return [];
-    return parsed.filter((id): id is SectionId => typeof id === 'string' && VALID_IDS.includes(id));
+    return parsed.filter((id): id is SectionId => typeof id === 'string' && (isCustomId(id) || VALID_IDS.includes(id)));
   } catch {
     return [];
   }

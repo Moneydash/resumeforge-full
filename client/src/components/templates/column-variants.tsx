@@ -4,6 +4,8 @@ import type { ResumeFormData } from "@/types/interface.resume-form-data";
 import type { SectionId } from "@/utils/section-layout";
 import type { TemplateTitles } from "@/utils/section-titles";
 import type { SectionMap } from "@/components/templates/render-sections";
+import { customSectionId, formatEntryDate } from "@/utils/custom-sections";
+import { visibleEntries } from "@/components/templates/custom-section";
 
 /**
  * artemis, athena and apollo style their sidebar and main columns with two separate
@@ -48,8 +50,32 @@ const SidebarItem: React.FC<{ name?: string; org?: string; date?: string }> = ({
   </div>
 );
 
+/** Custom sections have no native column, so each column gets its own version. */
+const buildCustomVariants = (data: ResumeFormData, t: TemplateTitles, column: 'main' | 'sidebar'): SectionMap => {
+  const map: SectionMap = {};
+  for (const section of data.customSections ?? []) {
+    const id = customSectionId(section.id);
+    const entries = visibleEntries(section);
+    map[id] = column === 'main' ? (
+      <MainSection id={id} t={t}>
+        {entries.map((entry, i) => (
+          <MainItem key={i} title={entry.title} date={formatEntryDate(entry)} description={entry.description} />
+        ))}
+      </MainSection>
+    ) : (
+      <SidebarSection id={id} t={t}>
+        {entries.map((entry, i) => (
+          <SidebarItem key={i} name={entry.title} org={entry.description} date={formatEntryDate(entry)} />
+        ))}
+      </SidebarSection>
+    );
+  }
+  return map;
+};
+
 /** Main-column (dark on white) versions of the sections that are native to the sidebar. */
 export const buildMainVariants = (data: ResumeFormData, t: TemplateTitles): SectionMap => ({
+  ...buildCustomVariants(data, t, 'main'),
   education: (
     <MainSection id="education" t={t}>
       {data.education?.filter((edu) => !edu.hidden).map((edu, i) => (
@@ -99,6 +125,7 @@ export const buildMainVariants = (data: ResumeFormData, t: TemplateTitles): Sect
 
 /** Sidebar (white on colour) versions of the sections that are native to the main column. */
 export const buildSidebarVariants = (data: ResumeFormData, t: TemplateTitles): SectionMap => ({
+  ...buildCustomVariants(data, t, 'sidebar'),
   references: (
     <SidebarSection id="references" t={t}>
       {data.references?.filter((ref) => !ref.hidden).map((ref, i) => (

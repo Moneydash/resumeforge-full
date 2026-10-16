@@ -17,6 +17,8 @@ import ReferencesFieldsComponent from './forms/References';
 import PersonalFieldsComponent from './forms/Personal';
 import { SectionBody, SectionHeader, type SectionControls } from './forms/SectionHeader';
 import ChipInput from './forms/ChipInput';
+import CustomSectionsComponent from './forms/CustomSections';
+import { customSectionId } from '@/utils/custom-sections';
 import { SECTION_LABELS, toggleHiddenSection, type SectionId } from '@/utils/section-layout';
 import { collapseStore, useCollapsedSections } from '@/utils/section-collapse';
 import {
@@ -49,6 +51,7 @@ interface ResumeFormProps {
     awardsRef: React.RefObject<HTMLDivElement>;
     certificationsRef: React.RefObject<HTMLDivElement>;
     referencesRef: React.RefObject<HTMLDivElement>;
+    customSectionsRef: React.RefObject<HTMLDivElement>;
   };
 }
 
@@ -79,7 +82,8 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
       experience: [],
       education: [],
       projects: [],
-      references: []
+      references: [],
+      customSections: []
     }
   });
 
@@ -124,6 +128,13 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
     name: 'references'
   });
 
+  // keyName: a custom section's own `id` is part of its data, so RHF's row key must not overwrite it
+  const { fields: customSectionFields, append: appendCustomSection, remove: removeCustomSection } = useFieldArray({
+    control,
+    name: 'customSections',
+    keyName: 'fieldKey',
+  });
+
   // Parent toggles (saved with the resume) and fold state (view-only, remembered in localStorage)
   const hiddenSections = watch('hiddenSections') ?? [];
   const collapsedSections = useCollapsedSections();
@@ -137,7 +148,16 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
 
   // A collapsed section would hide its own validation errors, so open the ones that have any
   const handleInvalid = (formErrors: FieldErrors<ResumeFormData>) => {
-    collapseStore.expandMany(Object.keys(formErrors).filter((key): key is SectionId => key in SECTION_LABELS));
+    const withErrors = Object.keys(formErrors).filter((key): key is SectionId => key in SECTION_LABELS);
+    const customWithErrors = (getValues('customSections') ?? []).flatMap((section, i) => (formErrors.customSections?.[i] ? [customSectionId(section.id)] : []));
+    collapseStore.expandMany([...withErrors, ...customWithErrors]);
+  };
+
+  // Deleting a custom section also drops its parent toggle so a stale id is not saved
+  const handleRemoveCustomSection = (index: number) => {
+    const id = customSectionId(customSectionFields[index].id);
+    removeCustomSection(index);
+    setValue('hiddenSections', (getValues('hiddenSections') ?? []).filter((hiddenId) => hiddenId !== id), { shouldDirty: true });
   };
 
   // Load saved data from localStorage when component mounts
@@ -168,6 +188,7 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
           education: [],
           projects: [],
           references: [],
+          customSections: [],
           ...parsedData
         };
 
@@ -495,6 +516,26 @@ const ResumeForm: React.FC<ResumeFormProps> = ({ onSubmit, template, loading = f
           setValue={setValue}
           trigger={trigger}
           control={control}
+        />
+      </div>
+
+      {/* Custom sections */}
+      <div ref={sectionRefs?.customSectionsRef}>
+        <CustomSectionsComponent
+          sections={customSectionFields}
+          controlsFor={controlsFor}
+          appendSection={appendCustomSection}
+          removeSection={handleRemoveCustomSection}
+          control={control}
+          register={register}
+          errors={errors}
+          setValue={setValue}
+          trigger={trigger}
+          cardClasses={cardClasses}
+          inputClasses={inputClasses}
+          labelClasses={labelClasses}
+          addButtonClasses={addButtonClasses}
+          removeButtonClasses={removeButtonClasses}
         />
       </div>
 

@@ -1,7 +1,8 @@
 import type { TemplateType } from "@/types";
 import type { ResumeFormData } from "@/types/interface.resume-form-data";
+import { customSectionId, findCustomSection, isCustomId } from "@/utils/custom-sections";
 
-export type SectionId =
+export type BuiltInSectionId =
   | 'summary'
   | 'socials'
   | 'experience'
@@ -14,7 +15,11 @@ export type SectionId =
   | 'languages'
   | 'interests';
 
-export const SECTION_LABELS: Record<SectionId, string> = {
+export type CustomId = `custom:${string}`;
+
+export type SectionId = BuiltInSectionId | CustomId;
+
+export const SECTION_LABELS: Record<BuiltInSectionId, string> = {
   summary: 'Summary',
   socials: 'Social Links',
   experience: 'Experience',
@@ -28,7 +33,7 @@ export const SECTION_LABELS: Record<SectionId, string> = {
   interests: 'Interests',
 };
 
-const ALL_SECTION_IDS = Object.keys(SECTION_LABELS) as SectionId[];
+const ALL_SECTION_IDS = Object.keys(SECTION_LABELS) as BuiltInSectionId[];
 
 /** Saved per resume inside resume_data. `columns` are in visual left-to-right order. */
 export interface SectionLayout {
@@ -119,8 +124,12 @@ const LAYOUTS: Record<TemplateType, TemplateLayoutConfig> = {
 const countVisible = (items: Array<{ hidden?: boolean }> | undefined): number =>
   (items ?? []).filter((item) => !item.hidden).length;
 
-export const getDefaultColumns = (template: TemplateType, data: ResumeFormData): SectionId[][] =>
-  LAYOUTS[template].defaultColumns(countVisible(data.experience)).map((column) => [...column]);
+export const getDefaultColumns = (template: TemplateType, data: ResumeFormData): SectionId[][] => {
+  const columns = LAYOUTS[template].defaultColumns(countVisible(data.experience)).map((column) => [...column]);
+  // custom sections have no home of their own: they go at the end of the last column until the user moves them
+  columns[columns.length - 1].push(...(data.customSections ?? []).map((section) => customSectionId(section.id)));
+  return columns;
+};
 
 export const getPinned = (template: TemplateType): SectionId[] => LAYOUTS[template].pinned;
 
@@ -144,8 +153,13 @@ export const getVisibleSocials = (data: ResumeFormData): ResumeFormData['socials
 export const getVisibleSummary = (data: ResumeFormData): string | undefined =>
   isSectionHidden('summary', data) ? undefined : data.summary;
 
+/** Name shown for a section in the editor: the built-in label, or the title the user typed for a custom one. */
+export const getSectionLabel = (id: SectionId, data: Pick<ResumeFormData, 'customSections'>): string =>
+  isCustomId(id) ? findCustomSection(data, id)?.title.trim() || 'Untitled section' : SECTION_LABELS[id];
+
 export const hasContent = (id: SectionId, data: ResumeFormData): boolean => {
   if (isSectionHidden(id, data)) return false;
+  if (isCustomId(id)) return countVisible(findCustomSection(data, id)?.entries) >= 1;
   switch (id) {
     case 'summary':
       return !!data.summary;
@@ -166,7 +180,7 @@ export const hasContent = (id: SectionId, data: ResumeFormData): boolean => {
 };
 
 const isSectionId = (value: unknown): value is SectionId =>
-  typeof value === 'string' && (ALL_SECTION_IDS as string[]).includes(value);
+  isCustomId(value) || (typeof value === 'string' && (ALL_SECTION_IDS as string[]).includes(value));
 
 /** Spread free sections (in `ordered` order) over the template's columns. */
 const distributeFree = (

@@ -2,11 +2,11 @@ import React, { useEffect, useState } from 'react';
 import { RotateCcw } from 'lucide-react';
 import { Input } from '@/components/ui/input';
 import type { TemplateType } from '@/types';
-import { SECTION_LABELS, type SectionId } from '@/utils/section-layout';
+import { SECTION_LABELS, type BuiltInSectionId } from '@/utils/section-layout';
 import { MAX_TITLE_LENGTH, getDefaultTitle, setSectionTitle, type SectionTitles } from '@/utils/section-titles';
 
 interface SectionTitleFieldProps {
-  id: SectionId;
+  id: BuiltInSectionId;
   template: TemplateType;
   titles: SectionTitles | undefined;
   onChange: (next: SectionTitles | undefined) => void;
