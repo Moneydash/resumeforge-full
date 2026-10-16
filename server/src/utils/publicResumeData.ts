@@ -24,5 +24,14 @@ export function stripHiddenContent(resumeData: string | null | undefined): strin
     }
   }
 
+  // custom sections nest their entries one level down and are switched off as `custom:<id>`
+  if (Array.isArray(parsed.customSections)) {
+    parsed.customSections = (parsed.customSections as Array<{ id?: unknown; entries?: unknown }>)
+      .filter((section) => !(section && hiddenSections.includes(`custom:${section.id}`)))
+      .map((section) => (section && Array.isArray(section.entries)
+        ? { ...section, entries: section.entries.filter((item) => !(item && typeof item === 'object' && (item as { hidden?: unknown }).hidden === true)) }
+        : section));
+  }
+
   return JSON.stringify(parsed);
 }
